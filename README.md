@@ -34,7 +34,6 @@ Things we changed in A6
 - cleaned up map.h to remove memory leaks (was in A2) - kind of
 - future iprovements, use map instead of array
 
-Reduce the number of switch statements all over dataframe
-
----
+Reduce the number of switch statements all over dataframe (esp. in helpers)
+Improvements to networking layer (connect to >2 other clients at once)
 
