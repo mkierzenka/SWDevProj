@@ -1,0 +1,30 @@
+build:
+
+	g++ -std=c++11 -g server.cpp -o server
+	g++ -std=c++11 -g client.cpp -o client
+
+run:
+
+	./server -ip "127.0.0.1" &
+	./client -ip "127.0.0.2" &
+	./client -ip "127.0.0.3"
+
+runServer:
+
+	./server -ip "127.0.0.1"
+
+runClient:
+
+	./client -ip "127.0.0.2"
+
+runClientTwo:
+	
+	./client -ip "127.0.0.3"
+
+runClientThree:
+
+	./client -ip "127.0.0.4"
+
+.SILENT: clean
+clean:
+	rm -f server client
