@@ -36,6 +36,10 @@ add join_delete to dataframe
 we updated DF code in A5, add those changes into A4P1 / A4P2
 (also maybe changed in A6, too)
 
+Clean up client and server, try to get more than two clients to connect successfully
+
+Check serializer for correctness
+
 Things we changed in A6
 - cleaned up map.h to remove memory leaks (was in A2) - kind of
 - future iprovements, use map instead of array

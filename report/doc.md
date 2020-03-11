@@ -77,6 +77,7 @@ Methods:
 
 *Note that the cache methods defined here will delegate to the Cache object, which work on the Cache's map object*
 
+
 * Cache: class that represents a cache within a distributed array
 
 Fields:
@@ -94,6 +95,7 @@ Methods:
 replace an element
 
 * clear() - remove all entries from the map
+
 
 *Application: this is the highest level of the program. The Application is what the user interacts with, in which he or she defines operations to perform over a certain set of data
 Fields:
