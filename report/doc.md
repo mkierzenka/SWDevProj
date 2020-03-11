@@ -112,7 +112,95 @@ application running (ex.producer to initialize and create the data, summarizer t
 
 ##Use cases: examples of uses of the system. This could be in the form of code like the one above. It is okay to leave this section mostly empty if there is nothing to say. Maybe just an example of creating a dataframe would be enough.
 
+The following is an example of a use case of the eau2 system. The lines of pseudocode are an outline of what each node will run.
+
+Application:
+
+ dataA = Key("dataA", 0);
+ dataB = Key("dataB", 1);
+ firstDifPos = Key("firstDifPos", 2);
+ dataAFirstDif = Key("dataAFirstDif", 2);
+ dataBFirstDif = Key("dataBFirstDif", 2);
+ same = Key("areSame", 2);
+ sameSize = Key("sameSize", 2);
+
+ * ProducerA (node_num = 0):
+	Sorer s = new Sorer();
+	DataFrame\* df = s.read("fileA");
+	// store df in distributed key-value store under key dataA
+	return;
+
+ * ProducerB (node_num = 1):
+	Sorer s = new Sorer();
+	DataFrame\* df = s.read("fileB");
+	// store df in distributed key-value store under key dataA
+	return;
+
+ * Comparer (node_num = 2):
+	DataFrame\* dfA = waitAndGet(dataA);
+	DataFrame\* dfB = waitAndGet(dataB);
+	int areSame = 0;
+	if (size of dfA != size of dfB) {
+		DataFrame::fromScalar(&sameSize, &kv, 0);
+		DataFrame::fromScalar(&same, &kv, 0);
+		return;
+	}
+	DataFrame::fromScalar(&sameSize, &kv, 1);
+	// loop through elements
+		if (dfA->get(i, j) not equal dfB->get(i, j)) {
+			int\* pos = new int\[2\];
+			pos\[0\] = i;
+			pos\[1\] = j;
+			DataFrame::fromArray(&firstDifPos, &kv, 2, pos);
+			DataFrame::fromScalar(&dataAFirstDif, &kv, dfA->get(i, j)); // generalize for any type
+			DataFrame::fromScalar(&dataBFirstDif, &kv, dfB->get(i, j)); // generalize for any type
+		}
+	DataFrame::fromScalar(&same, &kv, 1);
+	return;
+
+ * Reporter (node_num = 3):
+	DataFrame\* sameDF = waitAndGet(same);
+	if (sameDF->get(0, 0)) {
+		pln("Same Data! :)");
+		return;
+	}
+	pln("Different Data.");
+	DataFrame\* sizeDF = waitAndGet(sameSize);
+	if (sizeDF->get(0, 0)) {
+		pln("Non-Equal Size");
+		return;
+	}
+	DataFrame\* posDF = waitAndGet(firstDifPos);
+	DataFrame\* aDif = waitAndGet(dataAFirstDif);
+	DataFrame\* bDif = waitAndGet(dataBFirstDif);
+	pln("Different Data!");
+	p("Example: ");
+	p("dataA\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ").p(aDif->get(0));
+	p(" , dataB\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ").p(bDif->get(0));
+	pln("");
+	return;
+
+
 ##Open questions: where you list things that you are not sure of and would like the answer to.
+
+In HW6, we implemented a Server and Clients. It would make sense for each Key-Value Store to have the code from Client, but what about the code for Server?
+Having a single Server node makes it easier to register new Clients (add new nodes to the system). We are not sure on the details of implementing this,
+should the Server be another node of the network with it's own Key-Value store?
+Seems like having a dedicated Server which only handles registering new Clients would be cleaner, but that doesn't seem to fit with
+the provided example code. Any advice?
+
+
+Are we correct in our thinking that the DataFrame largely remains unchanged from how we originally implemented it,
+and is the only place actual (deserialized) data is grouped?
+(ie. workflow is: make DF of interesting data -> serialize and store in eau2 under some Key)
+
+Any guidance on the cache in the DistributedArray? Seems more usable if it's decided by the Application, but alternative
+is that it is an implementation detail of DistributedArray.
+
+Should each Client (KV store) always be connected to every other Client? Are we expecting 100K Client systems?
+
+
+
 
 ##Status: where you describe what has been done and give an estimate of the work that remains.
 
