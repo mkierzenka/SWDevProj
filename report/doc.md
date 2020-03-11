@@ -1,4 +1,4 @@
-##Introduction: where we give a high-level description of the eau2 system.
+## Introduction: where we give a high-level description of the eau2 system.
 
 The eau2 system is a framework to allow a wide variety of applications to
 operate on large datasets distributed across nodes in a network. Each node
@@ -8,7 +8,7 @@ be scaled for different use-cases (supports an arbitrary number of nodes).
 Most cases will have a different responsibility for each node, for example
 one to produce data and another to consume it.
 
-##Architecture: where we describe the various part of eau2 at a high-level.
+## Architecture: where we describe the various part of eau2 at a high-level.
 
 The eau2 system is made up of three layers of abstraction.
 
@@ -27,7 +27,7 @@ The next layer will include abstractions for holding the data from the key-value
 
 The last and highest level is the application layer. In the application, the user will be able to specify what they want to do. Each node will run its own application, with responsibilities distributed across each node. The application can get data from and put data into the key-value store. Distributed arrays can be used to track, organize, and work with specific data across the eau2 system.
 
-##Implementation: where we describe how the system is built, this can include a description of the classes and their API, but only the class you deem relevant and worth describing.(For example: do not describe the utility classes.)
+## Implementation: where we describe how the system is built, this can include a description of the classes and their API, but only the class you deem relevant and worth describing.(For example: do not describe the utility classes.)
 
 Also, add the serializer class somewhere below
 
@@ -110,7 +110,7 @@ application running (ex.producer to initialize and create the data, summarizer t
  some operation on the data). Distributed arrays and dataframes and can be initialized and
   used for these helpers, depending on the purpose of the application
 
-##Use cases: examples of uses of the system. This could be in the form of code like the one above. It is okay to leave this section mostly empty if there is nothing to say. Maybe just an example of creating a dataframe would be enough.
+## Use cases: examples of uses of the system. This could be in the form of code like the one above. It is okay to leave this section mostly empty if there is nothing to say. Maybe just an example of creating a dataframe would be enough.
 
 The following is an example of a use case of the eau2 system. The lines of pseudocode are an outline of what each node will run.
 
@@ -181,7 +181,7 @@ Application:
 	return;
 
 
-##Open questions: where you list things that you are not sure of and would like the answer to.
+## Open questions: where you list things that you are not sure of and would like the answer to.
 
 In HW6, we implemented a Server and Clients. It would make sense for each Key-Value Store to have the code from Client, but what about the code for Server?
 Having a single Server node makes it easier to register new Clients (add new nodes to the system). We are not sure on the details of implementing this,
@@ -202,5 +202,5 @@ Should each Client (KV store) always be connected to every other Client? Are we 
 
 
 
-##Status: where you describe what has been done and give an estimate of the work that remains.
+## Status: where you describe what has been done and give an estimate of the work that remains.
 
