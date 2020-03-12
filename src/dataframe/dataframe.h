@@ -3,10 +3,6 @@
 #include "../utils/object.h"
 #include "../utils/string.h"
 
-#include "intcolumn.h"
-#include "stringcolumn.h"
-#include "boolcolumn.h"
-#include "floatcolumn.h"
 #include "columnarray.h"
 
 #include "schema.h"
@@ -45,7 +41,7 @@ public:
     columns_ = new ColumnArray();
     for (int i = 0; i < numCols; i++)
     {
-      addNewColumn_(schema_.col_type(i));
+	  columns_->addNew(schema_.col_type(i));
     }
   }
 
@@ -61,7 +57,7 @@ public:
     return schema_;
   }
 
-  /** Adds a column this dataframe, updates the schema, the new column
+  /** Adds the column this dataframe, updates the schema, the new column
     * is external, and appears as the last column of the dataframe, the
     * name is optional and external. A nullptr colum is undefined. */
   void add_column(Column *col, String *name)
@@ -78,10 +74,9 @@ public:
     }
 
     //get type of column
-    char type = getColType_(col);
-
+	columns_->add(col); // Must add to end of column array
+    char type = columns_->getType(columns_->length() - 1);
     schema_.add_column(type, name);
-    columns_->add(col);
   }
 
   /** Return the value at the given column and row. Accessing rows or
@@ -314,30 +309,6 @@ public:
     }
   }
 
-  /** Return proper column for type */
-  void addNewColumn_(char type)
-  {
-    switch (type)
-    {
-    case 'I':
-      columns_->add(new IntColumn());
-      break;
-    case 'B':
-      columns_->add(new BoolColumn());
-      break;
-    case 'F':
-      columns_->add(new FloatColumn());
-      break;
-    case 'S':
-      columns_->add(new StringColumn());
-      break;
-    default:
-      fprintf(stderr, "Invalid column type %c", type);
-      exit(2);
-    }
-    // We get the columns from the schema, so no need to add cols to it here
-  }
-
   /** Set the field from the row given the type */
   void setColumnValByType_(size_t colIdx, size_t rowIdx, Row &row)
   {
@@ -452,30 +423,4 @@ public:
     }
   }
 
-  char getColType_(Column *col)
-  {
-    IntColumn *ic = col->as_int();
-    FloatColumn *fc = col->as_float();
-    BoolColumn *bc = col->as_bool();
-    StringColumn *sc = col->as_string();
-    if (ic != nullptr)
-    {
-      return ic->get_type();
-    }
-    else if (fc != nullptr)
-    {
-      return fc->get_type();
-    }
-    else if (bc != nullptr)
-    {
-      return bc->get_type();
-    }
-    else if (sc != nullptr)
-    {
-      return sc->get_type();
-    }
-
-    //doesn't match any types, so delegate to Column
-    return col->get_type();
-  }
 };

@@ -50,7 +50,7 @@ public:
 		return hash;
 	}
 
-	// get the column with the index in the array
+	// get the specified column (does not make a copy!)
 	Column *get(size_t index)
 	{
 		// check for out-of-bounds
@@ -62,8 +62,39 @@ public:
 
 		return colList_[index];
 	}
+	
+	/**
+	 * Get the type of the specified column. Exits if invalid index
+	 */
+	char getType(size_t index) {
+		Column* col = get(index); // <-- will error if invalid index
+		IntColumn *ic = col->as_int();
+		FloatColumn *fc = col->as_float();
+		BoolColumn *bc = col->as_bool();
+		StringColumn *sc = col->as_string();
+		if (ic != nullptr)
+		{
+		  return ic->get_type();
+		}
+		else if (fc != nullptr)
+		{
+		  return fc->get_type();
+		}
+		else if (bc != nullptr)
+		{
+		  return bc->get_type();
+		}
+		else if (sc != nullptr)
+		{
+		  return sc->get_type();
+		}
+		//doesn't match any types, so delegate to Column
+		return col->get_type();
+	}
 
-	// add the column to the end of the array with the given string
+	/**
+	 * Add the column (does not copy!) to the end of the array
+	 */
 	void add(Column *c)
 	{
 		if (!hasRoomForMoreElems_(1))
@@ -76,6 +107,35 @@ public:
 
 		//update list size
 		len_ += 1;
+	}
+	
+	/**
+	 * Adds a new column with specified type to the end of the array
+	 */
+	void addNew(char colType)
+	{
+		if (!hasRoomForMoreElems_(1))
+		{
+			expandArray_();
+		}
+
+		switch (colType) {
+			case 'I':
+			  add(new IntColumn());
+			  break;
+			case 'B':
+			  add(new BoolColumn());
+			  break;
+			case 'F':
+			  add(new FloatColumn());
+			  break;
+			case 'S':
+			  add(new StringColumn());
+			  break;
+			default:
+			  fprintf(stderr, "Invalid column type %c", colType);
+			  exit(2);
+		}
 	}
 
 	// set the element in the given index to the given column

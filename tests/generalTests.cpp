@@ -189,9 +189,7 @@ void columnTests()
 
 void dataFrameTest()
 {
-  Sys *c = new Sys();
-
-  c->pln("Data frame test started...");
+  SYSTEM->pln("Data frame test started...");
 
   Schema s;
   s.add_column('I', new String("counts"));
@@ -208,13 +206,18 @@ void dataFrameTest()
 
   DataFrame df(s);
   assert(df.ncols() == 2);
+  assert(df.get_schema().width() == 2);
   assert(df.nrows() == 0);
+  assert(df.get_schema().length() == 0);
 
   Column *col = new IntColumn();
   String *colName = new String("nums");
   df.add_column(col, colName);
   //make sure both schema and dataframe got updated
   assert(df.ncols() == 3);
+  assert(df.get_schema().width() == 3);
+  assert(df.nrows() == 0);
+  assert(df.get_schema().length() == 0);
   assert(df.get_col(*colName) == 2);
 
   //create row and set the values
@@ -226,6 +229,7 @@ void dataFrameTest()
   df.add_row(r);
   assert(df.nrows() == 1);
   assert(s.length() == 1);
+  assert(df.get_schema().length() == 1);
 
   assert(df.get_int(0, 0) == 4);
   assert(df.get_bool(1, 0) == true);
@@ -245,7 +249,7 @@ void dataFrameTest()
   assert(df.get_bool(1, 0) == false);
   assert(df.get_int(2, 0) == 0);
 
-  c->pln("Data frame test passed!");
+  SYSTEM->pln("Data frame test passed!");
 }
 
 void dataFrameLargeDataTest()
