@@ -1,7 +1,7 @@
 #pragma once
 
-#include "string.h"
-#include "object.h"
+#include "../utils/string.h"
+#include "../utils/object.h"
 #include "network.h"
 #include "array.h"
 #include "clientdata.h"

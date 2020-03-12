@@ -1,7 +1,7 @@
 #pragma once
 //lang:Cwc
 
-#include "object.h"
+#include "../utils/object.h"
 
 //class for wrapping integers
 class Integer: public Object {

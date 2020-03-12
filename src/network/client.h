@@ -1,10 +1,10 @@
 #pragma once
 
-#include "object.h"
+#include "../utils/object.h"
 #include "network.h"
 #include "array.h"
 #include "clientdata.h"
-#include "string.h"
+#include "../utils/string.h"
 #include "integer.h"
 #include <poll.h>
 
