@@ -88,26 +88,22 @@ public:
    *  columns out of bounds, or request the wrong type is undefined.*/
   int get_int(size_t col, size_t row)
   {
-    IntColumn *tmp = safeConvertIntCol_(col);
-    return tmp->get(row);
+    return columns_->get_int(col, row);
   }
 
   bool get_bool(size_t col, size_t row)
   {
-    BoolColumn *tmp = safeConvertBoolCol_(col);
-    return tmp->get(row);
+    return columns_->get_bool(col, row);
   }
 
   float get_float(size_t col, size_t row)
   {
-    FloatColumn *tmp = safeConvertFloatCol_(col);
-    return tmp->get(row);
+    return columns_->get_float(col, row);
   }
 
   String *get_string(size_t col, size_t row)
   {
-    StringColumn *tmp = safeConvertStringCol_(col);
-    return tmp->get(row);
+    return columns_->get_string(col, row);
   }
 
   /** Return the offset of the given column name or -1 if no such col. */
@@ -127,26 +123,22 @@ public:
     * bound, the result is undefined. */
   void set(size_t col, size_t row, int val)
   {
-    IntColumn *tmp = safeConvertIntCol_(col);
-    tmp->set(row, val);
+	columns_->set(col, row, val);
   }
 
   void set(size_t col, size_t row, bool val)
   {
-    BoolColumn *tmp = safeConvertBoolCol_(col);
-    tmp->set(row, val);
+	columns_->set(col, row, val);
   }
 
   void set(size_t col, size_t row, float val)
   {
-    FloatColumn *tmp = safeConvertFloatCol_(col);
-    tmp->set(row, val);
+    columns_->set(col, row, val);
   }
 
   void set(size_t col, size_t row, String *val)
   {
-    StringColumn *tmp = safeConvertStringCol_(col);
-    tmp->set(row, val);
+    columns_->set(col, row, val);
   }
 
   /** Set the fields of the given row object with values from the columns at
