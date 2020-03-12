@@ -128,7 +128,7 @@ public:
   void set(size_t col, size_t row, int val)
   {
     IntColumn *tmp = safeConvertIntCol_(col);
-    columns_->get(col)->as_int()->set(row, val);
+    tmp->set(row, val);
   }
 
   void set(size_t col, size_t row, bool val)
