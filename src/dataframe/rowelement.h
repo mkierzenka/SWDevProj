@@ -1,7 +1,7 @@
 #pragma once
 
-#include "object.h"
-#include "string.h"
+#include "../utils/object.h"
+#include "../utils/string.h"
 
 /** This union represents a value of a row element. It can be one of the four data types */
 union RowValue {

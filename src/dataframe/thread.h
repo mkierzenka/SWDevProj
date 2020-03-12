@@ -6,8 +6,8 @@
 #include <condition_variable>
 #include <sstream>
 #include <atomic>
-#include "object.h"
-#include "string.h"
+#include "../utils/object.h"
+#include "../utils/string.h"
 
 
 /** A Thread wraps the thread operations in the standard library.

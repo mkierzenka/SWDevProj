@@ -1,7 +1,7 @@
 #pragma once
 
 #include "row.h"
-#include "object.h"
+#include "../utils/object.h"
 /*******************************************************************************
  *  Rower::
  *  An interface for iterating through each row of a data frame. The intent
