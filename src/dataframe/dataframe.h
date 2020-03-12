@@ -366,76 +366,20 @@ public:
     switch (row.col_type(colIdx))
     {
     case 'I':
-      safeConvertIntCol_(colIdx)->push_back(row.get_int(colIdx));
+	  columns_->push_back(colIdx, row.get_int(colIdx));
       break;
     case 'B':
-      safeConvertBoolCol_(colIdx)->push_back(row.get_bool(colIdx));
+	  columns_->push_back(colIdx, row.get_bool(colIdx));
       break;
     case 'F':
-      safeConvertFloatCol_(colIdx)->push_back(row.get_float(colIdx));
+	  columns_->push_back(colIdx, row.get_float(colIdx));
       break;
     case 'S':
-      safeConvertStringCol_(colIdx)->push_back(row.get_string(colIdx));
+	  columns_->push_back(colIdx, row.get_string(colIdx));
       break;
     default:
       fprintf(stderr, "Invalid col type: %c", row.col_type(colIdx));
     }
-  }
-
-  /** Return pointer to column at given index as IntColumn
-	* Errors and exits if no column at index or of improper type*/
-  IntColumn *safeConvertIntCol_(size_t colIdx)
-  {
-    errorIfOutOfBounds_(colIdx);
-    IntColumn *ic = columns_->get(colIdx)->as_int();
-    if (ic == nullptr)
-    {
-      fprintf(stderr, "Illegal Column Conversion: column %zu is not an int column", colIdx);
-      exit(1);
-    }
-    return ic;
-  }
-
-  /** Return pointer to column at given index as BoolColumn
-	* Errors and exits if no column at index or of improper type*/
-  BoolColumn *safeConvertBoolCol_(size_t colIdx)
-  {
-    errorIfOutOfBounds_(colIdx);
-    BoolColumn *ic = columns_->get(colIdx)->as_bool();
-    if (ic == nullptr)
-    {
-      fprintf(stderr, "Illegal Column Conversion: column %zu is not an bool column", colIdx);
-      exit(1);
-    }
-    return ic;
-  }
-
-  /** Return pointer to column at given index as FloatColumn
-	* Errors and exits if no column at index or of improper type*/
-  FloatColumn *safeConvertFloatCol_(size_t colIdx)
-  {
-    errorIfOutOfBounds_(colIdx);
-    FloatColumn *ic = columns_->get(colIdx)->as_float();
-    if (ic == nullptr)
-    {
-      fprintf(stderr, "Illegal Column Conversion: column %zu is not a float column", colIdx);
-      exit(1);
-    }
-    return ic;
-  }
-
-  /** Return pointer to column at given index as StringColumn
-	* Errors and exits if no column at index or of improper type*/
-  StringColumn *safeConvertStringCol_(size_t colIdx)
-  {
-    errorIfOutOfBounds_(colIdx);
-    StringColumn *ic = columns_->get(colIdx)->as_string();
-    if (ic == nullptr)
-    {
-      fprintf(stderr, "Illegal Column Conversion: column %zu is not a string column", colIdx);
-      exit(1);
-    }
-    return ic;
   }
 
   /** Helper that allows program to error and exit if index-out-of-bounds */
@@ -492,16 +436,16 @@ public:
     switch (colType)
     {
     case 'I':
-      r.set(colIdx, safeConvertIntCol_(colIdx)->get(rowIdx));
+      r.set(colIdx, columns_->get_int(colIdx, rowIdx));
       break;
     case 'B':
-      r.set(colIdx, safeConvertBoolCol_(colIdx)->get(rowIdx));
+		r.set(colIdx, columns_->get_bool(colIdx, rowIdx));
       break;
     case 'F':
-      r.set(colIdx, safeConvertFloatCol_(colIdx)->get(rowIdx));
+		r.set(colIdx, columns_->get_float(colIdx, rowIdx));
       break;
     case 'S':
-      r.set(colIdx, safeConvertStringCol_(colIdx)->get(rowIdx)->clone());
+		r.set(colIdx, columns_->get_string(colIdx, rowIdx));
       break;
     default:
       fprintf(stderr, "Invalid col type: %c", colType);

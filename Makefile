@@ -1,11 +1,11 @@
 build:
-	g++ --std=c++11 -g tests/main.cpp -o tests/testDF
+	g++ --std=c++11 -g tests/generalTests.cpp -o tests/testGeneral
 	g++ --std=c++11 -g tests/colArrTests.cpp -o tests/testCA
 
 test:
-	./tests/testDF
+	.tests/testGeneral
 	./tests/testCA
 
 .SILENT: clean
 clean:
-	rm -f tests/testDF tests/testCA
+	rm -f tests/testGeneral tests/testCA

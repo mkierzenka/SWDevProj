@@ -244,6 +244,28 @@ public:
   }
 	
 	
+	/** Type appropriate push_back methods. Appends the element to the end of the
+	* specified column. Calling the wrong method is undefined behavior. **/
+    void push_back(size_t col, int val) {
+		IntColumn *tmp = safeConvertIntCol_(col);
+		tmp->push_back(val);
+	}
+
+    void push_back(size_t col, bool val) {
+		BoolColumn *tmp = safeConvertBoolCol_(col);
+		tmp->push_back(val);
+	}
+
+    void push_back(size_t col, float val) {
+		FloatColumn *tmp = safeConvertFloatCol_(col);
+		tmp->push_back(val);
+	}
+
+    void push_back(size_t col, String *val) {
+		StringColumn *tmp = safeConvertStringCol_(col);
+		tmp->push_back(val);
+	}
+	
 	void errorIfOutOfBounds_(size_t colIdx) {
 		if (colIdx >= len_) {
 		  fprintf(stderr, "Out-Of-Bounds Error: cannot get column from index %zu", colIdx);
@@ -308,9 +330,4 @@ public:
   }
   
   
-	
-	
-	
-
-	
 };
