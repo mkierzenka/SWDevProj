@@ -1,9 +1,9 @@
 build:
-	g++ --std=c++11 tests/main.cpp -o test
+	g++ --std=c++11 -g tests/main.cpp -o tests/testDF
 
 test:
-	./test
+	./tests/testDF
 
 .SILENT: clean
 clean:
-	rm -f tests/test
+	rm -f tests/testDF
