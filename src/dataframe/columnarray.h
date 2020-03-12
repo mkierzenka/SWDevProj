@@ -251,18 +251,6 @@ public:
 		}
 	}
 	
-	/*void errorIfItemIdxOutOfBounds_(size_t colIdx, size_t rowIdx) {
-		if (colIdx >= len_) {
-		  fprintf(stderr, "Out-Of-Bounds Error: cannot get column from index %zu", colIdx);
-		  exit(1);
-		}
-		size_t colLen = colList_[colIdx]->size();
-		if (rowIdx >= colLen) {
-		  fprintf(stderr, "Out-Of-Bounds Error: cannot get row idx=%zu from column idx=%zu", rowIdx, colIdx);
-		  exit(1);
-		}
-	}*/
-	
 	/** Return pointer to column at given index as IntColumn
 	* Errors and exits if no column at index or of improper type*/
   IntColumn *safeConvertIntCol_(size_t colIdx)

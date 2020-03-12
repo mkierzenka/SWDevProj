@@ -154,7 +154,7 @@ public:
     }
 
     size_t rowWidth = row.width();
-    checkRowEntries_(rowWidth);
+    checkRowLen_(rowWidth);
     for (int i = 0; i < rowWidth; i++)
     {
       checkColTypes_(row.col_type(i), i);
@@ -167,7 +167,7 @@ public:
   void add_row(Row &row)
   {
     size_t rowWidth = row.width();
-    checkRowEntries_(rowWidth);
+    checkRowLen_(rowWidth);
     for (int i = 0; i < rowWidth; i++)
     {
       checkColTypes_(row.col_type(i), i);
@@ -450,7 +450,7 @@ public:
 
   /** Error and exit if number of entries in row does not equal number of columns
    * in schema */
-  void checkRowEntries_(size_t rowWidth)
+  void checkRowLen_(size_t rowWidth)
   {
     if (rowWidth != schema_.width())
     {
