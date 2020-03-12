@@ -9,26 +9,29 @@
 
 int main() {
 	Sys system;
-	Schema scm("IFBS");
-	String str("Hello World!");
+	Schema* scm = new Schema("IFBS");
+	String* str = new String("Hello World!");
 	int num = 617;
 	bool b = true;
 	float f = 1.2f;
-	Row r(scm);
-	r.set(0, num);
-	r.set(1, f);
-	r.set(2, true);
-	r.set(3, &str);
-	DataFrame* df = new DataFrame(scm);
+	Row* r = new Row(*scm);
+	r->set(0, num);
+	r->set(1, f);
+	r->set(2, true);
+	r->set(3, str);
+	DataFrame* df = new DataFrame(*scm);
 	
-	df->add_row(r);
+	df->add_row(*r);
 	assert(df->get_int(0,0) == num);
 	assert(df->get_float(1,0) == f);
 	assert(df->get_bool(2,0) == b);
-	assert(df->get_string(3,0)->equals(&str));
+	assert(df->get_string(3,0)->equals(str));
 
-	system.pln("It worked!");
 	
 	delete df;
+	delete r;
+	delete str;
+	delete scm;
+	system.pln("It worked!");
 	return 0;
 }

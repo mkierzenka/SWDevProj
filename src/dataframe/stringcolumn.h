@@ -47,6 +47,13 @@ public:
     {
         return this;
     }
+	
+	~StringColumn() {
+		for (int i = 0; i < numBlocks_; i++) {
+			delete blocks_[i];
+		}
+		delete[] blocks_;
+	}
 
     /** Returns the string at idx; undefined on invalid idx.*/
     String *get(size_t idx)
