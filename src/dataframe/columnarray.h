@@ -4,6 +4,10 @@
 
 #include "../utils/object.h"
 #include "column.h"
+#include "intcolumn.h"
+#include "boolcolumn.h"
+#include "floatcolumn.h"
+#include "stringcolumn.h"
 
 /**
  * ColumnArray - to represent a list of column.

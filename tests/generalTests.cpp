@@ -1,6 +1,11 @@
 
 
 #include "../src/dataframe/dataframe.h"
+#include "../src/dataframe/intcolumn.h"
+#include "../src/dataframe/boolcolumn.h"
+#include "../src/dataframe/floatcolumn.h"
+#include "../src/dataframe/stringcolumn.h"
+
 
 #include <assert.h>
 #include <stdio.h>
