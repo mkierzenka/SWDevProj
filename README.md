@@ -1,6 +1,10 @@
 # SWDevProj
 
 
+
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./a.out
+
+
 For part 2
 *Example test case:
 	Sorer to read in a dataframe (use someone else's)

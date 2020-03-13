@@ -42,6 +42,13 @@ public:
 
         va_end(args);
     }
+	
+	~FloatColumn() {
+		for (int i = 0; i < numBlocks_; i++) {
+			delete blocks_[i];
+		}
+		delete[] blocks_;
+	}
 
     float get(size_t idx)
     {

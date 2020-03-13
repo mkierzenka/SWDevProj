@@ -27,6 +27,9 @@ public:
 	// deconstructor
 	~StringBlock()
 	{
+		for (size_t i = 0; i < size_; i++) {
+			delete vals_[i];
+		}
 		delete[] vals_;
 	}
 
@@ -53,7 +56,7 @@ public:
 		size_++;
 	}
 
-	// set the element in the given index to the given object
+	// set the element in the given index to a clone of the given String
 	void set(size_t index, String* s)
 	{
 		// check for out-of-bounds

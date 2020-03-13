@@ -41,7 +41,6 @@ public:
 		{
 			delete entries_[i];
 		}
-
 		delete[] entries_;
 	}
 

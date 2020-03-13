@@ -41,6 +41,13 @@ public:
 
         va_end(args);
     }
+	
+	~BoolColumn() {
+		for (int i = 0; i < numBlocks_; i++) {
+			delete blocks_[i];
+		}
+		delete[] blocks_;
+	}
 
     bool get(size_t idx)
     {
