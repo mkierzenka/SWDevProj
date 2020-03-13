@@ -2,6 +2,7 @@
 
 #include "../utils/object.h"
 #include "../utils/string.h"
+#include "../utils/helper.h"
 
 #include "intcolumn.h"
 #include "stringcolumn.h"
@@ -286,7 +287,7 @@ public:
   void pmap(Rower &r)
   {
     size_t numThreads = (std::thread::hardware_concurrency() / 2) + 1;
-    p("Number of threads in pmap: ").pln(numThreads);
+    //p("Number of threads in pmap: ").pln(numThreads);
     pmap(r, numThreads);
   }
 
