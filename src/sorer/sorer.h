@@ -61,7 +61,10 @@ class Sorer : public Object
         {
             FieldArray** fa = getColumnar();
             DataFrameAdapter* dfa = new DataFrameAdapter();
-            dfa->convertToFrame(fa, file, schema);
+            
+            DataFrame* d = dfa->convertToFrame(fa, file, schema);
+            delete dfa;
+            return d;
         }
         
 

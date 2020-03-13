@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "_object.h"
+#include "../utils/object.h"
 #include "helper.h"
 #include "../dataframe/dataframe.h"
 #include "../utils/string.h"
@@ -24,10 +24,11 @@ public:
         Schema *s = new Schema(schemaTypes);
         DataFrame *df = new DataFrame(*s);
 
-        //get data from the file and put it in the dataframe
-        for (int c = 0; c < df->ncols(); c++)
+        //assuming # of rows is what first frame array indicates: will check
+        for (int r = 0; r < fa[0]->len(); r++)
         {
-            for (int r = 0; r < fa[c]->len(); r++)
+            Row* row = new Row(*s);
+            for (int c = 0; c < df->ncols(); c++)
             {
                 size_t field_start = fa[c]->get_start(r);
                 size_t field_end = fa[c]->get_end(r);
@@ -35,21 +36,26 @@ public:
                 switch (typ->get(c))
                 {
                 case BOOL:
-                    df->push_back(c, get_bool_field(file, field_start, field_end));
+                    row->set(c, get_bool_field(file, field_start, field_end));
                     break;
                 case INT:
-                    df->push_back(c, get_int_field(file, field_start, field_end));
+                    row->set(c, get_int_field(file, field_start, field_end));
                     break;
                 case FLOAT:
-                    df->push_back(c, get_float_field(file, field_start, field_end));
+                    row->set(c, get_float_field(file, field_start, field_end));
                     break;
                 case STRING:
-                    df->push_back(c, get_string_field(file, field_start, field_end));
+                    row->set(c, get_string_field(file, field_start, field_end));
                     break;
                 default:
                     fprintf(stderr, "Column type not supported");
                 };
             }
+
+            //add row to df
+            df->add_row(*row);
+
+            delete row;
         }
 
         return df;
@@ -60,7 +66,6 @@ public:
     {
         printf("SCHEMA LENGTH: %zu\n", types->len());
         //buffer for storing all the types
-        //StrBuff *typeBuf = new StrBuff();
         char* typeBuf = new char[types->len()+1];
         typeBuf[0] = '\0';
         printf("BUFFER: %s\n", typeBuf);
@@ -70,8 +75,6 @@ public:
             typeBuf[i] = typ;
             typeBuf[i+1] = '\0';
             printf("Adding char for column %d: %c\n", i, typ);
-            //typeBuf->c(&typ);
-            //typeBuf->c(type);
             printf("Type buffer: %s\n", typeBuf);
         }
 

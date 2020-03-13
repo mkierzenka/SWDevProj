@@ -49,9 +49,7 @@ int main(int argc, char **argv) {
     DataFrame* d = s->getFrame();
 
     assert(d->ncols() == 5);
-    //Num rows does not update properly (makes sense)
-    //printf("NUM ROWS: %zu\n", d->nrows());
-    //assert(d->nrows() == 3);
+    assert(d->nrows() == 3);
     assert(d->get_int(0, 0) == 4);
     assert(d->get_bool(1, 0) == true);
     assert(d->get_float(2, 0) - 2.7 < 0.00001);
