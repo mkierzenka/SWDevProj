@@ -32,6 +32,8 @@ public:
                 size_t field_start = fa[c]->get_start(r);
                 size_t field_end = fa[c]->get_end(r);
 
+                assert(field_start <= field_end);
+
                 switch (typ->get(c))
                 {
                 case BOOL:
@@ -107,7 +109,9 @@ public:
         // remove empty spaces in front
         size_t new_start = triml(file, start, end);
 
-        return file[new_start];
+        //return file[new_start];
+
+        return (file[new_start] == '1') ? true : false;
     }
 
     float get_float_field(char *file, int start, int end)

@@ -48,15 +48,16 @@ int main(int argc, char **argv) {
     Sorer* s = new Sorer(argv[1]);
     DataFrame* d = s->getFrame();
 
-    assert(d->ncols() == 5);
-    assert(d->nrows() == 3);
-    assert(d->get_int(0, 0) == 4);
-    assert(d->get_bool(1, 0) == true);
-    assert(d->get_float(2, 0) - 2.7 < 0.00001);
-    assert(strcmp(d->get_string(3, 0)->c_str(), "facts") == 0);
-    assert(strcmp(d->get_string(3, 1)->c_str(), "ok") == 0);
-    assert(strcmp(d->get_string(3, 2)->c_str(), "n") == 0);
-    assert(d->get_int(4, 1) == 7);
+    assert(d->ncols() == 12);
+    assert(d->nrows() == 1000);
+    assert(d->get_int(0, 0) == -1437879);
+    assert(d->get_bool(1, 0) == false);
+    assert(d->get_bool(1, 1) == true);
+    assert(d->get_float(3, 0) - 1040.435425 < 0.00001);
+    assert(strcmp(d->get_string(2, 0)->c_str(), "inflexive") == 0);
+    assert(strcmp(d->get_string(2, 1)->c_str(), "abdominal's") == 0);
+    assert(strcmp(d->get_string(2, 2)->c_str(), "discourtesy's") == 0);
+    assert(d->get_int(4, 1) == -1924364);
 
     printf("Dataframe successfully transferred!\n");
 
