@@ -20,7 +20,6 @@ public:
     {
         //initialize new dataframe
         char *schemaTypes = getTypes_(typ);
-        printf("Schema types: %s\n", schemaTypes);
         Schema *s = new Schema(schemaTypes);
         DataFrame *df = new DataFrame(*s);
 
@@ -64,26 +63,16 @@ public:
     //get character representation of schema types from the types array
     char *getTypes_(TypesArray *types)
     {
-        printf("SCHEMA LENGTH: %zu\n", types->len());
         //buffer for storing all the types
         char* typeBuf = new char[types->len()+1];
         typeBuf[0] = '\0';
-        printf("BUFFER: %s\n", typeBuf);
         for (int i = 0; i < types->len(); i++)
         {
             char typ = toChar_(types->get(i));
             typeBuf[i] = typ;
             typeBuf[i+1] = '\0';
-            printf("Adding char for column %d: %c\n", i, typ);
-            printf("Type buffer: %s\n", typeBuf);
         }
 
-
-        //String *res = typeBuf->get();
-        //delete typeBuf;
-
-        //printf("SCHEMA STRING %s\n", res->c_str());
-        //return res->c_str();
         return typeBuf;
     }
 
@@ -118,7 +107,6 @@ public:
         // remove empty spaces in front
         size_t new_start = triml(file, start, end);
 
-        //will this work?
         return file[new_start];
     }
 
@@ -137,10 +125,6 @@ public:
         size_t new_start = triml(file, start, end);
         size_t new_end = trimr(file, start, end);
 
-        // if (file[new_start] != '\"' && file[new_end] != '\"')
-        // {
-        //     str->c("");
-        // }
         if (file[new_start] == '\"')
         {
             new_start += 1;
@@ -158,7 +142,6 @@ public:
             strBuff[0] = file[i];
             strBuff[1] = '\0';
             str->c(strBuff);
-            //str->c((char*)file[i]);
         }
 
         delete[] strBuff;
