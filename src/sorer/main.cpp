@@ -55,9 +55,9 @@ int main(int argc, char **argv) {
     assert(d->get_int(0, 0) == 4);
     assert(d->get_bool(1, 0) == true);
     assert(d->get_float(2, 0) - 2.7 < 0.00001);
-    printf("%s\n", d->get_string(3, 0)->c_str());
-    printf("%s\n", "\"facts\"");
-    assert(strcmp(d->get_string(3, 0)->c_str(), "\"facts\"\n") == 0);
+    assert(strcmp(d->get_string(3, 0)->c_str(), "facts") == 0);
+    assert(strcmp(d->get_string(3, 1)->c_str(), "ok") == 0);
+    assert(strcmp(d->get_string(3, 2)->c_str(), "n") == 0);
     assert(d->get_int(4, 1) == 7);
 
     printf("Dataframe successfully transferred!\n");

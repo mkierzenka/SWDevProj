@@ -134,9 +134,18 @@ public:
         size_t new_start = triml(file, start, end);
         size_t new_end = trimr(file, start, end);
 
-        if (file[new_start] != '\"' && file[new_end] != '\"')
+        // if (file[new_start] != '\"' && file[new_end] != '\"')
+        // {
+        //     str->c("");
+        // }
+        if (file[new_start] == '\"')
         {
-            str->c("");
+            new_start += 1;
+        }
+
+        if (file[new_end] == '\"')
+        {
+            new_end -= 1;
         }
 
         char* strBuff = new char[2];
@@ -155,8 +164,6 @@ public:
         {
             str->c("");
         }
-
-        str->c("\n");
 
         String *res = str->get();
         delete str;
