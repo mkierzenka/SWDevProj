@@ -35,16 +35,16 @@ public:
                 switch (typ->get(c))
                 {
                 case BOOL:
-                    df->set(c, r, get_bool_field(file, field_start, field_end));
+                    df->push_back(c, get_bool_field(file, field_start, field_end));
                     break;
                 case INT:
-                    df->set(c, r, get_int_field(file, field_start, field_end));
+                    df->push_back(c, get_int_field(file, field_start, field_end));
                     break;
                 case FLOAT:
-                    df->set(c, r, get_float_field(file, field_start, field_end));
+                    df->push_back(c, get_float_field(file, field_start, field_end));
                     break;
                 case STRING:
-                    df->set(c, r, get_string_field(file, field_start, field_end));
+                    df->push_back(c, get_string_field(file, field_start, field_end));
                     break;
                 default:
                     fprintf(stderr, "Column type not supported");

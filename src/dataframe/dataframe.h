@@ -129,7 +129,7 @@ public:
   void set(size_t col, size_t row, int val)
   {
     IntColumn *tmp = safeConvertIntCol_(col);
-    columns_->get(col)->as_int()->set(row, val);
+    tmp->set(row, val);
   }
 
   void set(size_t col, size_t row, bool val)
@@ -148,6 +148,30 @@ public:
   {
     StringColumn *tmp = safeConvertStringCol_(col);
     tmp->set(row, val);
+  }
+
+  void push_back(size_t col, int val)
+  {
+    IntColumn *tmp = safeConvertIntCol_(col);
+    tmp->push_back(val);
+  }
+
+  void push_back(size_t col, bool val)
+  {
+    BoolColumn *tmp = safeConvertBoolCol_(col);
+    tmp->push_back(val);
+  }
+
+  void push_back(size_t col, float val)
+  {
+    FloatColumn *tmp = safeConvertFloatCol_(col);
+    tmp->push_back(val);
+  }
+
+  void push_back(size_t col, String *val)
+  {
+    StringColumn *tmp = safeConvertStringCol_(col);
+    tmp->push_back(val);
   }
 
   /** Set the fields of the given row object with values from the columns at
