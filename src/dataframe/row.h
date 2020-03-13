@@ -36,14 +36,11 @@ public:
 
 	~Row()
 	{
+		delete scm_;
 		for (size_t i = 0; i < len_; i++)
 		{
-			if (scm_->col_type(i) == 'S' && entries_[i]->isSet()) {
-				delete entries_[i]->getString();
-			}
 			delete entries_[i];
 		}
-		delete scm_;
 		delete[] entries_;
 	}
 

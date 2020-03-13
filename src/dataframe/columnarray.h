@@ -256,6 +256,7 @@ public:
     return tmp->get(row);
   }
 
+  // gets the actual String*, no copy
   String *get_string(size_t col, size_t row)
   {
     StringColumn *tmp = safeConvertStringCol_(col);
