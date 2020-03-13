@@ -244,26 +244,28 @@ public:
     }
     DataFrameThread **threads = new DataFrameThread *[numThreads];
     size_t startIdx = 0, endIdx = 0, step = schema_->length() / numThreads;
-    int i;
-    for (i = 0; i < numThreads - 1; i++)
+    size_t t;
+    for (t = 0; t < numThreads - 1; t++)
     {
-      startIdx = i * step;
-      endIdx = (i + 1) * step;
-      threads[i] = new DataFrameThread(this, r, startIdx, endIdx);
-      threads[i]->start();
+      startIdx = t * step;
+      endIdx = (t + 1) * step;
+      threads[t] = new DataFrameThread(this, r, startIdx, endIdx);
+      threads[t]->start();
     }
 
     //handle remaining rows in last thread
-    startIdx = i * step;
+    startIdx = t * step;
     endIdx = schema_->length();
-    threads[i] = new DataFrameThread(this, r, startIdx, endIdx);
-    threads[i]->start();
+    threads[t] = new DataFrameThread(this, r, startIdx, endIdx);
+    threads[t]->start();
 
     for (int i = numThreads - 1; i >= 0; i--)
     {
       threads[i]->join();
+	  delete threads[i];
     }
-    delete threads;
+
+    delete[] threads;
   }
 
   /** This method clones the Rower and executes the map in parallel. Join is
