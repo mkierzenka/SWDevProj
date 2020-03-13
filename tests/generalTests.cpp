@@ -464,6 +464,60 @@ void findIntRowerTest()
   SYSTEM->pln("Find int rower test passed!");
 }
 
+// pmap version
+void findIntRowerTest_pmap()
+{
+  SYSTEM->pln("Find int rower pmap test started...");
+
+  //fill data
+  Schema s("IIIII");
+  DataFrame data(s);
+  Row r(data.get_schema());
+  int numRows = 100 * 1000;
+  int mult = 5;
+  for (int i = 0; i < numRows; i++)
+  {
+    for (int j = 0; j < r.width(); j++)
+    {
+      r.set(j, (i + j) * mult);
+    }
+
+    data.add_row(r);
+  }
+
+  Schema rowSchem("IIIII");
+  DataFrame vals(rowSchem);
+  Row rTwo(vals.get_schema());
+  int colNum = 5;
+  int intConst = 3;
+  for (int j = 0; j < colNum; j++)
+  {
+    if (j == 4)
+    {
+      //this will be the sum
+      rTwo.set(j, 0);
+    }
+    else if (j == 3)
+    {
+      //multiple of 5
+      rTwo.set(j, 15);
+    }
+    else
+    {
+      rTwo.set(j, (j + 1) * intConst);
+    }
+  }
+
+  vals.add_row(rTwo);
+
+  FindRower ir(&data, &vals);
+  vals.pmap(ir);
+
+  assert(vals.get_int(4, 0) == 1);
+
+  SYSTEM->pln("Find int rower pmap test passed!");
+}
+
 //this test is to measure accuracy, not as much performance
 void findRower_variousTypes()
 {
@@ -616,6 +670,7 @@ int main()
 
   // rowers
   findIntRowerTest();
+  findIntRowerTest_pmap();
   findRower_variousTypes();
   lengthRowerTest();
   return 0;
