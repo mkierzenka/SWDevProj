@@ -341,7 +341,7 @@ public:
       columns_->add(new StringColumn());
       break;
     default:
-      fprintf(stderr, "Invalid column type %c", type);
+      fprintf(stderr, "Invalid column type %c\n", type);
       exit(2);
     }
     // We get the columns from the schema, so no need to add cols to it here

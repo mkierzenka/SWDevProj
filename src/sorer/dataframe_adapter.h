@@ -20,6 +20,7 @@ public:
     {
         //initialize new dataframe
         char *schemaTypes = getTypes_(typ);
+        printf("Schema types: %s\n", schemaTypes);
         Schema *s = new Schema(schemaTypes);
         DataFrame *df = new DataFrame(*s);
 
@@ -57,18 +58,30 @@ public:
     //get character representation of schema types from the types array
     char *getTypes_(TypesArray *types)
     {
+        printf("SCHEMA LENGTH: %zu\n", types->len());
         //buffer for storing all the types
-        StrBuff *typeBuf = new StrBuff();
+        //StrBuff *typeBuf = new StrBuff();
+        char* typeBuf = new char[types->len()+1];
+        typeBuf[0] = '\0';
+        printf("BUFFER: %s\n", typeBuf);
         for (int i = 0; i < types->len(); i++)
         {
             char typ = toChar_(types->get(i));
-            typeBuf->c(&typ);
+            typeBuf[i] = typ;
+            typeBuf[i+1] = '\0';
+            printf("Adding char for column %d: %c\n", i, typ);
+            //typeBuf->c(&typ);
+            //typeBuf->c(type);
+            printf("Type buffer: %s\n", typeBuf);
         }
 
-        String *res = typeBuf->get();
-        delete typeBuf;
 
-        return res->c_str();
+        //String *res = typeBuf->get();
+        //delete typeBuf;
+
+        //printf("SCHEMA STRING %s\n", res->c_str());
+        //return res->c_str();
+        return typeBuf;
     }
 
     /**convert Type to character */
