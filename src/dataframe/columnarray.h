@@ -225,27 +225,11 @@ public:
 	}
 	
 	void deleteColList_() {
-		 for (int i = 0; i < len_; i++) {
-		 	deleteCol_(colList_[i]);
+		for (int i = 0; i < len_; i++) {
+			delete colList_[i];
 		}
 		
 		delete[] colList_;
-	}
-	
-	void deleteCol_(Column* col) {
-		IntColumn* ic = col->as_int();
-		FloatColumn* fc = col->as_float();
-		BoolColumn* bc = col->as_bool();
-		StringColumn* sc = col->as_string();
-		if (ic != nullptr) {
-			delete ic;
-		} else if (fc != nullptr) {
-			delete fc;
-		} else if (bc != nullptr) {
-			delete bc;
-		} else if (sc != nullptr) {
-			delete sc;
-		}
 	}
 	
 	
