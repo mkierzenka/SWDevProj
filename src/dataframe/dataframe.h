@@ -24,7 +24,7 @@ class DataFrame : public Object
 {
 public:
   ColumnArray *columns_; //keeps track of columns in data frame
-  Schema schema_;        //schema of dataframe
+  Schema* schema_;        //schema of dataframe
 
   /** Create a data frame with the same columns as the give df but no rows */
   DataFrame(DataFrame &df) : DataFrame(df.get_schema())
@@ -36,25 +36,26 @@ public:
   DataFrame(Schema &schema)
   {
     //don't copy rows
-    schema_ = *(new Schema(schema, false));
-    size_t numCols = schema_.width();
+    schema_ = new Schema(schema, false);
+    size_t numCols = schema_->width();
     columns_ = new ColumnArray();
     for (int i = 0; i < numCols; i++)
     {
-	  columns_->addNew(schema_.col_type(i));
+	  columns_->addNew(schema_->col_type(i));
     }
   }
 
   ~DataFrame()
   {
-    delete columns_;
+    delete schema_;
+	delete columns_;
   }
 
   /** Returns the dataframe's schema. Modifying the schema after a dataframe
     * has been created in undefined. */
   Schema &get_schema()
   {
-    return schema_;
+    return *schema_;
   }
 
   /** Adds the column this dataframe, updates the schema, the new column
@@ -67,16 +68,16 @@ public:
       fprintf(stderr, "Cannot add null column");
       exit(1);
     }
-    else if (col->size() != schema_.length())
+    else if (col->size() != schema_->length())
     {
-      fprintf(stderr, "Cannot add column whose length (%zu) != number of rows in dataframe (%zu)\n", col->size(), schema_.length());
+      fprintf(stderr, "Cannot add column whose length (%zu) != number of rows in dataframe (%zu)\n", col->size(), schema_->length());
       exit(1);
     }
 
     //get type of column
 	columns_->add(col); // Must add to end of column array
     char type = columns_->getType(columns_->length() - 1);
-    schema_.add_column(type, name);
+    schema_->add_column(type, name);
   }
 
   /** Return the value at the given column and row. Accessing rows or
@@ -104,13 +105,13 @@ public:
   /** Return the offset of the given column name or -1 if no such col. */
   int get_col(String &col)
   {
-    return schema_.col_idx(col.c_str());
+    return schema_->col_idx(col.c_str());
   }
 
   /** Return the offset of the given row name or -1 if no such row. */
   int get_row(String &col)
   {
-    return schema_.row_idx(col.c_str());
+    return schema_->row_idx(col.c_str());
   }
 
   /** Set the value at the given column and row to the given value.
@@ -142,7 +143,7 @@ public:
     */
   void fill_row(size_t idx, Row &row)
   {
-    if (idx >= schema_.length())
+    if (idx >= schema_->length())
     {
       fprintf(stderr, "Row %zu does not exist in dataframe", idx);
       exit(1);
@@ -170,31 +171,31 @@ public:
     }
 
     //Row does not have a name
-    schema_.add_row(nullptr);
+    schema_->add_row(nullptr);
   }
 
   /** The number of rows in the dataframe. */
   size_t nrows()
   {
-    return schema_.length();
+    return schema_->length();
   }
 
   /** The number of columns in the dataframe.*/
   size_t ncols()
   {
-    return schema_.width();
+    return schema_->width();
   }
 
   /** Visit rows in order */
   void map(Rower &r)
   {
-    map(r, 0, schema_.length());
+    map(r, 0, schema_->length());
   }
 
   /** Visit subset of rows in order */
   void map(Rower &r, size_t startIdx, size_t endIdx)
   {
-    Row *row = new Row(schema_);
+    Row *row = new Row(*schema_);
 
     for (size_t rowIdx = startIdx; rowIdx < endIdx; rowIdx++)
     {
@@ -202,7 +203,7 @@ public:
       //iterate through each column to get value
       for (int colIdx = 0; colIdx < row->width(); colIdx++)
       {
-        setRowValByColType_(*row, colIdx, rowIdx, schema_.col_type(colIdx));
+        setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type(colIdx));
       }
 
       r.accept(*row);
@@ -242,7 +243,7 @@ public:
       exit(1);
     }
     DataFrameThread **threads = new DataFrameThread *[numThreads];
-    size_t startIdx = 0, endIdx = 0, step = schema_.length() / numThreads;
+    size_t startIdx = 0, endIdx = 0, step = schema_->length() / numThreads;
     int i;
     for (i = 0; i < numThreads - 1; i++)
     {
@@ -254,7 +255,7 @@ public:
 
     //handle remaining rows in last thread
     startIdx = i * step;
-    endIdx = schema_.length();
+    endIdx = schema_->length();
     threads[i] = new DataFrameThread(this, r, startIdx, endIdx);
     threads[i]->start();
 
@@ -281,8 +282,8 @@ public:
     * returned true from its accept method. */
   DataFrame *filter(Rower &r)
   {
-    DataFrame *newFrame = new DataFrame(schema_);
-    for (int i = 0; i < schema_.length(); i++)
+    DataFrame *newFrame = new DataFrame(*schema_);
+    for (int i = 0; i < schema_->length(); i++)
     {
       Row *row = createRow_(i);
       if (r.accept(*row))
@@ -298,9 +299,9 @@ public:
   /** Print the dataframe in SoR format to standard output. */
   void print()
   {
-    for (int i = 0; i < schema_.width(); i++)
+    for (int i = 0; i < schema_->width(); i++)
     {
-      for (int j = 0; j < schema_.length(); i++)
+      for (int j = 0; j < schema_->length(); i++)
       {
         columns_->get(i)->printElement(j);
       }
@@ -356,7 +357,7 @@ public:
   /** Helper that allows program to error and exit if index-out-of-bounds */
   void errorIfOutOfBounds_(size_t colIdx)
   {
-    if (colIdx >= schema_.width())
+    if (colIdx >= schema_->width())
     {
       fprintf(stderr, "Out-Of-Bounds Error: cannot get column from index %zu", colIdx);
       exit(1);
@@ -367,10 +368,10 @@ public:
    * in schema */
   void checkRowLen_(size_t rowWidth)
   {
-    if (rowWidth != schema_.width())
+    if (rowWidth != schema_->width())
     {
       fprintf(stderr, "Cannot have row of %zu entries in schema of %zu columns",
-              rowWidth, schema_.width());
+              rowWidth, schema_->width());
       exit(1);
     }
   }
@@ -378,7 +379,7 @@ public:
   /** Checks for matching col types. Error and exit if not the same */
   void checkColTypes_(char colTypeFromRow, size_t schemaColIdx)
   {
-    char colTypeFromSchema = schema_.col_type(schemaColIdx);
+    char colTypeFromSchema = schema_->col_type(schemaColIdx);
     if (colTypeFromRow != colTypeFromSchema)
     {
       fprintf(stderr, "Row's column type \"%c\" at index %zu does not match dataframe's column type \"%c\"", colTypeFromRow, schemaColIdx, colTypeFromSchema);
@@ -389,13 +390,13 @@ public:
   /** Create Row object from the DataFrame info */
   Row *createRow_(size_t rowIdx)
   {
-    Row *r = new Row(schema_);
+    Row *r = new Row(*schema_);
     r->set_idx(rowIdx);
 
     //iterate through each column to get value
     for (int i = 0; i < r->width(); i++)
     {
-      setRowValByColType_(*r, i, rowIdx, schema_.col_type(i));
+      setRowValByColType_(*r, i, rowIdx, schema_->col_type(i));
     }
 
     return r;
