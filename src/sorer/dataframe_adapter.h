@@ -139,10 +139,17 @@ public:
             str->c("");
         }
 
+        char* strBuff = new char[2];
+        strBuff[0] = '\0';
         for (size_t i = new_start; i <= new_end; ++i)
         {
-            str->c(&file[i]);
+            strBuff[0] = file[i];
+            strBuff[1] = '\0';
+            str->c(strBuff);
+            //str->c((char*)file[i]);
         }
+
+        delete[] strBuff;
 
         if (file[new_start] != '\"' && file[new_end] != '\"')
         {
