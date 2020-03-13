@@ -150,30 +150,6 @@ public:
     tmp->set(row, val);
   }
 
-  void push_back(size_t col, int val)
-  {
-    IntColumn *tmp = safeConvertIntCol_(col);
-    tmp->push_back(val);
-  }
-
-  void push_back(size_t col, bool val)
-  {
-    BoolColumn *tmp = safeConvertBoolCol_(col);
-    tmp->push_back(val);
-  }
-
-  void push_back(size_t col, float val)
-  {
-    FloatColumn *tmp = safeConvertFloatCol_(col);
-    tmp->push_back(val);
-  }
-
-  void push_back(size_t col, String *val)
-  {
-    StringColumn *tmp = safeConvertStringCol_(col);
-    tmp->push_back(val);
-  }
-
   /** Set the fields of the given row object with values from the columns at
     * the given offset.  If the row is not form the same schema as the
     * dataframe, results are undefined.
