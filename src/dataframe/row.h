@@ -194,7 +194,7 @@ public:
 	/** Exits program if try to access value that's not set */
 	void exitIfNotSet_(size_t idx)
 	{
-		fprintf(stderr, "Row element at column %zu is not set", idx);
+		fprintf(stderr, "Row element at column %zu is not set\n", idx);
 		exit(1);
 	}
 };
