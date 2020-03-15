@@ -48,9 +48,31 @@ int main(int argc, char **argv) {
 
     printf("Dataframe successfully transferred!\n");
 
-    // LengthRower* lr = new LengthRower(d);
-    // d->pmap(*lr);
+    LengthRower* lr = new LengthRower(d);
 
+    //add extra column to store results of rower
+    IntColumn* lenResults = new IntColumn();
+    for (int i = 0; i < d->nrows(); i++)
+    {
+        lenResults->push_back(0);
+    }
+
+    d->add_column(lenResults, nullptr);
+
+    size_t lastColIdx = d->ncols() - 1;
+    //doing map for now: getting "undefined reference to 'pthread_create'"
+    //error when doing pmap
+    d->map(*lr);
+
+    //make sure rower works
+    assert(d->get_int(lastColIdx, 0) == 62);
+    assert(d->get_int(lastColIdx, 670) == 62);
+    assert(d->get_int(lastColIdx, 999) == 63);
+
+    printf("Length rower worked!\n");
     delete s;
     delete d;
+
+
+    //delete lr;
 }
