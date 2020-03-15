@@ -232,11 +232,16 @@ public:
     {
       df_->map(r_, startRowIdx_, endRowIdx_);
     }
+	
+	Rower& getRower() {
+		return r_;
+	}
   };
 
-  /** This method clones the Rower and executes the map in parallel over
-	 *  the specified number of threads.
-	 */
+  /**
+   * This method clones the Rower and executes the map in parallel over
+   * the specified number of threads.
+   */
   void pmap(Rower &r, size_t numThreads)
   {
     if (numThreads == 0)
@@ -251,19 +256,20 @@ public:
     {
       startIdx = t * step;
       endIdx = (t + 1) * step;
-      threads[t] = new DataFrameThread(this, r, startIdx, endIdx);
+      threads[t] = new DataFrameThread(this, *(r.clone()), startIdx, endIdx);
       threads[t]->start();
     }
 
     //handle remaining rows in last thread
     startIdx = t * step;
     endIdx = schema_->length();
-    threads[t] = new DataFrameThread(this, r, startIdx, endIdx);
+    threads[t] = new DataFrameThread(this, *(r.clone()), startIdx, endIdx);
     threads[t]->start();
 
     for (int i = numThreads - 1; i >= 0; i--)
     {
       threads[i]->join();
+	  r.join_delete(&(threads[i]->getRower()));
 	  delete threads[i];
     }
 
@@ -303,11 +309,11 @@ public:
   /** Print the dataframe in SoR format to standard output. */
   void print()
   {
-    for (int i = 0; i < schema_->width(); i++)
+    for (int rowIdx = 0; rowIdx < schema_->length(); rowIdx++)
     {
-      for (int j = 0; j < schema_->length(); i++)
+      for (int colIdx = 0; colIdx < schema_->width(); colIdx++)
       {
-        columns_->get(i)->printElement(j);
+        columns_->get(colIdx)->printElement(rowIdx);
       }
 
       printf("\n");
