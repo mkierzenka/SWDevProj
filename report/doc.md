@@ -12,20 +12,28 @@ one to produce data and another to consume it.
 
 The eau2 system is made up of three layers of abstraction.
 
-The first and lowest layer is the distributed key-value store. There will be multiple 
-key-value stores, each holding some portion of data.
-The stored data will be a serialized string 
-representation. Each store will be able to serialize
- and deserialize its own data.
-If a key-value store requires data that it does not 
-have, then it will be able to communicate with other the key-value stores to retrieve this information.
-This will be done via a networking abstraction, which will allow key-value stores to behave as nodes on a
- network. In addition to the stores, there will also be a lead node, which will keep track of registered
-  stores and notify all connected stores when a new store is added to the network.
+The first and lowest layer is the distributed key-value store. There will be 
+multiple key-value stores, each holding some portion of data. The stored data 
+will be a serialized string representation. Each store will be able to serialize
+and deserialize its own data. If a key-value store requires data that it does not 
+have, then it will be able to communicate with other the key-value stores to retrieve 
+this information. This will be done via a networking abstraction, which will allow 
+key-value stores to behave as nodes on a network. In addition to the stores, there 
+will also be a lead node, which will keep track of registered stores and notify all 
+connected stores when a new store is added to the network.
 
-The next layer will include abstractions for holding the data from the key-value stores. These abstractions include distributed arrays and dataframes. The distributed array will include a list of keys; a key will define a string that maps to a piece of data, and will include the identifier of the key-value store that the data lives on. The array will also include a cache, which will hold the data for some of the listed keys. However, at any given time, not every key will have its data in the cache. A dataframe will represent the deserialized data that exists in the key-value stores.
+The next layer will include abstractions for holding the data from the key-value stores. 
+These abstractions include distributed arrays and dataframes. The distributed array will 
+include a list of keys; a key will define a string that maps to a piece of data, and will 
+include the identifier of the key-value store that the data lives on. The array will also 
+include a cache, which will hold the data for some of the listed keys. However, at any given 
+time, not every key will have its data in the cache. A dataframe will represent the 
+deserialized data that exists in the key-value stores.
 
-The last and highest level is the application layer. In the application, the user will be able to specify what they want to do. Each node will run its own application, with responsibilities distributed across each node. The application can get data from and put data into the key-value store. Distributed arrays can be used to track, organize, and work with specific data across the eau2 system.
+The last and highest level is the application layer. In the application, the user will be 
+able to specify what they want to do. Each node will run its own application, with responsibilities distributed across each node. The application can get data from and 
+put data into the key-value store. Distributed arrays can be used to track, organize, 
+and work with specific data across the eau2 system.
 
 ## Implementation: where we describe how the system is built, this can include a description of the classes and their API, but only the class you deem relevant and worth describing.(For example: do not describe the utility classes.)
 
