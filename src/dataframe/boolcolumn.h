@@ -91,7 +91,7 @@ public:
     void printElement(size_t idx)
     {
         //Cited from https://stackoverflow.com/questions/17307275/what-is-the-printf-format-specifier-for-bool
-        printf("<%s> ", get(idx) ? "true" : "false");
+        printf("<%s>\t", get(idx) ? "true" : "false");
     }
 	
 	void addBlocks_() {

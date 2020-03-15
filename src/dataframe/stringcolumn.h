@@ -95,7 +95,7 @@ public:
 
 	void printElement(size_t idx)
     {
-        printf("<\"%s\"> ", get(idx)->c_str());
+        printf("<\"%s\">\t", get(idx)->c_str());
     }
 	
 	void addBlocks_() {

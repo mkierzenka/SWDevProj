@@ -91,7 +91,7 @@ public:
 
     void printElement(size_t idx)
     {
-        printf("<%f> ", get(idx));
+        printf("<%f>\t", get(idx));
     }
 
     void addBlocks_() {
