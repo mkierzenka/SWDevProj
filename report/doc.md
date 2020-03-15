@@ -1,3 +1,11 @@
+## Usage:
+"make build" - compiles all tests
+"make test" - runs sorer test
+"make testGeneral" - runs sorer test and a bunch of others testing different things
+"make memory" - runs sorer test through valgrind
+"make clean" - deletes compiled files
+
+
 ## Introduction: where we give a high-level description of the eau2 system.
 
 The eau2 system is a framework to allow a wide variety of applications to
