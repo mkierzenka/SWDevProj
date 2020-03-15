@@ -13,6 +13,7 @@
 #include <sys/mman.h>
 
 #include "sorer.h"
+#include "../dataframe/lengthrower.h"
 
 
 const char *USAGE = "Usage: ./sorer [-f] [-from] [-len] [-print_col_type] " \
@@ -32,6 +33,7 @@ int main(int argc, char **argv) {
     Sorer* s = new Sorer(argv[1]);
     DataFrame* d = s->getFrame();
 
+    //some checks to make sure our dataframe reading worked properly
     assert(d->ncols() == 12);
     assert(d->nrows() == 1000);
     assert(d->get_int(0, 0) == -1437879);
@@ -42,8 +44,12 @@ int main(int argc, char **argv) {
     assert(strcmp(d->get_string(2, 1)->c_str(), "abdominal's") == 0);
     assert(strcmp(d->get_string(2, 2)->c_str(), "discourtesy's") == 0);
     assert(d->get_int(4, 1) == -1924364);
+    assert(strcmp(d->get_string(6, 143)->c_str(), "cornworms") == 0);
 
     printf("Dataframe successfully transferred!\n");
+
+    // LengthRower* lr = new LengthRower(d);
+    // d->pmap(*lr);
 
     delete s;
     delete d;

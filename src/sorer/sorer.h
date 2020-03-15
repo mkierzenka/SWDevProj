@@ -64,6 +64,12 @@ class Sorer : public Object
             
             DataFrame* d = dfa->convertToFrame(fa, file, schema);
             delete dfa;
+            for (int i = 0; i < sizeof(fa) / sizeof(fa[0]); i++)
+            {
+                delete fa[i];
+            }
+            
+            delete[] fa;
             return d;
         }
         

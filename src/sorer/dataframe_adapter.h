@@ -46,8 +46,12 @@ public:
                     row->set(c, get_float_field(file, field_start, field_end));
                     break;
                 case STRING:
-                    row->set(c, get_string_field(file, field_start, field_end));
+                {
+                    String* val = get_string_field(file, field_start, field_end);
+                    row->set(c, val);
+                    delete val;
                     break;
+                }
                 default:
                     fprintf(stderr, "Column type not supported");
                 };
@@ -58,6 +62,9 @@ public:
 
             delete row;
         }
+
+        delete[] schemaTypes;
+        delete s;
 
         return df;
     }

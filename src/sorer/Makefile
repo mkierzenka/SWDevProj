@@ -3,3 +3,6 @@ build:
 
 run:
 	./sorer datafile.sor
+
+memory:
+	valgrind --leak-check=full ./sorer datafile.sor

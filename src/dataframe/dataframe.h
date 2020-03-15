@@ -49,7 +49,7 @@ public:
   ~DataFrame()
   {
     delete schema_;
-	delete columns_;
+	  delete columns_;
   }
 
   /** Returns the dataframe's schema. Modifying the schema after a dataframe
