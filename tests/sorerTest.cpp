@@ -30,6 +30,7 @@ const char *USAGE = "Usage: ./sorer [-f] [-from] [-len] [-print_col_type] " \
 /** Entrypoint for sorer program. Sorer used to read in data and then convert
  * it to a DataFrame */
 int main(int argc, char **argv) {
+	puts("Sorer test started...");
     Sorer* s = new Sorer(argv[1]);
     DataFrame* d = s->getFrame();
 
@@ -46,7 +47,7 @@ int main(int argc, char **argv) {
     assert(d->get_int(4, 1) == -1924364);
     assert(strcmp(d->get_string(6, 143)->c_str(), "cornworms") == 0);
 
-    puts("Dataframe successfully transferred!\n");
+    puts("Dataframe successfully transferred!");
 
     LengthRower* lr = new LengthRower(d);
 
@@ -67,7 +68,7 @@ int main(int argc, char **argv) {
     assert(d->get_int(lastColIdx, 670) == 62);
     assert(d->get_int(lastColIdx, 999) == 63);
 
-    puts("Length rower worked!\n");
+    puts("Sorer test passed!");
 	delete lr;
     delete d;
     delete s;

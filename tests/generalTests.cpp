@@ -415,12 +415,12 @@ void findIntRowerTest()
 {
   SYSTEM->pln("Find int rower test started...");
 
-  //fill data
+  //fill data -> a DataFrame full of multiples of 11
   Schema s("IIIII");
   DataFrame data(s);
   Row r(data.get_schema());
   int numRows = 100 * 1000;
-  int mult = 5;
+  int mult = 11;
   for (int i = 0; i < numRows; i++)
   {
     for (int j = 0; j < r.width(); j++)
@@ -431,35 +431,49 @@ void findIntRowerTest()
     data.add_row(r);
   }
 
-  Schema rowSchem("IIIII");
+  //setup row dataframe
+  Schema rowSchem("IIIIII");
   DataFrame vals(rowSchem);
   Row rTwo(vals.get_schema());
-  int colNum = 5;
-  int intConst = 3;
-  for (int j = 0; j < colNum; j++)
-  {
-    if (j == 4)
-    {
-      //this will be the sum
-      rTwo.set(j, 0);
-    }
-    else if (j == 3)
-    {
-      //multiple of 5
-      rTwo.set(j, 15);
-    }
-    else
-    {
-      rTwo.set(j, (j + 1) * intConst);
-    }
+  int numRowsRDF = 9; // Num rows in Row DataFrame
+  int colNum = 6;
+
+  for (int i = 0; i < numRowsRDF; i++) {
+	  rTwo.clear();
+	  for (int j = 0; j < colNum - 1; j++) {
+		if (i == j) {
+			rTwo.set(j, j * mult); //odd cols should be found/counted
+		} else if (j == 3) {
+			rTwo.set(j, j * mult);
+		} else {
+			rTwo.set(j, j * (mult - 1)); //should not be counted
+		}
+	  }
+	  rTwo.set(colNum - 1, 0); // last col is int and 0, to report count
+	  vals.add_row(rTwo);
   }
+  /*SYSTEM->pln("Vals before map");
+  vals.print();*/
 
-  vals.add_row(rTwo);
-
+  // Run FindRower
   FindRower ir(&data, &vals);
-  vals.map(ir);
+  vals.pmap(ir);
 
-  assert(vals.get_int(4, 0) == 1);
+  /*SYSTEM->pln("\nVals after map");
+  vals.print();*/
+  
+  // Check each row's count
+  assert(vals.get_int(colNum - 1, 0) == 2);
+  assert(vals.get_int(colNum - 1, 1) == 3);
+  assert(vals.get_int(colNum - 1, 2) == 3);
+  assert(vals.get_int(colNum - 1, 3) == 2);
+  assert(vals.get_int(colNum - 1, 4) == 3);
+  assert(vals.get_int(colNum - 1, 5) == 2);
+  assert(vals.get_int(colNum - 1, 6) == 2);
+  assert(vals.get_int(colNum - 1, 7) == 2);
+  assert(vals.get_int(colNum - 1, 8) == 2);
+  // Check final count of Rower
+  assert(ir.getCount() == 21);
 
   SYSTEM->pln("Find int rower test passed!");
 }
@@ -469,12 +483,12 @@ void findIntRowerTest_pmap()
 {
   SYSTEM->pln("Find int rower pmap test started...");
 
-  //fill data
+  //fill data -> a DataFrame full of multiples of 11
   Schema s("IIIII");
   DataFrame data(s);
   Row r(data.get_schema());
   int numRows = 100 * 1000;
-  int mult = 5;
+  int mult = 11;
   for (int i = 0; i < numRows; i++)
   {
     for (int j = 0; j < r.width(); j++)
@@ -485,35 +499,50 @@ void findIntRowerTest_pmap()
     data.add_row(r);
   }
 
-  Schema rowSchem("IIIII");
+  //setup row dataframe
+  Schema rowSchem("IIIIII");
   DataFrame vals(rowSchem);
   Row rTwo(vals.get_schema());
-  int colNum = 5;
-  int intConst = 3;
-  for (int j = 0; j < colNum; j++)
-  {
-    if (j == 4)
-    {
-      //this will be the sum
-      rTwo.set(j, 0);
-    }
-    else if (j == 3)
-    {
-      //multiple of 5
-      rTwo.set(j, 15);
-    }
-    else
-    {
-      rTwo.set(j, (j + 1) * intConst);
-    }
+  int numRowsRDF = 9; // Num rows in Row DataFrame
+  int colNum = 6;
+
+  for (int i = 0; i < numRowsRDF; i++) {
+	  rTwo.clear();
+	  for (int j = 0; j < colNum - 1; j++) {
+		if (i == j) {
+			rTwo.set(j, j * mult); //odd cols should be found/counted
+		} else if (j == 3) {
+			rTwo.set(j, j * mult);
+		} else {
+			rTwo.set(j, j * (mult - 1)); //should not be counted
+		}
+	  }
+	  rTwo.set(colNum - 1, 0); // last col is int and 0, to report count
+	  vals.add_row(rTwo);
   }
+  /*SYSTEM->pln("Vals before map");
+  vals.print();*/
 
-  vals.add_row(rTwo);
-
+  // Run FindRower
   FindRower ir(&data, &vals);
   vals.pmap(ir);
 
-  assert(vals.get_int(4, 0) == 1);
+  /*SYSTEM->pln("\nVals after map");
+  vals.print();*/
+  
+  // Check each row's count
+  assert(vals.get_int(colNum - 1, 0) == 2);
+  assert(vals.get_int(colNum - 1, 1) == 3);
+  assert(vals.get_int(colNum - 1, 2) == 3);
+  assert(vals.get_int(colNum - 1, 3) == 2);
+  assert(vals.get_int(colNum - 1, 4) == 3);
+  assert(vals.get_int(colNum - 1, 5) == 2);
+  assert(vals.get_int(colNum - 1, 6) == 2);
+  assert(vals.get_int(colNum - 1, 7) == 2);
+  assert(vals.get_int(colNum - 1, 8) == 2);
+  // Check final count of Rower
+  assert(ir.getCount() == 21);
+
 
   SYSTEM->pln("Find int rower pmap test passed!");
 }
