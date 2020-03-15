@@ -44,6 +44,7 @@ class Sorer : public Object
         ~Sorer()
         {
             delete schema;
+            close(fd);
         }
 
         /** Return columnar form of the data */

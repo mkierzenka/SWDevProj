@@ -70,9 +70,7 @@ int main(int argc, char **argv) {
     assert(d->get_int(lastColIdx, 999) == 63);
 
     printf("Length rower worked!\n");
+    delete lr;
     delete s;
     delete d;
-
-
-    //delete lr;
 }
