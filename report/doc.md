@@ -90,10 +90,7 @@ Methods:
 * containsKey(Key): does the map contain data for the given key?
 * getValue(Key): get the mapped data for the given key
 * remove(Key): remove the key and data associated with the given key from the map
-* put(Key, String): add the serialized data, with the given key, to the map. If map full, 
-
-replace an element
-
+* put(Key, String): add the serialized data, with the given key, to the map. If map full, replace an element
 * clear() - remove all entries from the map
 
 
@@ -205,4 +202,14 @@ Should each Client (KV store) always be connected to every other Client? Are we 
 
 
 ## Status: where you describe what has been done and give an estimate of the work that remains.
+We have decided to use another groups's Sorer implementation, as ours was written in Python and not fully correct.
+The group was chosen based on the results of our testing in Assignment 5, Part 1 -> https://github.com/yth/CS4500A1P1
+As part of incorporating their Sorer into our codebase, we discovered a bug that we fixed locally and notified the team so they could fix their codebase.
 
+We succeeded in creating an adapter to use their Sorer with our DataFrame classes, a test demonstrating this can be found in tests/sorerTest.cpp.
+This test highlighted some memory leaks in our implementation, which have now all been fixed.
+There is a little bit of small bug-fixing left for our DataFrame implementation.
+
+The networks portion implemented for previous assignments is a good start for what will be required for this project.
+One current problem with it is that it only supports two clients and a server. Working on a fix.
+Most of the networking functionality required for this project is set up.
