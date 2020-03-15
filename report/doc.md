@@ -96,7 +96,7 @@ arrays of these types.
 in charge of serializing and deserializing data, and buffering the result. The Serializer 
 will be used in multiple places in this project. All of DataFrame's from... methods will 
 need to initialize a Serializer to serialize the constructed dataframe, to store in the 
-key-value store. The wait and waitAndGet methods within Store will need to intialize a 
+key-value store. The wait and waitAndGet methods within Store will need to initalize a 
 Serializer; the serializer will need to convert the serialized string data into the dataframe 
 that it represents
 
@@ -272,7 +272,7 @@ Should each Client (KV store) always be connected to every other Client? Are we 
 
 
 ## Status: where you describe what has been done and give an estimate of the work that remains.
-We have decided to use another groups's Sorer implementation, as ours was written in Python and 
+We have decided to use another group's Sorer implementation, as ours was written in Python and 
 not fully correct.
 The group was chosen based on the results of our testing in Assignment 5, Part 1 -> 
 https://github.com/yth/CS4500A1P1
