@@ -12,8 +12,8 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-#include "sorer.h"
-#include "../dataframe/lengthrower.h"
+#include "../src/sorer/sorer.h"
+#include "../src/dataframe/lengthrower.h"
 
 
 const char *USAGE = "Usage: ./sorer [-f] [-from] [-len] [-print_col_type] " \
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
     assert(d->get_int(4, 1) == -1924364);
     assert(strcmp(d->get_string(6, 143)->c_str(), "cornworms") == 0);
 
-    printf("Dataframe successfully transferred!\n");
+    puts("Dataframe successfully transferred!\n");
 
     LengthRower* lr = new LengthRower(d);
 
@@ -60,8 +60,6 @@ int main(int argc, char **argv) {
     d->add_column(lenResults, nullptr);
 
     size_t lastColIdx = d->ncols() - 1;
-    //doing map for now: getting "undefined reference to 'pthread_create'"
-    //error when doing pmap
     d->map(*lr);
 
     //make sure rower works
@@ -69,8 +67,8 @@ int main(int argc, char **argv) {
     assert(d->get_int(lastColIdx, 670) == 62);
     assert(d->get_int(lastColIdx, 999) == 63);
 
-    printf("Length rower worked!\n");
-    delete lr;
-    delete s;
+    puts("Length rower worked!\n");
+	delete lr;
     delete d;
+    delete s;
 }

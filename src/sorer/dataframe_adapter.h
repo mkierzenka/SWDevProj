@@ -3,7 +3,7 @@
 #pragma once
 
 #include "../utils/object.h"
-#include "helper.h"
+#include "sorer_helper.h"
 #include "../dataframe/dataframe.h"
 #include "../utils/string.h"
 
@@ -24,9 +24,9 @@ public:
         DataFrame *df = new DataFrame(*s);
 
         //assuming # of rows is what first frame array indicates: will check
-        for (int r = 0; r < fa[0]->len(); r++)
+        Row* row = new Row(*s);
+		for (int r = 0; r < fa[0]->len(); r++)
         {
-            Row* row = new Row(*s);
             for (int c = 0; c < df->ncols(); c++)
             {
                 size_t field_start = fa[c]->get_start(r);
@@ -58,11 +58,12 @@ public:
             }
 
             //add row to df
-            df->add_row(*row);
 
-            delete row;
+            df->add_row(*row);
+            row->clear();
         }
 
+		delete row;
         delete[] schemaTypes;
         delete s;
 
