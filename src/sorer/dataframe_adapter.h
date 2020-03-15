@@ -58,7 +58,9 @@ public:
             }
 
             //add row to df
+
             df->add_row(*row);
+            row->clear();
         }
 
 		delete row;

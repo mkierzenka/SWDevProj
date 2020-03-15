@@ -175,6 +175,28 @@ public:
 		}
 		f.done();
 	}
+	
+	/**
+	 * Clears all entries (frees memory) from this row. Leaves size unchanged.
+	 * Resets stored row index to 0. Does NOT change stored Schema.
+	 */
+	void clear() {
+		// Delete old entries
+		for (size_t i = 0; i < len_; i++)
+		{
+			delete entries_[i];
+		}
+		delete[] entries_;
+		
+		// Reset state to a new Row of proper size
+		len_ = scm_->width();
+		entries_ = new RowElement *[len_];
+		for (size_t i = 0; i < len_; i++)
+		{
+			entries_[i] = new RowElement();
+		}
+		rowIdx_ = 0;
+	}
 
 	void exitIfBadSet_(size_t idx, char expectedType)
 	{

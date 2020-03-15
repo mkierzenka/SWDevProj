@@ -208,6 +208,7 @@ public:
       }
 
       r.accept(*row);
+      row->clear();
     }
 
     delete row;
