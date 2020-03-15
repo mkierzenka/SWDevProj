@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <cassert>
 
-#include "helper.h"
+#include "sorer_helper.h"
 #include "dataframe_adapter.h"
 
 #include "../utils/object.h"
@@ -43,10 +43,12 @@ class Sorer : public Object
 
         ~Sorer()
         {
-            delete schema;
+			munmap(file, getMapLen_());            
+			close(fd);
+			delete schema;
         }
 
-        /** Return columnar form of the data */
+        /** Return columnar form of the data. The length of the FieldArray is schema->len() */
         FieldArray** getColumnar()
         {
             //make column for whole file
@@ -63,16 +65,15 @@ class Sorer : public Object
             DataFrameAdapter* dfa = new DataFrameAdapter();
             
             DataFrame* d = dfa->convertToFrame(fa, file, schema);
+
             delete dfa;
-            for (int i = 0; i < sizeof(fa) / sizeof(fa[0]); i++)
+            for (int i = 0; i < schema->len(); i++)
             {
                 delete fa[i];
             }
-            
             delete[] fa;
             return d;
         }
-        
 
         /** Get file size of the read in file */
         size_t getFileSize_(const char* name)
