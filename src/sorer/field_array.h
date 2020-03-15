@@ -119,6 +119,13 @@ public:
      * Empties this field array.
      */
     virtual void clear() {
+        int* new_starts = new int[this->capacity_];
+        int* new_ends = new int[this->capacity_];
+
+        delete[] this->starts_;
+        delete[] this->ends_;
+        this->starts_ = new_starts;
+        this->ends_ = new_ends;
         this->size_ = 0;
     }
 
