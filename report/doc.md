@@ -21,22 +21,20 @@ one to produce data and another to consume it.
 The eau2 system is made up of three layers of abstraction.
 
 The first and lowest layer is the distributed key-value store. There will be 
-multiple key-value stores, each holding some portion of data. The stored data 
-will be a serialized string representation. Each store will be able to serialize
-and deserialize its own data. If a key-value store requires data that it does not 
-have, then it will be able to communicate with other the key-value stores to retrieve 
-this information. This will be done via a networking abstraction, which will allow 
-key-value stores to behave as nodes on a network. In addition to the stores, there 
-will also be a lead node, which will keep track of registered stores and notify all 
-connected stores when a new store is added to the network.
+multiple key-value stores, each holding some portion of data. Each key will map to
+a piece of serialized data. Each store will be able to serialize and deserialize its own
+data. If a key-value store requires data that it does not have, then it will be able to 
+communicate with the other key-value stores to retrieve this information. This will be done 
+via a networking abstraction, which will allow key-value stores to behave as nodes on a 
+network. In addition to the stores, there will also be a lead node, which will keep track of 
+registered stores and notify all connected stores when a new store is added to the network.
 
 The next layer will include abstractions for holding the data from the key-value stores. 
-These abstractions include distributed arrays and dataframes. The distributed array 
-will include a list of keys; a key will define a string that maps to a piece of data, 
-and will include the identifier of the key-value store that the data lives on. The 
-array will also include a cache, which will hold the data for some of the listed keys. 
-However, at any given time, not every key will have its data in the cache. A dataframe 
-will represent the deserialized data that exists in the key-value stores.
+These abstractions include distributed arrays and dataframes. A dataframe allows the user
+to access a set of data across multiple nodes. It supports data storage and retrieval 
+without exposing the details of how and where the data is stored. A dataframe holds a 
+distributed array. The array contains a bunch of keys as well as a cache, which will support
+short-term storage for some of the keys' data. For all keys without data in the cache, the dataframe will be able to determine where all of its data lives, and will be able to look it up through the distributed key-value store.
 
 The last and highest level is the application layer. In the application, the user 
 will be able to specify what they want to do. Each node will run its own application, 
@@ -55,7 +53,7 @@ we provided descriptions of how they'll be used.
 *Store: this class will represent a local key-value store
 
 Fields:
- - map (Str-to-Str Map): the String key will map to a serialized piece of data
+ - map (Str-to-Obj Map): the String key will map to a serialized piece of data
  - networkHelper (Client): this network abstraction will allow the store to listen for 
  messages from other nodes and send messages to other stores to request data
  - storeId (size_t): each local store will be represented by a unique numerical identifier. 
@@ -78,6 +76,9 @@ Fields:
 
  *NOTE: Keys are immutable*
 
+ *Value: represents the serialized data that a Key maps to. It will contain a single field,
+ a character pointer that holds the serialized data
+
 *Server: This is the "lead node." All nodes will connect and register with this host. 
 Upon registration, the server will broadcast a list of every node that it is connected to. 
 The server will have basic network functionality and a socket in which it listens for node 
@@ -94,11 +95,29 @@ and listening.
 include operations to store and perform operations on data, such as map. A Schema will 
 be used to describe the Dataframe's column structure. A DataFrame will be immutable, so 
 it will not support operations such as deleting, setting, and modifying columns and rows. 
-The DataFrame will have methods that support converting data types into frames. An example is 
-fromArray; it will take in an array of a certain type, and it will return the DataFrame version. 
-It will also put the serialized data into the given key-value store, with the specified key. 
-These methods will exist for all supported data types (bool, int, floats, strings), and for 
-arrays of these types.
+
+DataFrame's data storage will change. In previous assignments, DataFrames held all of their
+data in columns and rows. However we now want to make them distributed. Instead of storing
+the actual data, frames will now hold a DistributedArray. This array will hold keys that
+map to chunks of the DataFrame's data.
+
+The DataFrame will hold a KVStore object so that it can look up data as requested by the 
+user.
+
+The DataFrame will have methods that support converting data types into frames. An example 
+is fromArray; it will take in an array of a certain type, and it will return the DataFrame 
+version. It will do so by breaking up the array into chunks; each chunk will be assigned a
+key to be stored in the distributed KV system. The key will then be added to the frame's distributed array. Once the array is completely broken up and stored, the DataFrame will be
+serialized and stored under its key in the distributed system.
+
+Fields:
+-DistributedArray (to hold keys to the DataFrame's chunks of data)
+-KVStore: to look up data using the keys in the DistributedArray
+-Schema: keeps track of the DataFrame's column structure
+
+Methods (new ones we anticipate):
+-all the methods that create a DataFrame from a data type (ex. fromArray, fromScalar, etc.)
+-local_map: perform an operation on all data that is only held on a certain node
 
 *Serializer: This class will be similar to the one started in Assignment 6. It will be 
 in charge of serializing and deserializing data, and buffering the result. The Serializer 
@@ -268,15 +287,25 @@ Server which only handles registering new Clients would be cleaner, but that doe
 to fit with the provided example code. Any advice?
 
 
-Are we correct in our thinking that the DataFrame largely remains unchanged from how we 
-originally implemented it, and is the only place actual (deserialized) data is grouped?
-(ie. workflow is: make DF of interesting data -> serialize and store in eau2 under some Key)
+We are unsure about how we want to store our data. Currently, our plan is store everything
+in one key-value store (dataframes and chunks). However, since these two serialized blobs
+will need to be handled differently, it might make sense to store dataframes and chunks in
+two separate stores. The dataframe store would need to be able to access the chunk store,
+and both stores would still need networking capabilities.
 
-Any guidance on the cache in the DistributedArray? Seems more usable if it's decided by the
-Application, but alternative is that it is an implementation detail of DistributedArray.
 
 Should each Client (KV store) always be connected to every other Client? Are we expecting 
 100K Client systems?
+
+
+How exactly will creating dataframes from data types work. For example, if we convert an 
+array into a dataframe, will these values all be stored in a single column? Would we want
+multiple columns? How exactly would we decide this...
+
+
+Cyclic dependency: if the DataFrame has a KVStore (which it seems like it needs), wouldn't
+it be possible for the DataFrame to technically access the deserialized form of itself?
+Could this cause issues?
 
 
 ## Status: where you describe what has been done and give an estimate of the work that remains.
@@ -297,3 +326,12 @@ required for this project.
 One current problem with it is that it only supports two clients and a server. Working on a
 fix.
 Most of the networking functionality required for this project is set up.
+
+Remaining tasks for M2
+-Create clases for distributed KV store: Key, Value, KVStore; this should be fairly
+straightforward
+-Client level: create DistributedArray object, modify DataFrames to store a DistributedArray
+and a KVStore, rather than holding its own data; could be complex, need to figure out
+more specifics for how we want to break up the data
+-Figure out how we want to serialize all of our classes
+-Create Application level: fairly straightforward, mainly uses classes from bottom two layers
