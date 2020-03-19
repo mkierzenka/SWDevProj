@@ -29,7 +29,7 @@ public:
     /**
      * Return this key's String value
      */
-    String *getKey()
+    String *getKeyStr()
     {
         return kStr_;
     }

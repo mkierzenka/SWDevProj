@@ -63,9 +63,8 @@ Fields:
  - put(Key, String): adds given data to the key-value store specified in the key, 
  not blocking
  - get(Key): request for the data; returns deserialized data from its own store if 
- stored locally, otherwise will make a request to whichever store holds the data
- - getAndWait(Key): same functionality as get but call will block until the data is 
- retrieved
+ stored locall
+ - getAndWait(Key): retrieves data with the given Key from the Key's node
  -getStoreId(): return the id of this store (storeId)
 
 *Key: these are used to define a piece of data at a level higher than the local KV store. 
