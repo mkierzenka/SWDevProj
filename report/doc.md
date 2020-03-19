@@ -6,7 +6,7 @@
 "make clean" - deletes compiled files
 
 
-## Introduction: where we give a high-level description of the eau2 system.
+## Introduction
 
 The eau2 system is a framework to allow a wide variety of applications to
 operate on large datasets distributed across nodes in a network. Each node
@@ -16,7 +16,7 @@ be scaled for different use-cases (supports an arbitrary number of nodes).
 Most cases will have a different responsibility for each node, for example
 one to produce data and another to consume it.
 
-## Architecture: where we describe the various part of eau2 at a high-level.
+## Architecture
 
 The eau2 system is made up of three layers of abstraction.
 
@@ -42,9 +42,7 @@ with responsibilities distributed across each node. The application can get data
 from and put data into the key-value store. Distributed arrays can be used to track, 
 organize, and work with specific data across the eau2 system.
 
-## Implementation: where we describe how the system is built, this can include a 
-## description of the classes and their API, but only the class you deem relevant 
-## and worth describing.(For example: do not describe the utility classes.)
+## Implementation
 
 For the critical classes that we will implement for this system, we included a run-down
 of their fields and methods. For components that are re-used from previous assignments,
@@ -196,9 +194,7 @@ application running (ex.producer to initialize and create the data, summarizer t
 perform some operation on the data). Distributed arrays and dataframes and can be 
 initialized and used for these helpers, depending on the purpose of the application
 
-## Use cases: examples of uses of the system. This could be in the form of code like 
-## the one above. It is okay to leave this section mostly empty if there is nothing to 
-## say. Maybe just an example of creating a dataframe would be enough.
+## Use cases
 
 The following is an example of a use case of the eau2 system. The lines of pseudocode 
 are an outline of what each node will run.
@@ -274,8 +270,7 @@ Application:
 	return;
 
 
-## Open questions: where you list things that you are not sure of and would like 
-## the answer to.
+## Open questions
 
 In HW6, we implemented a Server and Clients. It would make sense for each Key-Value 
 Store to have the code from Client, but what about the code for Server?
@@ -307,7 +302,7 @@ it be possible for the DataFrame to technically access the deserialized form of 
 Could this cause issues?
 
 
-## Status: where you describe what has been done and give an estimate of the work that remains.
+## Status
 We have decided to use another group's Sorer implementation, as ours was written in Python and 
 not fully correct.
 The group was chosen based on the results of our testing in Assignment 5, Part 1 -> 
