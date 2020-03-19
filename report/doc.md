@@ -160,13 +160,9 @@ Methods:
 
 * containsKey(Key): does the distributed array's key list contain the given key?
 * addKey(Key): add the given key to the distributed array's list of keys
-* removeKey(Key): remove the given key from the distributed array's key list
-* hasCachedValue(Key): does the cache contain data for the given key?
-* getCachedValue(Key): get the cached data for the given key
-* removeFromCache(Key): remove the data associated with the given key from the cache
-* addToCache(Key, String): add the serialized data, with the given key, to the cache. If 
-cache full, replace an element
-* clearCache() - remove all entries from the cache
+* get(Key): get the value for the specified key from the distributed array. Check the cache first and if the cache
+does not contain the data, then make a call too the KV
+store
 
 *Note that the cache methods defined here will delegate to the Cache object, which work 
 on the Cache's map object*
@@ -179,14 +175,14 @@ Fields:
 
 * maxSize: defines a maximum size of the cache; the cache's map cannot hold more than 
 this amount of elements at any given time
-* data (Obj-to-String map): this map will hold the data within the cache. The keys will 
+* data (Obj-to-Obj map): this map will hold the data within the cache. The keys will 
 be Key objects, and they will map to the serialized data
+* keyOrder (Queue): this queue will keep the order in which keys are added to the cache. This will help us update our cache by adding and removing elements on a FIFO basis
 
 Methods:
 
 * containsKey(Key): does the map contain data for the given key?
 * getValue(Key): get the mapped data for the given key
-* remove(Key): remove the key and data associated with the given key from the map
 * put(Key, String): add the serialized data, with the given key, to the map. If map 
 full, replace an element
 * clear() - remove all entries from the map
