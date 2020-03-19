@@ -266,29 +266,29 @@ public:
 	/** Set the value at the given column and row to the given value.
     * If the column is not  of the right type or the indices are out of
     * bound, the result is undefined. */
-  void set(size_t col, size_t row, int val)
-  {
-    IntColumn *tmp = safeConvertIntCol_(col);
-    tmp->set(row, val);
-  }
+//   void set(size_t col, size_t row, int val)
+//   {
+//     IntColumn *tmp = safeConvertIntCol_(col);
+//     tmp->set(row, val);
+//   }
 
-  void set(size_t col, size_t row, bool val)
-  {
-    BoolColumn *tmp = safeConvertBoolCol_(col);
-    tmp->set(row, val);
-  }
+//   void set(size_t col, size_t row, bool val)
+//   {
+//     BoolColumn *tmp = safeConvertBoolCol_(col);
+//     tmp->set(row, val);
+//   }
 
-  void set(size_t col, size_t row, float val)
-  {
-	FloatColumn *tmp = safeConvertFloatCol_(col);
-    tmp->set(row, val);
-  }
+//   void set(size_t col, size_t row, float val)
+//   {
+// 	FloatColumn *tmp = safeConvertFloatCol_(col);
+//     tmp->set(row, val);
+//   }
 
-  void set(size_t col, size_t row, String *val)
-  {
-	StringColumn *tmp = safeConvertStringCol_(col);
-    tmp->set(row, val);
-  }
+//   void set(size_t col, size_t row, String *val)
+//   {
+// 	StringColumn *tmp = safeConvertStringCol_(col);
+//     tmp->set(row, val);
+//   }
 	
 	
 	/** Type appropriate push_back methods. Appends the element to the end of the
@@ -322,59 +322,59 @@ public:
 	
 	/** Return pointer to column at given index as IntColumn
 	* Errors and exits if no column at index or of improper type*/
-  IntColumn *safeConvertIntCol_(size_t colIdx)
-  {
-    errorIfOutOfBounds_(colIdx);
-    IntColumn *ic = colList_[colIdx]->as_int();
-    if (ic == nullptr)
-    {
-      fprintf(stderr, "Illegal Column Conversion: column %zu is not an int column", colIdx);
-      exit(1);
-    }
-    return ic;
-  }
+//   IntColumn *safeConvertIntCol_(size_t colIdx)
+//   {
+//     errorIfOutOfBounds_(colIdx);
+//     IntColumn *ic = colList_[colIdx]->as_int();
+//     if (ic == nullptr)
+//     {
+//       fprintf(stderr, "Illegal Column Conversion: column %zu is not an int column", colIdx);
+//       exit(1);
+//     }
+//     return ic;
+//   }
 
-  /** Return pointer to column at given index as BoolColumn
-	* Errors and exits if no column at index or of improper type*/
-  BoolColumn *safeConvertBoolCol_(size_t colIdx)
-  {
-    errorIfOutOfBounds_(colIdx);
-    BoolColumn *ic = colList_[colIdx]->as_bool();
-    if (ic == nullptr)
-    {
-      fprintf(stderr, "Illegal Column Conversion: column %zu is not an bool column", colIdx);
-      exit(1);
-    }
-    return ic;
-  }
+//   /** Return pointer to column at given index as BoolColumn
+// 	* Errors and exits if no column at index or of improper type*/
+//   BoolColumn *safeConvertBoolCol_(size_t colIdx)
+//   {
+//     errorIfOutOfBounds_(colIdx);
+//     BoolColumn *ic = colList_[colIdx]->as_bool();
+//     if (ic == nullptr)
+//     {
+//       fprintf(stderr, "Illegal Column Conversion: column %zu is not an bool column", colIdx);
+//       exit(1);
+//     }
+//     return ic;
+//   }
 
-  /** Return pointer to column at given index as FloatColumn
-	* Errors and exits if no column at index or of improper type*/
-  FloatColumn *safeConvertFloatCol_(size_t colIdx)
-  {
-    errorIfOutOfBounds_(colIdx);
-    FloatColumn *ic = colList_[colIdx]->as_float();
-    if (ic == nullptr)
-    {
-      fprintf(stderr, "Illegal Column Conversion: column %zu is not a float column", colIdx);
-      exit(1);
-    }
-    return ic;
-  }
+//   /** Return pointer to column at given index as FloatColumn
+// 	* Errors and exits if no column at index or of improper type*/
+//   FloatColumn *safeConvertFloatCol_(size_t colIdx)
+//   {
+//     errorIfOutOfBounds_(colIdx);
+//     FloatColumn *ic = colList_[colIdx]->as_float();
+//     if (ic == nullptr)
+//     {
+//       fprintf(stderr, "Illegal Column Conversion: column %zu is not a float column", colIdx);
+//       exit(1);
+//     }
+//     return ic;
+//   }
 
-  /** Return pointer to column at given index as StringColumn
-	* Errors and exits if no column at index or of improper type*/
-  StringColumn *safeConvertStringCol_(size_t colIdx)
-  {
-    errorIfOutOfBounds_(colIdx);
-    StringColumn *ic = colList_[colIdx]->as_string();
-    if (ic == nullptr)
-    {
-      fprintf(stderr, "Illegal Column Conversion: column %zu is not a string column", colIdx);
-      exit(1);
-    }
-    return ic;
-  }
+//   /** Return pointer to column at given index as StringColumn
+// 	* Errors and exits if no column at index or of improper type*/
+//   StringColumn *safeConvertStringCol_(size_t colIdx)
+//   {
+//     errorIfOutOfBounds_(colIdx);
+//     StringColumn *ic = colList_[colIdx]->as_string();
+//     if (ic == nullptr)
+//     {
+//       fprintf(stderr, "Illegal Column Conversion: column %zu is not a string column", colIdx);
+//       exit(1);
+//     }
+//     return ic;
+//   }
   
   
 };

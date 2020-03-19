@@ -335,8 +335,6 @@ fix.
 Most of the networking functionality required for this project is set up.
 
 Remaining tasks for M2
--Create clases for distributed KV store: Key, Value, KVStore; this should be fairly
-straightforward
 -Client level: create DistributedArray object, modify DataFrames to store a DistributedArray
 and a KVStore, rather than holding its own data; could be complex, need to figure out
 more specifics for how we want to break up the data
