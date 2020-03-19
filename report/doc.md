@@ -95,26 +95,41 @@ it will not support operations such as deleting, setting, and modifying columns 
 
 DataFrame's data storage will change. In previous assignments, DataFrames held all of their
 data in columns and rows. However we now want to make them distributed. Instead of storing
-the actual data, frames will now hold a DistributedArray. This array will hold keys that
-map to chunks of the DataFrame's data.
+the actual data, frames will now hold a DistributedArray of Columns. This array will hold keys that
+map to the individual Columns. Each Column will be a DistributedArray of Chunks.
 
 The DataFrame will hold a KVStore object so that it can look up data as requested by the 
 user.
 
 The DataFrame will have methods that support converting data types into frames. An example 
 is fromArray; it will take in an array of a certain type, and it will return the DataFrame 
-version. It will do so by breaking up the array into chunks; each chunk will be assigned a
-key to be stored in the distributed KV system. The key will then be added to the frame's distributed array. Once the array is completely broken up and stored, the DataFrame will be
+version (add the values in one new column). It will generate a new key for the Column,
+then break up the array into chunks; each chunk will be assigned a key to be stored
+in the distributed KV system. The key will then be added to the column's distributed
+array. Once the input array is completely broken up and stored, the DataFrame will be
 serialized and stored under its key in the distributed system.
 
 Fields:
--DistributedArray (to hold keys to the DataFrame's chunks of data)
+-DistributedArray (to hold columns)
 -KVStore: to look up data using the keys in the DistributedArray
 -Schema: keeps track of the DataFrame's column structure
 
 Methods (new ones we anticipate):
 -all the methods that create a DataFrame from a data type (ex. fromArray, fromScalar, etc.)
 -local_map: perform an operation on all data that is only held on a certain node
+
+
+*Column: Based on our previous assignments, however, now stores data in the distributed
+KV Store instead of locally. A Column will be a DistributedArray where each Key
+points to a Value containing a fixed sized number of elements that belong in this Column.
+Column will be more of an interface/abstract class, there will be typed columns for each supported datatype.
+
+Fields:
+-DistributedArray (to hold blocks of values)
+-size: number of elements in the column (!= number of keys in array)
+Methods:
+-most methods from before, for getting data from the column. not 'set' methods
+
 
 *Serializer: This class will be similar to the one started in Assignment 6. It will be 
 in charge of serializing and deserializing data, and buffering the result. The Serializer 
@@ -126,12 +141,14 @@ that it represents
 
 *DistributedArray: this class will hold reference information about data throughout the 
 system. The purpose of this class is to bridge data that lives in different areas of the 
-system
+system. This class also holds a KVStore reference, so that it can look up data not
+stored locally.
 
 Fields:
 
+* store (KVStore): to get data from the distributed system
 * keys (Array): this array will hold all Key values of interest
-* cache (Obj-to-Str Map): this map will hold the data for some of the Key objects within 
+* cache (Obj-to-Obj Map): this map will hold the data for some of the Key objects within 
 this distributed array. The key for this map will be the same Key object stored within the 
 keys array; the value will be the serialized data. The goal of the cache is to improve the 
 performance of data retrieval; before sending a data request to a key-value store, we will 
