@@ -12,7 +12,7 @@
 * The Entry class represents an Entry in a HashMap as implemented below.
 * Each Entry has a Key, Value pair of Object* and a field to link it to
 *   the next Entry. This Entry object is intended to be used as a linked
-*   list.
+*   list. It takes ownership of keys and values.
 *
 */
 class Entry : public Object {
@@ -34,9 +34,15 @@ class Entry : public Object {
 		}
 		
 		~Entry() { 
-			delete key_;
-			delete value_;
-			delete next_;
+			if (key_ != NULL && key_ != nullptr) {
+				delete key_;
+			}
+			if (value_ != NULL && value_ != nullptr) {
+				delete value_;
+			}
+			if (next_ != NULL && next_ != nullptr) {
+				delete next_;
+			}
 		}
 		
 		// Gets key field
@@ -105,6 +111,7 @@ class Entry : public Object {
  * at O(1) time because each key is unique and grabbed by index, there are no duplicate keys.
  * 
  * NOTE: This parent Map class will deal strictly with key-value pairs of (Object, Object). 
+ * IT TAKES OWNERSHIP OF KEYS AND VALUES!
  * 
  * If you wish to type-check specifically, use the SOMap and SSMap accordingly. If you wish to add 
  * more specific maps that you think will be useful, make a pull request here: 
