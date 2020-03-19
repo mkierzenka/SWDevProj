@@ -3,7 +3,10 @@
 #include "../utils/object.h"
 #include "../utils/string.h"
 #include "../utils/helper.h"
+#include "../store/kvstore.h"
+#include "../store/key.h"
 
+#include "distributedarray.h"
 #include "columnarray.h"
 
 #include "schema.h"
@@ -25,25 +28,28 @@ class DataFrame : public Object
 {
 public:
   ColumnArray *columns_; //keeps track of columns in data frame
-  Schema* schema_;        //schema of dataframe
+  KVStore* store_;
+  Schema* schema_;        //owned, schema of dataframe
+  Key* key_; //key for this dataframe in the KV store
 
   /** Create a data frame with the same columns as the give df but no rows */
-  DataFrame(DataFrame &df) : DataFrame(df.get_schema())
+  DataFrame(DataFrame &df, Key* k) : DataFrame(df.get_schema(), k)
   {
   }
 
   /** Create a data frame from a schema and columns. All columns are created
     * empty. */
-  DataFrame(Schema &schema)
+  DataFrame(Schema &schema, Key* k)
   {
     //don't copy rows
     schema_ = new Schema(schema, false);
     size_t numCols = schema_->width();
-    columns_ = new ColumnArray();
-    for (int i = 0; i < numCols; i++)
+    key_ = k;
+    columns_ = new ColumnArray(store_, key_);
+    /*for (int i = 0; i < numCols; i++)
     {
-	  columns_->addNew(schema_->col_type(i));
-    }
+	    columns_->addNew(schema_->col_type(i));
+    }*/
   }
 
   ~DataFrame()
@@ -77,7 +83,7 @@ public:
 
     //get type of column
 	columns_->add(col); // Must add to end of column array
-    char type = columns_->getType(columns_->length() - 1);
+    char type = col->getType();//columns_->getType(columns_->length() - 1);
     schema_->add_column(type, name);
   }
 

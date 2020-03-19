@@ -73,4 +73,20 @@ class DistributedArray : public Object
 
             return val;
         }
+
+        /**
+         * Gets key with specified index in array, then get data for that key
+         */
+        Value* get(size_t idx)
+        {
+            return get(keyList_[idx]);
+        }
+
+        /**
+         * Get key at specified index, return error if out-of-bounds
+         */
+        Key* getKeyAtIndex(size_t idx)
+        {
+            return dynamic_cast<Key*>(keyList_->get(idx));
+        }
 };

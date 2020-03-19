@@ -32,7 +32,7 @@ public:
     }
 
     /** Puts key-value pair into map. Since it is stored locally, don't need to include store id */
-    void put(Key* k, String* data)
+    void put(Key* k, Value* data)
     {
         //make sure adding key to right node
         if (k->getNode() != storeId)
