@@ -34,3 +34,5 @@
 	one has just the dataframes, and is where the Application pulls "get" from
 	the other has all the actual blocks of data that is used by a dataframe to return
 	actual values (get_double(i,j))
+
+* Change all NULL references to nullptr
