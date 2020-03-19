@@ -13,14 +13,13 @@
 * Each Entry has a Key, Value pair of Object* and a field to link it to
 *   the next Entry. This Entry object is intended to be used as a linked
 *   list.
-* An Entry does _not_ own its fields, they must be deleted by user. ---- now it does own its fields
 *
 */
 class Entry : public Object {
 	public:
-		Object* key_;
-		Object* value_;
-		Entry* next_;
+		Object* key_;    //owned
+		Object* value_;  //owned
+		Entry* next_;    //owned
 		
 		Entry() : Object() {
 			this->key_ = nullptr;
