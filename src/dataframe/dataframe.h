@@ -118,7 +118,7 @@ public:
   /** Set the value at the given column and row to the given value.
     * If the column is not  of the right type or the indices are out of
     * bound, the result is undefined. */
-  void set(size_t col, size_t row, int val)
+  /*void set(size_t col, size_t row, int val)
   {
 	columns_->set(col, row, val);
   }
@@ -136,13 +136,13 @@ public:
   void set(size_t col, size_t row, String *val)
   {
     columns_->set(col, row, val);
-  }
+  }*/
 
   /** Set the fields of the given row object with values from the columns at
     * the given offset.  If the row is not form the same schema as the
     * dataframe, results are undefined.
     */
-  void fill_row(size_t idx, Row &row)
+ /* void fill_row(size_t idx, Row &row)
   {
     if (idx >= schema_->length())
     {
@@ -157,7 +157,7 @@ public:
       checkColTypes_(row.col_type(i), i);
       setColumnValByType_(i, idx, row);
     }
-  }
+  }*/
 
   /** Add a row at the end of this dataframe. The row is expected to have
    *  the right schema and be filled with values, otherwise undedined.  */
@@ -226,7 +226,8 @@ public:
     DataFrame *df_;
     Rower &r_;
 
-    DataFrameThread(DataFrame *df, Rower &r, size_t startRowIdx, size_t endRowIdx) : df_(df), r_(r), startRowIdx_(startRowIdx), endRowIdx_(endRowIdx) {}
+    DataFrameThread(DataFrame *df, Rower &r, size_t startRowIdx, size_t endRowIdx) :
+		df_(df), r_(r), startRowIdx_(startRowIdx), endRowIdx_(endRowIdx) {}
 
     void run()
     {
@@ -321,7 +322,7 @@ public:
   }
 
   /** Set the field from the row given the type */
-  void setColumnValByType_(size_t colIdx, size_t rowIdx, Row &row)
+/*  void setColumnValByType_(size_t colIdx, size_t rowIdx, Row &row)
   {
     switch (row.col_type(colIdx))
     {
@@ -340,7 +341,7 @@ public:
     default:
       fprintf(stderr, "Invalid col type: %c", row.col_type(colIdx));
     }
-  }
+  }*/
 
   /** Add to end of column depending on the type */
   void addToEndOfColByType_(size_t colIdx, Row &row)

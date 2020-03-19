@@ -24,12 +24,14 @@ void basicTest2()
   DataFrame df(s);
   Row r(df.get_schema());
   int numRows = 100 * 1000;
+  int expectedSum = 0;
   for (int i = 0; i < numRows; i++)
   {
     r.set(0, i);
     r.set(1, i + 1);
-    r.set(2, 0);
+    r.set(2, i);
     df.add_row(r);
+	expectedSum += (i + i + 1 + i);
   }
   assert(df.nrows() == numRows);
   assert(df.ncols() == 3);
@@ -37,11 +39,12 @@ void basicTest2()
   SumRower sr(&df);
   df.map(sr);
 
-  assert(df.get_int(2, 0) == 1);
+  assert(sr.getSum() == expectedSum);
+  /*assert(df.get_int(2, 0) == 1);
   assert(df.get_int(2, 1501) == (1501 + 1502));
   assert(df.get_int(0, 45617) == 45617);
   assert(df.get_int(1, 45617) == 45618);
-  assert(df.get_int(2, 45617) == (45617 + 45618));
+  assert(df.get_int(2, 45617) == (45617 + 45618));*/
 
   SYSTEM->pln("Basic test2 passed!");
 }
@@ -240,7 +243,7 @@ void dataFrameTest()
   assert(df.get_bool(1, 0) == true);
   assert(df.get_int(2, 0) == 77);
 
-  Row ro(df.get_schema());
+/*  Row ro(df.get_schema());
   ro.set(0, 3);
   ro.set(1, false);
   ro.set(2, 0);
@@ -252,7 +255,7 @@ void dataFrameTest()
 
   assert(df.get_int(0, 0) == 3);
   assert(df.get_bool(1, 0) == false);
-  assert(df.get_int(2, 0) == 0);
+  assert(df.get_int(2, 0) == 0);*/
 
   SYSTEM->pln("Data frame test passed!");
 }
@@ -440,7 +443,7 @@ void findIntRowerTest()
 
   for (int i = 0; i < numRowsRDF; i++) {
 	  rTwo.clear();
-	  for (int j = 0; j < colNum - 1; j++) {
+	  for (int j = 0; j < colNum; j++) {
 		if (i == j) {
 			rTwo.set(j, j * mult); //odd cols should be found/counted
 		} else if (j == 3) {
@@ -449,7 +452,6 @@ void findIntRowerTest()
 			rTwo.set(j, j * (mult - 1)); //should not be counted
 		}
 	  }
-	  rTwo.set(colNum - 1, 0); // last col is int and 0, to report count
 	  vals.add_row(rTwo);
   }
   /*SYSTEM->pln("Vals before map");
@@ -461,20 +463,9 @@ void findIntRowerTest()
 
   /*SYSTEM->pln("\nVals after map");
   vals.print();*/
-  
-  // Check each row's count
-  assert(vals.get_int(colNum - 1, 0) == 2);
-  assert(vals.get_int(colNum - 1, 1) == 3);
-  assert(vals.get_int(colNum - 1, 2) == 3);
-  assert(vals.get_int(colNum - 1, 3) == 2);
-  assert(vals.get_int(colNum - 1, 4) == 3);
-  assert(vals.get_int(colNum - 1, 5) == 2);
-  assert(vals.get_int(colNum - 1, 6) == 2);
-  assert(vals.get_int(colNum - 1, 7) == 2);
-  assert(vals.get_int(colNum - 1, 8) == 2);
-  // Check final count of Rower
-  assert(ir.getCount() == 21);
 
+  // Check final count of Rower
+  assert(ir.getCount() == 22);
   SYSTEM->pln("Find int rower test passed!");
 }
 
@@ -508,7 +499,7 @@ void findIntRowerTest_pmap()
 
   for (int i = 0; i < numRowsRDF; i++) {
 	  rTwo.clear();
-	  for (int j = 0; j < colNum - 1; j++) {
+	  for (int j = 0; j < colNum; j++) {
 		if (i == j) {
 			rTwo.set(j, j * mult); //odd cols should be found/counted
 		} else if (j == 3) {
@@ -517,7 +508,6 @@ void findIntRowerTest_pmap()
 			rTwo.set(j, j * (mult - 1)); //should not be counted
 		}
 	  }
-	  rTwo.set(colNum - 1, 0); // last col is int and 0, to report count
 	  vals.add_row(rTwo);
   }
   /*SYSTEM->pln("Vals before map");
@@ -530,20 +520,8 @@ void findIntRowerTest_pmap()
   /*SYSTEM->pln("\nVals after map");
   vals.print();*/
   
-  // Check each row's count
-  assert(vals.get_int(colNum - 1, 0) == 2);
-  assert(vals.get_int(colNum - 1, 1) == 3);
-  assert(vals.get_int(colNum - 1, 2) == 3);
-  assert(vals.get_int(colNum - 1, 3) == 2);
-  assert(vals.get_int(colNum - 1, 4) == 3);
-  assert(vals.get_int(colNum - 1, 5) == 2);
-  assert(vals.get_int(colNum - 1, 6) == 2);
-  assert(vals.get_int(colNum - 1, 7) == 2);
-  assert(vals.get_int(colNum - 1, 8) == 2);
   // Check final count of Rower
-  assert(ir.getCount() == 21);
-
-
+  assert(ir.getCount() == 22);
   SYSTEM->pln("Find int rower pmap test passed!");
 }
 
@@ -600,9 +578,7 @@ void findRower_variousTypes()
   rFour.set(5, &str4);
   rFour.set(6, false); //Y
   rFour.set(7, 2.3f); //Y
-
-  //sum
-  rFour.set(8, 0);
+  rFour.set(8, 7); //Y
 
   rFive.set(0, 46); 
   rFive.set(1, true);//Y
@@ -612,8 +588,6 @@ void findRower_variousTypes()
   rFive.set(5, &str5);
   rFive.set(6, true); //Y
   rFive.set(7, 2.1f);
-
-  //sum
   rFive.set(8, 0);
 
   vals.add_row(rFour);
@@ -622,10 +596,7 @@ void findRower_variousTypes()
   FindRower ir(&data, &vals);
   vals.map(ir);
 
-  assert(vals.get_int(8, 0) == 5);
-
-  assert(vals.get_int(8, 1) == 4);
-
+  assert(ir.getCount() == 10);
   SYSTEM->pln("Find rower test for various types passed!");
 }
 
@@ -674,10 +645,7 @@ void lengthRowerTest() {
   LengthRower lr(&d);
   d.map(lr);
 
-  assert(d.get_int(6, 0) == 12);
-  assert(d.get_int(6, 1) == 17);
-  assert(d.get_int(6, 2) == 16);
-
+  assert(lr.getLen() == 45);
   SYSTEM->pln("Length rower test passed!");
 }
 

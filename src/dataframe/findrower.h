@@ -9,11 +9,9 @@
  *  This Rower takes in 2 dataframe (Search Frame and Row Frame).
  *  It should be mapped over the "Row Frame"
  *  It determines how many elements from a row in "Row Frame" are found in "Search Frame"
- *  It then sets the last column of the row it is looping over in "Row Frame"
- *  to be a count of the above. This Rower also keeps track of the total number
- *  of elements it has found so far (sum over all rows it accepts).
+ *  This Rower keeps track of the total number of elements it has found so far 
+ *  (sum over all rows it accepts).
  *
- *  ASSUME: "Row Frame" ends in an integer column
  */
 class FindRower : public Rower
 {
@@ -22,9 +20,12 @@ public:
     DataFrame *rowFrame_;
 	size_t totalFound_; //total number of elements found
 
-    FindRower(DataFrame *sf, DataFrame *rf, size_t numFoundSoFar) : searchFrame_(sf), rowFrame_(rf), totalFound_(numFoundSoFar) {}
+    FindRower(DataFrame *sf, DataFrame *rf, size_t numFoundSoFar) :
+		searchFrame_(sf), rowFrame_(rf), totalFound_(numFoundSoFar) {}
 
     FindRower(DataFrame *sf, DataFrame *rf) : FindRower(sf, rf, 0) {}
+	
+	~FindRower() {}
 	
 	/**
 	 * Returns the running total number of "Search Frame" elements this rower
@@ -34,23 +35,20 @@ public:
 		return totalFound_;
 	}
 
-    /** Go through each element in the row (except for last). If element
+    /** Go through each element in the row. If element
      * found in the dataframe, increment found. found becomes last element
      * in row. Should be a row from "Row Frame"*/
     bool accept(Row &r)
     {
-        int found = 0;
-        for (size_t i = 0; i < r.width() - 1; i++)
+        size_t ncols = r.width();
+		for (size_t i = 0; i < ncols; i++)
         {
             //row data should only be ints
             if (intElementInDf_(r, i) || boolElementInDf_(r, i) || stringElementInDf_(r, i) || floatElementInDf_(r, i))
             {
-                found++;
+                totalFound_++;
             }
         }
-
-        rowFrame_->set(r.width() - 1, r.get_idx(), found);
-		totalFound_ += found;
     }
 	
 	/** Override. Clones this rower for parallel execution through pmap */
@@ -63,7 +61,7 @@ public:
 	 */
     void join_delete(Rower *other) {
 		FindRower* otherFR = dynamic_cast<FindRower*>(other);
-		if (other == nullptr) {
+		if (otherFR == nullptr) {
 			perror("Trying to join non FindRower with this FindRower\n");
 		}
 

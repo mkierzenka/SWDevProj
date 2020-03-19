@@ -1,35 +1,54 @@
 #include "rower.h"
 #include "dataframe.h"
 
-/** This class is a rower implementation. It calculates the total length of the row's elements
- * and stores it in the row's last element. For ints it calculates the number of digits. Floats are
- * rounded down to the nearest int and the number of digits are counted. Boolean adds 1 or 0, depending on
+/** This class is a rower implementation. It calculates the total length of the row's elements.
+ * For ints it calculates the number of digits. Floats are rounded down to the
+ * nearest int and the number of digits are counted. Boolean adds 1 or 0, depending on
  * the value. Strings add the number of characters in the string */
 class LengthRower : public Rower
 {
 public:
     DataFrame *df_;
+	size_t totalLen_;
 
-    LengthRower(DataFrame* data) : df_(data) {};
+    LengthRower(DataFrame* data, size_t lenSoFar) : df_(data), totalLen_(lenSoFar) {};
 
-    /** Counts the length of the row based on our strategy above and sets it to the last value of the row.
-     * Therefore the last column of this row must be an int */
+    LengthRower(DataFrame* data) : LengthRower(data, 0) {};
+	
+	~LengthRower() {}
+
+	/**Get the total length found by this Rower so far*/
+	size_t getLen() {
+		return totalLen_;
+	}
+
+    /** Adds the total length of the row, based on our strategy above to local total*/
     bool accept(Row &r)
     {
-        int size = 0;
-        for (size_t i = 0; i < r.width() - 1; i++)
+        size_t ncols = r.width();
+		for (size_t i = 0; i < ncols; i++)
         {
-            size += getSizeByType_(r, i);
+            totalLen_ += getSizeByType_(r, i);
         }
-
-        df_->set(r.width() - 1, r.get_idx(), size);
     }
 
     /** Once traversal of the data frame is complete the rowers that were
       split off will be joined.  There will be one join per split. The
       original object will be the last to be called join on. The join method
       is reponsible for cleaning up memory. */
-    void join_delete(Rower *other) {}
+    void join_delete(Rower *other) {
+		LengthRower* otherLR = dynamic_cast<LengthRower*>(other);
+		if (otherLR == nullptr) {
+			perror("Trying to join non LengthRower with this LengthRower\n");
+		}
+
+		totalLen_ += otherLR->getLen();
+	}
+	
+	/** Override. Clones this rower for parallel execution through pmap */
+	Rower* clone() {
+		return new LengthRower(df_, totalLen_);
+	}
 
     /** This helper determines the type of the row, then returns the length of that element */
     size_t getSizeByType_(Row &r, size_t idx)

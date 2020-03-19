@@ -28,7 +28,7 @@ int main() {
 	assert(df->get_bool(2,0) == b);
 	assert(df->get_string(3,0)->equals(&str));
 	
-	df->set(0,0,num - 1);
+	/*df->set(0,0,num - 1);
 	df->set(1,0,f - 1);
 	df->set(2,0,!b);
 	df->set(3,0,&str2);
@@ -36,7 +36,7 @@ int main() {
 	assert(df->get_int(0,0) == num - 1);
 	assert(df->get_float(1,0) == f - 1);
 	assert(df->get_bool(2,0) == !b);
-	assert(df->get_string(3,0)->equals(&str2));
+	assert(df->get_string(3,0)->equals(&str2));*/
 
 	system.pln("It worked!");
 	
