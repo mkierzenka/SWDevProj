@@ -13,7 +13,7 @@
 * Each Entry has a Key, Value pair of Object* and a field to link it to
 *   the next Entry. This Entry object is intended to be used as a linked
 *   list.
-* An Entry does _not_ own its fields, they must be deleted by user.
+* An Entry does _not_ own its fields, they must be deleted by user. ---- now it does own its fields
 *
 */
 class Entry : public Object {
@@ -34,7 +34,11 @@ class Entry : public Object {
 			this->next_ = nullptr;
 		}
 		
-		~Entry() { }
+		~Entry() { 
+			delete key_;
+			delete value_;
+			delete next_;
+		}
 		
 		// Gets key field
 		Object* getKey() {
@@ -140,13 +144,12 @@ class Map : public Object {
 		 * 
 		 */
 		~Map() {
-			//delete[] buckets_;
 			for (size_t i = 0; i < capacity_; i++) {
 				if (buckets_[i]) {
 					delete buckets_[i];
 				}
 			}
-			//delete buckets_;
+			delete[] buckets_;
 		}
 
 		// Helper method for equals()
@@ -259,13 +262,13 @@ class Map : public Object {
 		/**
 		 * @brief Prints a representation of map to the console.
 		 */
-		// virtual void print() {
-		// 	printf("Map:\n");
-		// 	for(size_t i = 0; i < size_; i++) {
-		// 		buckets_[i]->print();
-		// 		printf("\n");
-		// 	}
-		// }
+		/*virtual void print() {
+			printf("Map:\n");
+			for(size_t i = 0; i < size_; i++) {
+				buckets_[i]->print();
+				printf("\n");
+			}
+		}*/
 
 		/**
 		 * @brief Determines the number of mappings in this map.
