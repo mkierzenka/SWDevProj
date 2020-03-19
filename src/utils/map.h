@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../utils/object.h"
-#include "../utils/string.h"
-#include "../utils/helper.h"
+#include "object.h"
+#include "string.h"
+#include "helper.h"
 #include <cstdio>
 
 // some inspiration from https://dzone.com/articles/custom-hashmap-implementation-in-java
