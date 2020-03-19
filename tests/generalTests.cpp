@@ -1,5 +1,3 @@
-
-
 #include "../src/dataframe/dataframe.h"
 #include "../src/dataframe/intcolumn.h"
 #include "../src/dataframe/boolcolumn.h"
@@ -40,12 +38,6 @@ void basicTest2()
   df.map(sr);
 
   assert(sr.getSum() == expectedSum);
-  /*assert(df.get_int(2, 0) == 1);
-  assert(df.get_int(2, 1501) == (1501 + 1502));
-  assert(df.get_int(0, 45617) == 45617);
-  assert(df.get_int(1, 45617) == 45618);
-  assert(df.get_int(2, 45617) == (45617 + 45618));*/
-
   SYSTEM->pln("Basic test2 passed!");
 }
 
@@ -88,7 +80,6 @@ void testSchema2()
     scm->add_row(nullptr);
   }
 
-  SYSTEM->pln("Schema2 test passed!");
   delete s0;
   delete s1;
   delete s2;
@@ -96,6 +87,7 @@ void testSchema2()
   delete s4;
   delete s5;
   delete scm;
+  SYSTEM->pln("Schema2 test passed!");
 }
 
 void testSchema()
@@ -127,7 +119,7 @@ void testSchema()
   assert(scm->col_name(3)->equals(s3));
   assert(scm->col_type(3) == 'S');
   assert(scm->col_type(4) == 'B');
-  SYSTEM->pln("Schema test passed!");
+
   delete s0;
   delete s1;
   delete s2;
@@ -135,11 +127,11 @@ void testSchema()
   delete s4;
   delete s5;
   delete scm;
+  SYSTEM->pln("Schema test passed!");
 }
 
 void columnTests()
 {
-
   SYSTEM->pln("Columns test started...");
 
   int intA = 1;
@@ -180,8 +172,7 @@ void columnTests()
   String *stringB = new String("Morning");
   String *stringC = new String("Graduation");
   String *nptr = nullptr;
-  StringColumn *sc = new StringColumn(5, stringA, stringC,
-                                      stringA, stringB, nptr);
+  StringColumn *sc = new StringColumn(5, stringA, stringC, stringA, stringB, nptr);
 
   assert(sc->get(1)->equals(stringC));
   assert(sc->get(2)->equals(stringA));
@@ -242,28 +233,12 @@ void dataFrameTest()
   assert(df.get_int(0, 0) == 4);
   assert(df.get_bool(1, 0) == true);
   assert(df.get_int(2, 0) == 77);
-
-/*  Row ro(df.get_schema());
-  ro.set(0, 3);
-  ro.set(1, false);
-  ro.set(2, 0);
-
-  df.fill_row(0, ro);
-
-  assert(df.nrows() == 1);
-  assert(s.length() == 1);
-
-  assert(df.get_int(0, 0) == 3);
-  assert(df.get_bool(1, 0) == false);
-  assert(df.get_int(2, 0) == 0);*/
-
   SYSTEM->pln("Data frame test passed!");
 }
 
 void dataFrameLargeDataTest()
 {
   Sys *c = new Sys();
-
   c->pln("Large data frame test started...");
 
   int numCols = 50 * 1000;
@@ -293,14 +268,12 @@ void dataFrameLargeDataTest()
   assert(df.get_int(0, 0) == 0);
   assert(df.get_int(40574, 200) == 40774);
   assert(df.get_int(numCols - 1, numRows - 1) == (numCols - 1) + (numRows - 1));
-
   SYSTEM->pln("Large data frame test passed!");
 }
 
 void rowTest()
 {
   Sys *c = new Sys();
-
   SYSTEM->pln("Row test started...");
 
   Schema s("IFBSFS");
@@ -367,7 +340,6 @@ void basicDfTest()
   assert(dfTwo.nrows() == 1);
   assert(dfTwo.ncols() == 3);
   assert(df.nrows() != dfTwo.nrows());
-
   SYSTEM->pln("Basic df test passed!");
 }
 

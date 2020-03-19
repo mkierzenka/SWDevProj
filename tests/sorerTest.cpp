@@ -63,14 +63,10 @@ int main(int argc, char **argv) {
     size_t lastColIdx = d->ncols() - 1;
     d->map(*lr);
 
-    //make sure rower works
-    //assert(d->get_int(lastColIdx, 0) == 62);
-    //assert(d->get_int(lastColIdx, 670) == 62);
-    //assert(d->get_int(lastColIdx, 999) == 63);
-	assert(lr->getLen() == 60631);
+	assert(lr->getLen() == 60631); //check rower is correct
 
-    puts("Sorer test passed!");
 	delete lr;
     delete d;
     delete s;
+	puts("Sorer test passed!");
 }
