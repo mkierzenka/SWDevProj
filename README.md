@@ -30,4 +30,6 @@
 
 * Change all NULL references to nullptr
 
-*Rename float references to double
+* Rename float references to double
+
+* Remove all column name references

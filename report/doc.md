@@ -327,6 +327,8 @@ it be possible for the DataFrame to technically access the deserialized form of 
 Could this cause issues?
 
 
+Should we serialize and deserialize KV stores?
+
 ## Status
 We have decided to use another group's Sorer implementation, as ours was written in Python and 
 not fully correct.
@@ -350,6 +352,6 @@ Remaining tasks for M2
 -Client level: modify columns to have distributed arrays; could be complex, might result in changes to
 dataframe as well
 -from methods
--Figure out how we want to serialize all of our classes
+-Test serialization
 -Create Application level: fairly straightforward, mainly uses classes from bottom two layers
 -Jan feedback from M1
