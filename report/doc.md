@@ -1,9 +1,9 @@
 ## Usage:
-"make build" - compiles all tests
-"make test" - runs sorer test
-"make testGeneral" - runs sorer test and a bunch of others testing different things
-"make memory" - runs sorer test through valgrind
-"make clean" - deletes compiled files
+* "make build" - compiles all tests
+* "make test" - runs sorer test
+* "make testGeneral" - runs sorer test and a bunch of others testing different things
+* "make memory" - runs sorer test through valgrind
+* "make clean" - deletes compiled files
 
 
 ## Introduction
