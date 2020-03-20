@@ -46,8 +46,7 @@ public:
     /** Get data from the local store. Returns nullptr if data doesn't exist in map */
     DataFrame* get(Key* k)
     {
-        Object* o = kvMap->get(k->getKeyStr());
-        Value* val = dynamic_cast<Value*>(o);
+        Value* val = getValue(k);
         //set up new serializer to deserialize returned data into a dataframe
         Serializer* s = new Serializer();
 
@@ -63,5 +62,12 @@ public:
     DataFrame* waitAndGet(Key *k)
     {
         //will need to create a Message 
+    }
+
+    /** Get the actual Value that the given key maps to */
+    Value* getValue(Key *k)
+    {
+        Object* o = kvMap->get(k->getKeyStr());
+        return dynamic_cast<Value*>(o);
     }
 };
