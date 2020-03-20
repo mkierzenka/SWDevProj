@@ -106,42 +106,49 @@ of storing the actual data, Columns will now be distributed. Like before, the Da
 have an array of columns. However the Column class will change, as it will now contain a 
 Distributed Array of keys. Each key will map to a "block" of data that is held in the store. 
 With this change, now that Columns no longer store their own data, we will be able to eliminate 
-the duplicate Column classes for each type. Instead, we can just have a field in Column that describes the type.
+the duplicate Column classes for each type. Instead, we can just have a field in Column that 
+describes the type.
 
 The DataFrame will hold a KVStore object so that it can look up data as requested by the 
 user.
 
 The DataFrame will have methods that support converting data types into frames. An example 
 is fromArray; it will take in an array of a certain type, and it will return the DataFrame 
-version (add the values in one new column). It will generate a new key for the Column,
-then break up the array into chunks; each chunk will be assigned a key to be stored
-in the distributed KV system. The key will then be added to the column's distributed
-array. Once the input array is completely broken up and stored, the DataFrame will be
-serialized and stored under its key in the distributed system.
+version (add the values in one new column). It will break up the array into chunks; each chunk 
+will be assigned a key to be stored in the distributed KV system. The key will then be added to 
+the column's distributed array. Once the input array is completely broken up and stored, the 
+DataFrame will be serialized and stored under its key in the distributed system.
 
 Fields:
--DistributedArray (to hold columns)
--KVStore: to look up data using the keys in the DistributedArray
--Schema: keeps track of the DataFrame's column structure
+* DistributedArray (to hold columns)
+* KVStore: to look up data using the keys in the DistributedArray
+* Schema: keeps track of the DataFrame's column structure
+* Key: key for this dataframe in the store; will be used to create the keys for the
+frame's columns' chunks
+
 
 Methods (new ones we anticipate):
--all the methods that create a DataFrame from a data type (ex. fromArray, fromScalar, etc.)
--local_map: perform an operation on all data that is only held on a certain node
+* all the methods that create a DataFrame from a data type (ex. fromArray, fromScalar, etc.)
+* local_map: perform an operation on all data that is only held on a certain node
+* since a dataframe is immutable, we can remove any that modify the dataframe
 
 
-*Column: Based on our previous assignments, however, now stores data in the distributed
-KV Store instead of locally. A Column will be a DistributedArray where each Key
-points to a Value containing a fixed sized number of elements that belong in this Column.
-Column will be more of an interface/abstract class, there will be typed columns for each supported datatype.
+* Column: A column now stores data in the distributed KV Store, instead of locally. A Column will be a DistributedArray where each Key points to a Value containing a fixed sized number of elements that belong in this Column. Since we are no longer storing elements
+directly in the column, we only need one column class now.
 
 Fields:
--DistributedArray (to hold blocks of values)
--size: number of elements in the column (!= number of keys in array)
+* DistributedArray (to hold blocks of values)
+* size: number of elements in the column (!= number of keys in array)
+* KVStore: will be used by column to retrieve its own data when needed and add keys to the store
+* ColType(enum): what type of column is this? String, boolean, int, or double
+* Key: key of the dataframe that the column belongs to; will be used to build up block keys
+
 Methods:
--most methods from before, for getting data from the column. not 'set' methods
+* most methods from before, for getting data from the column. not 'set' methods (or anything else that modifies the column). Might include the push_back methods
+* add_all: one for each data type; adds all given elements of that datatype to the array; breaks data up into chunks, creates keys for those chunks, and adds them to the KVStore
 
 
-*Serializer: This class will be similar to the one started in Assignment 6. It will be 
+* Serializer: This class will be similar to the one started in Assignment 6. It will be 
 in charge of serializing and deserializing data, and buffering the result. The Serializer 
 will be used in multiple places in this project. All of DataFrame's from... methods will 
 need to initialize a Serializer to serialize the constructed dataframe, to store in the 
@@ -149,7 +156,7 @@ key-value store. The wait and waitAndGet methods within Store will need to inita
 Serializer; the serializer will need to convert the serialized string data into the dataframe 
 that it represents
 
-*DistributedArray: this class will hold reference information about data throughout the 
+* DistributedArray: this class will hold reference information about data throughout the 
 system. The purpose of this class is to bridge data that lives in different areas of the 
 system. This class also holds a KVStore reference, so that it can look up data not
 stored locally.
@@ -173,8 +180,10 @@ Methods:
 * get(Key): get the value for the specified key from the distributed array. Check the cache first and if the cache
 does not contain the data, then make a call too the KV
 store
+* get(size_t): get key at specified index in array, then return data for that key
+* getKeyAtIndex(size_t): return key at the given index in the array
 
-*Note that the cache methods defined here will delegate to the Cache object, which work 
+*NOTE that the cache methods defined here will delegate to the Cache object, which work 
 on the Cache's map object*
 
 
@@ -304,13 +313,6 @@ Server which only handles registering new Clients would be cleaner, but that doe
 to fit with the provided example code. Any advice?
 
 
-We are unsure about how we want to store our data. Currently, our plan is store everything
-in one key-value store (dataframes and chunks). However, since these two serialized blobs
-will need to be handled differently, it might make sense to store dataframes and chunks in
-two separate stores. The dataframe store would need to be able to access the chunk store,
-and both stores would still need networking capabilities.
-
-
 Should each Client (KV store) always be connected to every other Client? Are we expecting 
 100K Client systems?
 
@@ -345,9 +347,9 @@ fix.
 Most of the networking functionality required for this project is set up.
 
 Remaining tasks for M2
--Client level: create DistributedArray object, modify DataFrames to store a DistributedArray
-and a KVStore, rather than holding its own data; could be complex, need to figure out
-more specifics for how we want to break up the data
+-Client level: modify columns to have distributed arrays; could be complex, might result in changes to
+dataframe as well
 -from methods
 -Figure out how we want to serialize all of our classes
 -Create Application level: fairly straightforward, mainly uses classes from bottom two layers
+-Jan feedback from M1
