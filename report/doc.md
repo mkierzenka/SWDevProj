@@ -347,9 +347,9 @@ fix.
 Most of the networking functionality required for this project is set up.
 
 Remaining tasks for M2
--Client level: create DistributedArray object, modify DataFrames to store a DistributedArray
-and a KVStore, rather than holding its own data; could be complex, need to figure out
-more specifics for how we want to break up the data
+-Client level: modify columns to have distributed arrays; could be complex, might result in changes to
+dataframe as well
 -from methods
 -Figure out how we want to serialize all of our classes
 -Create Application level: fairly straightforward, mainly uses classes from bottom two layers
+-Jan feedback from M1
