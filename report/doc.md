@@ -145,9 +145,10 @@ Fields:
 
 Methods:
 * most methods from before, for getting data from the column. not 'set' methods (or anything else that modifies the column). Might include the push_back methods
+* add_all: one for each data type; adds all given elements of that datatype to the array; breaks data up into chunks, creates keys for those chunks, and adds them to the KVStore
 
 
-*Serializer: This class will be similar to the one started in Assignment 6. It will be 
+* Serializer: This class will be similar to the one started in Assignment 6. It will be 
 in charge of serializing and deserializing data, and buffering the result. The Serializer 
 will be used in multiple places in this project. All of DataFrame's from... methods will 
 need to initialize a Serializer to serialize the constructed dataframe, to store in the 
@@ -155,7 +156,7 @@ key-value store. The wait and waitAndGet methods within Store will need to inita
 Serializer; the serializer will need to convert the serialized string data into the dataframe 
 that it represents
 
-*DistributedArray: this class will hold reference information about data throughout the 
+* DistributedArray: this class will hold reference information about data throughout the 
 system. The purpose of this class is to bridge data that lives in different areas of the 
 system. This class also holds a KVStore reference, so that it can look up data not
 stored locally.
@@ -179,8 +180,10 @@ Methods:
 * get(Key): get the value for the specified key from the distributed array. Check the cache first and if the cache
 does not contain the data, then make a call too the KV
 store
+* get(size_t): get key at specified index in array, then return data for that key
+* getKeyAtIndex(size_t): return key at the given index in the array
 
-*Note that the cache methods defined here will delegate to the Cache object, which work 
+*NOTE that the cache methods defined here will delegate to the Cache object, which work 
 on the Cache's map object*
 
 
@@ -308,13 +311,6 @@ to the system). We are not sure on the details of implementing this; should the 
 be another node of the network with it's own Key-Value store? Seems like having a dedicated 
 Server which only handles registering new Clients would be cleaner, but that doesn't seem 
 to fit with the provided example code. Any advice?
-
-
-We are unsure about how we want to store our data. Currently, our plan is store everything
-in one key-value store (dataframes and chunks). However, since these two serialized blobs
-will need to be handled differently, it might make sense to store dataframes and chunks in
-two separate stores. The dataframe store would need to be able to access the chunk store,
-and both stores would still need networking capabilities.
 
 
 Should each Client (KV store) always be connected to every other Client? Are we expecting 

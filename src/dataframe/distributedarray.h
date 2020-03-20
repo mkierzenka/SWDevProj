@@ -81,7 +81,7 @@ class DistributedArray : public Object
          */
         Value* get(size_t idx)
         {
-            return get(dynamic_cast<Key*>(keyList_->get(idx)));
+            return get(getKeyAtIndex(idx));
         }
 
         /**
