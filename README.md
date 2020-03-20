@@ -28,9 +28,6 @@
 
 * document which methods using String\* take ownership and makes copies in comments
 
-* Maybe refactor to have 2 stores: blobstore and kvstore
-	one has just the dataframes, and is where the Application pulls "get" from
-	the other has all the actual blocks of data that is used by a dataframe to return
-	actual values (get_double(i,j))
-
 * Change all NULL references to nullptr
+
+*Rename float references to double
