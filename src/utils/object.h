@@ -1,5 +1,8 @@
 #pragma once
+
 #include "helper.h"
+#include "../serial/serial.h"
+
 // LANGUAGE: CwC
 
 /** Base class for all objects in the system.
@@ -27,4 +30,10 @@ public:
 
     /** Returned c_str is owned by the object, don't modify nor delete. */
     virtual char* c_str() { return nullptr; }
+
+    /** Serialize an object with the given serializer */
+    virtual void serialize(Serializer* s) { }
+
+    /** Deserialize an object with the given serializer */
+    virtual void deserialize(Serializer* s) { }
 }; 

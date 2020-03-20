@@ -1,6 +1,6 @@
 //lang::CwC
 
-#pragma once
+#pragma on.ce
 
 #include "object.h"
 
@@ -28,17 +28,57 @@ public:
 	// deconstructor
 	~Array()
 	{
-        for (int i = 0; i < len_; i++) {
-            //delete individual elements
-            delete objList_[i];
-        }
-		delete[] objList_;
+        deleteObjList_();
 	}
 
 	// get the length of this array
 	size_t length()
 	{
 		return len_;
+	}
+
+	/** Serialize this Array of Objects into s*/
+	void serialize(Serializer* s) {
+		s->write(listSize_);
+		s->write(len_);
+		for (size_t i = 0; i < len_; i++) {
+			objList_[i]->serialize(s);
+		}
+	}
+
+	/** Deserialize this Array as an Array of Objects, mutates this*/
+	void deserialize(Serializer* s) {
+		listSize_ = s->readSizeT();
+		len_ = s->readSizeT();
+		//make sure there's enough capacity in the array
+		assert(listSize >= len);
+
+		// delete all old data in this array here
+		deleteObjList_();
+		objList_ = new Object *[listSize_];
+		for (size_t i = 0; i < len_; i++)
+		{
+			objList_[i] = new Object();
+			objList_[i]->deserialize(s);
+		}
+	}
+
+	/**
+	 * Deserialize by treating the elements at columns. May need something similar
+	 * for Serialization */
+	void deserializeAsColumnArray(Serializer* s) {
+		listSize_ = s->readSizeT();
+		len_ = s->readSizeT();
+		//make sure there's enough capacity in the array
+		assert(listSize_ >= len_);
+
+		// delete all old data in this array here
+		deleteObjList_();
+		objList_ = new Object *[listSize_];
+		for (size_t i = 0; i < len_; i++)
+		{
+			objList_[i] = s->readColumn(s);
+		}
 	}
 
 	// check if this array equals to other array
@@ -225,5 +265,17 @@ public:
 		//delete old reference and set updated pointer
 		delete[] objList_;
 		objList_ = tmp;
+	}
+
+	/**
+	 * Delete all elements in object list and then the list itself
+	 */ 
+	void deleteObjList_()
+	{
+		for (int i = 0; i < len_; i++) {
+            //delete individual elements
+            delete objList_[i];
+        }
+		delete[] objList_;
 	}
 };

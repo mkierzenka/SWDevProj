@@ -87,7 +87,14 @@ public:
 		curBuffPtrWrite_ += sizeof(size_t);
 	}
 	
+	void write(char c) {
+		memcpy(curBuffPtrWrite_, &c, sizeof(char));
+		curBuffPtrWrite_ += sizeof(char);
+	}
+
+	/** Calculates the length using strlen*/
 	void write(const char* str) {
+		//issue with strlen if null byte in middle of string?
 		size_t lenStr = strlen(str); //length of str
 		memcpy(curBuffPtrWrite_, str, lenStr + 1); //add 1 to also copy null terminator
 		curBuffPtrWrite_ += lenStr+1;
@@ -130,6 +137,13 @@ public:
 		long out;
 		memcpy(&out, curBuffPtrRead_, sizeof(long));
 		curBuffPtrRead_ += sizeof(long);
+		return out;
+	}
+
+	char readChar() {
+		char out;
+		memcpy(&out, curBuffPtrRead_, sizeof(char));
+		curBuffPtrRead_ += sizeof(char);
 		return out;
 	}
 	

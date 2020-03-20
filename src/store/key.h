@@ -26,6 +26,18 @@ public:
         delete kStr_;
     }
 
+    /** Serialize a Key*/
+    void serialize(Serializer* s) {
+        kStr_->serialize(s);
+        s->write(homeNode_);
+    }
+
+    /** Deserialize a Key, mutate this Key*/
+    void deserialize(Serializer* s) {
+        kStr_->deserialize(s);
+        homeNode_ = s->readSizeT();
+    }
+
     /**
      * Return this key's String value
      */

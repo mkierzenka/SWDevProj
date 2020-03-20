@@ -4,11 +4,8 @@
 
 #include "../utils/object.h"
 #include "../store/kvstore.h"
+#include "../serial/serial.h"
 #include "column.h"
-#include "intcolumn.h"
-#include "boolcolumn.h"
-#include "floatcolumn.h"
-#include "stringcolumn.h"
 
 /**
  * ColumnArray - to represent a list of column.
@@ -36,13 +33,28 @@ public:
 		//len_ = 0;
 	}
 
-	// deconstructor
+	// destructor
 	~ColumnArray()
 	{
 		//deleteColList_();
 		delete colList_;
 	}
 
+	/** Serialize a ColumnArray into char* representation */
+	void serialize(Serializer* s)
+	{
+		//will elements be serialized as objects or columns?
+		colList_->serialize(s);
+		dfKey_->serialize(s);
+	}
+
+	/** Deserialize as a ColumnArray, set values into this ColumnArray*/
+	void deserialize(Serializer* s)
+	{
+		colList_->deserializeAsColumnArray(s);
+		dfKey_->deserialize(s);
+	}
+	
 	// get the length of this array
 	size_t length()
 	{

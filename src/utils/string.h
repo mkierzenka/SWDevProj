@@ -49,6 +49,17 @@ public:
     
     /** Return the raw char*. The result should not be modified or freed. */
     char* c_str() {  return cstr_; }
+
+    void serialize(Serializer* s) {
+        s->write(size_);
+        s->write(cstr_);
+    }
+
+    /** Deserealize as a String into this String*/
+    void deserialize(Serializer* s) {
+        size_ = s->readSizeT();
+        cstr_ = s->readString();
+    }
     
     /** Returns the character at index */
     char at(size_t index) {

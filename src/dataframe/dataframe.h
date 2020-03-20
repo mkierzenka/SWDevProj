@@ -5,6 +5,7 @@
 #include "../utils/helper.h"
 #include "../store/kvstore.h"
 #include "../store/key.h"
+#include "../serial/serial.h"
 
 #include "distributedarray.h"
 #include "columnarray.h"
@@ -62,6 +63,23 @@ public:
   Schema &get_schema()
   {
     return *schema_;
+  }
+
+  // Serialize store?
+  /** Serialize this DataFrame into s*/
+  void serialize(Serializer* s) {
+    columns_->serialize(s);
+    schema_->serialize(s);
+    key_->serialize(s);
+  }
+
+  
+  //Deserialize store?
+  /** Deserialize as a dataframe and set the values in this dataframe */
+  void deserialize(Serializer* s) {
+    columns_->deserialize(s);
+    schema_->deserialize(s);
+    key_->deserialize(s);
   }
 
   /** Adds the column this dataframe, updates the schema, the new column
@@ -164,7 +182,7 @@ public:
     }
 
     //Row does not have a name
-    schema_->add_row(nullptr);
+    schema_->add_row();
   }
 
   /** The number of rows in the dataframe. */
