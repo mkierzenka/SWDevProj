@@ -15,10 +15,12 @@
  * 
  * Authors: Marcin Kierzenka and Chase Broder
  */
-class Cache : public Object {
+class Cache : public Object
+{
+public:
     size_t maxSize_ = 5; //maximum size of the cache; this value can be altered
-    Map* data_; //data being stored in cache
-    Queue* keyOrder_; //keeps track of order in which keys added to cache
+    Map *data_;          //data being stored in cache
+    Queue *keyOrder_;    //keeps track of order in which keys added to cache
 
     Cache()
     {
@@ -35,7 +37,7 @@ class Cache : public Object {
     /**
      * Check if the cache contains the given key
      */
-    bool containsKey(Key* k)
+    bool containsKey(Key *k)
     {
         //Possibly same issue as before: k will be treated as an Object
         return data_->contains_key(k);
@@ -44,16 +46,16 @@ class Cache : public Object {
     /**
      * Get mapped data for given key or nullptr if it doesn't exist
      */
-    Value* getValue(Key* k)
+    Value *getValue(Key *k)
     {
-        return dynamic_cast<Value*>(data_->get(k));
+        return dynamic_cast<Value *>(data_->get(k));
     }
 
     /**
      * Put key-value pair into cache; if cache full, remove key that was
      * added longest ago
      */
-    void put(Key* k, Value* val)
+    void put(Key *k, Value *val)
     {
         //remove element from queue if it's full
         if (isFull_())
@@ -86,9 +88,9 @@ class Cache : public Object {
      * Remove element from map that was first added. Figure out key by
      * popping from the queue
      */
-    Key* removeFirstAddedElement_()
+    Key *removeFirstAddedElement_()
     {
-        Key* k = keyOrder_->pop();
+        Key *k = keyOrder_->pop();
         //queue is empty: don't need to return anything
         if (k == nullptr)
         {

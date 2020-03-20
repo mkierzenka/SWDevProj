@@ -338,5 +338,6 @@ Remaining tasks for M2
 -Client level: create DistributedArray object, modify DataFrames to store a DistributedArray
 and a KVStore, rather than holding its own data; could be complex, need to figure out
 more specifics for how we want to break up the data
+-from methods
 -Figure out how we want to serialize all of our classes
 -Create Application level: fairly straightforward, mainly uses classes from bottom two layers
