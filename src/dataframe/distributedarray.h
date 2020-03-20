@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "cache.h"
+
 #include "../store/key.h"
 #include "../store/kvstore.h"
 #include "../utils/object.h"
@@ -61,7 +63,7 @@ class DistributedArray : public Object
             //check the cache first: return if exists
             if (cache_->containsKey(k))
             {
-                return cache_->get(k);
+                return cache_->getValue(k);
             }
 
             //get data from store, and cache and return it
@@ -79,7 +81,7 @@ class DistributedArray : public Object
          */
         Value* get(size_t idx)
         {
-            return get(keyList_[idx]);
+            return get(dynamic_cast<Key*>(keyList_->get(idx)));
         }
 
         /**
