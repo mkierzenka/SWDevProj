@@ -22,19 +22,23 @@ The eau2 system is made up of three layers of abstraction.
 
 The first and lowest layer is the distributed key-value store. There will be 
 multiple key-value stores, each holding some portion of data. Each key will map to
-a piece of serialized data. Each store will be able to serialize and deserialize its own
-data. If a key-value store requires data that it does not have, then it will be able to 
-communicate with the other key-value stores to retrieve this information. This will be done 
-via a networking abstraction, which will allow key-value stores to behave as nodes on a 
-network. In addition to the stores, there will also be a lead node, which will keep track of 
-registered stores and notify all connected stores when a new store is added to the network.
+a piece of serialized data or a dataframe. Each store will be able to serialize and
+deserialize its own data. If a key-value store requires data that it does not have, then 
+it will be able to communicate with the other key-value stores to retrieve this 
+information. This will be done via a networking abstraction, which will allow key-value 
+stores to behave as nodes on a network. In addition to the stores, there will also be a lead
+node, which will keep track of registered stores and notify all connected stores when a new 
+store is added to the network.
 
 The next layer will include abstractions for holding the data from the key-value stores. 
 These abstractions include distributed arrays and dataframes. A dataframe allows the user
 to access a set of data across multiple nodes. It supports data storage and retrieval 
 without exposing the details of how and where the data is stored. A dataframe holds a 
-distributed array. The array contains a bunch of keys as well as a cache, which will support
-short-term storage for some of the keys' data. For all keys without data in the cache, the dataframe will be able to determine where all of its data lives, and will be able to look it up through the distributed key-value store.
+collection of columns. Each column is a distributed array. A distributed array contains a 
+bunch of keys as well as a cache, which will support short-term storage for some of the 
+keys' data. The distributed array will also have a key-value store; therefore even if data
+does not live in the cache, the array will be able to look up the corresponding data for 
+all of its keys. 
 
 The last and highest level is the application layer. In the application, the user 
 will be able to specify what they want to do. Each node will run its own application, 
@@ -48,7 +52,7 @@ For the critical classes that we will implement for this system, we included a r
 of their fields and methods. For components that are re-used from previous assignments,
 we provided descriptions of how they'll be used.
 
-*Store: this class will represent a local key-value store
+*KVStore: this class will represent a local key-value store
 
 Fields:
  - map (Str-to-Obj Map): the String key will map to a serialized piece of data
@@ -64,6 +68,8 @@ Fields:
  stored locall
  - getAndWait(Key): retrieves data with the given Key from the Key's node
  -getStoreId(): return the id of this store (storeId)
+ -getValue(Key): return the value that the given key maps to; this method will not do
+ any serialization or deserialization, rather will return the result exactly as it is stored
 
 *Key: these are used to define a piece of data at a level higher than the local KV store. 
 Since data can exist in any of the stores, we need multiple attributes to keep track of data
