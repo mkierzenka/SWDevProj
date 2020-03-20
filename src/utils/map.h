@@ -150,12 +150,7 @@ class Map : public Object {
 		 * 
 		 */
 		~Map() {
-			for (size_t i = 0; i < capacity_; i++) {
-				if (buckets_[i]) {
-					delete buckets_[i];
-				}
-			}
-			delete[] buckets_;
+			deleteData_();
 		}
 
 		// Helper method for equals()
@@ -446,6 +441,33 @@ class Map : public Object {
 			size_t index = hash % capacity_;
 			
 			return this->bucketContainsKey_(index, key);
+		}
+
+		/**
+		 * Remove all values from the map
+		 */
+		void clear()
+		{
+			deleteData_();
+
+			capacity_ = 4;
+			size_ = 0;
+			buckets_ = new Entry*[capacity_];
+			memset(buckets_, 0, capacity_ * sizeof(buckets_));
+		}
+
+		/**
+		 * Removes all bucket data from the map
+		 */
+		void deleteData_()
+		{
+			for (size_t i = 0; i < capacity_; i++) {
+				if (buckets_[i]) {
+					delete buckets_[i];
+				}
+			}
+
+			delete[] buckets_;
 		}
 
 		/**

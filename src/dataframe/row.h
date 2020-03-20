@@ -3,7 +3,6 @@
 #include "../utils/object.h"
 #include "../utils/string.h"
 #include "schema.h"
-#include "fielder.h"
 #include "rowelement.h"
 
 /*************************************************************************
@@ -141,13 +140,13 @@ public:
 		return scm_->col_type(idx);
 	}
 
-	/** Given a Fielder, visit every field of this row. The first argument is
+	/** Visit every field of this row. The first argument is
     * index of the row in the dataframe.
     * Calling this method before the row's fields have been set is undefined. */
-	void visit(size_t idx, Fielder &f)
+	void visit(size_t idx)
 	{
 		// idx is ignored
-		f.start(idx);
+		//f.start(idx);
 		char colType = 0;
 		RowElement *curElem = NULL;
 		for (size_t i = 0; i < len_; i++)

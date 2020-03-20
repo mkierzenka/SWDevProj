@@ -3,13 +3,15 @@
 #include "../utils/object.h"
 #include "../utils/string.h"
 #include "../utils/helper.h"
+#include "../store/kvstore.h"
+#include "../store/key.h"
 
+#include "distributedarray.h"
 #include "columnarray.h"
 
 #include "schema.h"
 #include "rower.h"
 #include "row.h"
-#include "fielder.h"
 #include "thread.h"
 
 /****************************************************************************
@@ -25,25 +27,28 @@ class DataFrame : public Object
 {
 public:
   ColumnArray *columns_; //keeps track of columns in data frame
-  Schema* schema_;        //schema of dataframe
+  KVStore* store_;
+  Schema* schema_;        //owned, schema of dataframe
+  Key* key_; //key for this dataframe in the KV store
 
   /** Create a data frame with the same columns as the give df but no rows */
-  DataFrame(DataFrame &df) : DataFrame(df.get_schema())
+  DataFrame(DataFrame &df, Key* k) : DataFrame(df.get_schema(), k)
   {
   }
 
   /** Create a data frame from a schema and columns. All columns are created
     * empty. */
-  DataFrame(Schema &schema)
+  DataFrame(Schema &schema, Key* k)
   {
     //don't copy rows
     schema_ = new Schema(schema, false);
     size_t numCols = schema_->width();
-    columns_ = new ColumnArray();
-    for (int i = 0; i < numCols; i++)
+    key_ = k;
+    columns_ = new ColumnArray(store_, key_);
+    /*for (int i = 0; i < numCols; i++)
     {
-	  columns_->addNew(schema_->col_type(i));
-    }
+	    columns_->addNew(schema_->col_type(i));
+    }*/
   }
 
   ~DataFrame()
@@ -62,7 +67,7 @@ public:
   /** Adds the column this dataframe, updates the schema, the new column
     * is external, and appears as the last column of the dataframe, the
     * name is optional and external. A nullptr colum is undefined. */
-  void add_column(Column *col, String *name)
+  void add_column(Column *col)
   {
     if (col == nullptr)
     {
@@ -75,9 +80,8 @@ public:
       exit(1);
     }
 
-    //get type of column
-	columns_->add(col); // Must add to end of column array
-    char type = columns_->getType(columns_->length() - 1);
+	  columns_->add(col); // Must add to end of column array
+    char type = col->getType();//columns_->getType(columns_->length() - 1);
     schema_->add_column(type, name);
   }
 
@@ -101,18 +105,6 @@ public:
   String *get_string(size_t col, size_t row)
   {
     return columns_->get_string(col, row);
-  }
-
-  /** Return the offset of the given column name or -1 if no such col. */
-  int get_col(String &col)
-  {
-    return schema_->col_idx(col.c_str());
-  }
-
-  /** Return the offset of the given row name or -1 if no such row. */
-  int get_row(String &col)
-  {
-    return schema_->row_idx(col.c_str());
   }
 
   /** Set the value at the given column and row to the given value.
