@@ -34,10 +34,10 @@ int main() {
 	assert(map->get(e)->equals(e1));
 	assert(!(map->get(e)->equals(a1)));
 
-	Object* oldA = map->put(e, a1->clone());
+	Object* oldA = map->put(e, a1->clone()); //overwrite value for key e
 	String* oldA_str = dynamic_cast<String*>(oldA);
 	assert(oldA_str != nullptr && oldA->equals(e1));
-	delete e1;
+	delete oldA;
 	
 	assert(map->get(e)->equals(a1));
 
