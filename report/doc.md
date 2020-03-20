@@ -52,57 +52,61 @@ For the critical classes that we will implement for this system, we included a r
 of their fields and methods. For components that are re-used from previous assignments,
 we provided descriptions of how they'll be used.
 
-*KVStore: this class will represent a local key-value store
+* KVStore: this class will represent a local key-value store
 
 Fields:
- - map (Str-to-Obj Map): the String key will map to a serialized piece of data
- - networkHelper (Client): this network abstraction will allow the store to listen for 
+ * map (Str-to-Obj Map): the String key will map to a serialized piece of data
+ * networkHelper (Client): this network abstraction will allow the store to listen for 
  messages from other nodes and send messages to other stores to request data
- - storeId (size_t): each local store will be represented by a unique numerical identifier. 
+ * storeId (size_t): each local store will be represented by a unique numerical identifier. 
  At a higher level, this identifier will help keep track of where the data is stored
  
  Methods:
- - put(Key, String): adds given data to the key-value store specified in the key, 
+ * put(Key, String): adds given data to the key-value store specified in the key, 
  not blocking
- - get(Key): request for the data; returns deserialized data from its own store if 
+ * get(Key): request for the data; returns deserialized data from its own store if 
  stored locall
- - getAndWait(Key): retrieves data with the given Key from the Key's node
- -getStoreId(): return the id of this store (storeId)
- -getValue(Key): return the value that the given key maps to; this method will not do
+ * getAndWait(Key): retrieves data with the given Key from the Key's node
+ * getStoreId(): return the id of this store (storeId)
+ * getValue(Key): return the value that the given key maps to; this method will not do
  any serialization or deserialization, rather will return the result exactly as it is stored
 
-*Key: these are used to define a piece of data at a level higher than the local KV store. 
+* Key: these are used to define a piece of data at a level higher than the local KV store. 
 Since data can exist in any of the stores, we need multiple attributes to keep track of data
 Fields:
  - key (String): maps to a piece of data in a key-value store
  - node_num (size_t): the identifier for the key-value store in which the data is stored
 
- *NOTE: Keys are immutable*
+ *NOTE: Keys are immutable. There will be methods to retrieve these values but not modify them*
 
- *Value: represents the serialized data that a Key maps to. It will contain a single field,
- a character pointer that holds the serialized data
+* Value: represents the serialized data that a Key maps to. It will include a character pointer 
+that holds the serialized data and a size_t that describes the maximum amount of bytes that can
+be stored in this pointer.
 
-*Server: This is the "lead node." All nodes will connect and register with this host. 
+* Server: This is the "lead node." All nodes will connect and register with this host. 
 Upon registration, the server will broadcast a list of every node that it is connected to. 
 The server will have basic network functionality and a socket in which it listens for node 
 connections. It will also hold connection information for each known node.
 
-*Client: This class is the abstraction that key-value stores will use to communicate with 
+* Client: This class is the abstraction that key-value stores will use to communicate with 
 each other. The client will establish a connection and subscribe to the lead node, which 
 tells the client about all other nodes on the system. The client also establishes 
 connections to all other nodes to support two-way communication. Like the server, the 
 client will also include essential networking capabilities, and hold sockets for sending 
 and listening.
 
-*DataFrame: The DataFrame API will be similar to that on previous assignments. It will 
+* DataFrame: The DataFrame API will be similar to that on previous assignments. It will 
 include operations to store and perform operations on data, such as map. A Schema will 
 be used to describe the Dataframe's column structure. A DataFrame will be immutable, so 
 it will not support operations such as deleting, setting, and modifying columns and rows. 
 
 DataFrame's data storage will change. In previous assignments, DataFrames held all of their
-data in columns and rows. However we now want to make them distributed. Instead of storing
-the actual data, frames will now hold a DistributedArray of Columns. This array will hold keys that
-map to the individual Columns. Each Column will be a DistributedArray of Chunks.
+data in columns and rows. However we now want to make the data storage distributed. Instead 
+of storing the actual data, Columns will now be distributed. Like before, the DataFrame will 
+have an array of columns. However the Column class will change, as it will now contain a 
+Distributed Array of keys. Each key will map to a "block" of data that is held in the store. 
+With this change, now that Columns no longer store their own data, we will be able to eliminate 
+the duplicate Column classes for each type. Instead, we can just have a field in Column that describes the type.
 
 The DataFrame will hold a KVStore object so that it can look up data as requested by the 
 user.
