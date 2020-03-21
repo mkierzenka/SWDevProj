@@ -10,7 +10,7 @@
 class Value : public Object
 {
 public:
-    char *val_; //serialized data stored in character pointer buffer
+    char *val_;       //serialized data stored in character pointer buffer
     size_t capacity_; //max size of data, in bytes
 
     Value(const char *data, size_t cap)
@@ -25,7 +25,7 @@ public:
     }
 
     /** Returns serialized data */
-    char* getData() 
+    char *getData()
     {
         return val_;
     }
@@ -34,5 +34,18 @@ public:
     size_t getSize()
     {
         return capacity_;
+    }
+
+    /** Check if this Value object equals the given one */
+    bool equals(Object *other)
+    {
+        Value *o = dynamic_cast<Value *>(other);
+        return (strcmp(val_, o->getData()) == 0) && capacity_ == o->getSize();
+    }
+
+    /** Compute hash for this value */
+    size_t hash_me_()
+    {
+        return reinterpret_cast<size_t>(val_) + capacity_;
     }
 };

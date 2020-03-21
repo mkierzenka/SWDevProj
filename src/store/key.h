@@ -33,13 +33,15 @@ public:
     }
 
     /** Serialize a Key*/
-    void serialize(Serializer* s) {
+    void serialize(Serializer *s)
+    {
         kStr_->serialize(s);
         s->write(homeNode_);
     }
 
     /** Deserialize a Key, mutate this Key*/
-    void deserialize(Serializer* s) {
+    void deserialize(Serializer *s)
+    {
         kStr_->deserialize(s);
         homeNode_ = s->readSizeT();
     }
@@ -58,5 +60,22 @@ public:
     size_t getNode()
     {
         return homeNode_;
+    }
+
+    bool equals(Object *other)
+    {
+        if (other == this)
+        {
+            return true;
+        }
+
+        Key *o = dynamic_cast<Key *>(other);
+        return (kStr_->equals(o->getKeyStr())) &&
+               homeNode_ == o->getNode();
+    }
+
+    size_t hash_me_()
+    {
+        return reinterpret_cast<size_t>(kStr_) + homeNode_;
     }
 };
