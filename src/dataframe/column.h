@@ -6,15 +6,14 @@
 
 #include "distributedarray.h"
 #include "block.h"
+#include "intblock.h"
+#include "boolblock.h"
+#include "stringblock.h"
+#include "floatblock.h"
 
 #include <stddef.h>
 #include <math.h>
 #include <stdarg.h>
-
-// class IntColumn;
-// class BoolColumn;
-// class StringColumn;
-// class FloatColumn;
 
 enum ColType {
     Str = 0, 
@@ -50,6 +49,9 @@ public:
         size_ = 0;
         type_ = t;
     }
+
+    Column() {
+    }
     
     ~Column() {
         delete blocks_;
@@ -64,54 +66,68 @@ public:
         capacity_ = capacity;
     }*/
 
-    /** Type converters: Return same column under its actual type, or
-    *  nullptr if of the wrong type.  */
-    // virtual IntColumn *as_int()
-    // {
-    //     return nullptr;
-    // }
-
-    // virtual BoolColumn *as_bool()
-    // {
-    //     return nullptr;
-    // }
-
-    // virtual FloatColumn *as_float()
-    // {
-    //     return nullptr;
-    // }
-
-    // virtual StringColumn *as_string()
-    // {
-    //     return nullptr;
-    // }
+	/** 
+     * Get character representation of column's type
+     */
+    char getCharType()
+    {
+        switch(type_)
+        {
+            case ColType::Integer:
+                return 'i';
+            case ColType::Str:
+                return 's';
+            case ColType::Boolean:
+                return 'b';
+            case ColType::Float:
+                return 'f';
+            default:
+                fprintf(stderr, "Unknown data type");
+                exit(-1);
+        }
+    }
+	
+	
+	void serialize(Serializer* s) {
+		s->write(size_);
+		blocks_->serialize(s);
+		s->write(getCharType());
+		baseKey_->serialize(s);
+	}
+	
+	void deserialize(Serializer* s) {
+		size_ = s->readSizeT();
+		blocks_->deserialize(s);
+		type_ = getColType_(s->readChar());
+		baseKey_->deserialize(s);
+	}
 
     /** Type appropriate push_back methods. Calling the wrong method is
     * undefined behavior. **/
     void push_back(int val) {
         if (type_ != ColType::Integer) {
-            fprintf(stderr, "Cannot add integer to column of type %c", getColChar_());
+            fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
             exit(1);
         }
     }
 
     void push_back(bool val) {
         if (type_ != ColType::Boolean) {
-            fprintf(stderr, "Cannot add boolean to column of type %c", getColChar_());
+            fprintf(stderr, "Cannot add boolean to column of type %c", getCharType());
             exit(1);
         }
     }
 
     void push_back(float val) {
         if (type_ != ColType::Float) {
-            fprintf(stderr, "Cannot add float to column of type %c", getColChar_());
+            fprintf(stderr, "Cannot add float to column of type %c", getCharType());
             exit(1);
         }
     }
 
     void push_back(String* val) {
         if (type_ != ColType::Str) {
-            fprintf(stderr, "Cannot add String to column of type %c", getColChar_());
+            fprintf(stderr, "Cannot add String to column of type %c", getCharType());
             exit(1);
         }
     }
@@ -119,7 +135,7 @@ public:
     /** Add an entire list of integers to this column*/
     void add_all(size_t len, int* vals) {
         if (type_ != ColType::Integer) {
-            fprintf(stderr, "Cannot add integer to column of type %c", getColChar_());
+            fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
             exit(1);
         }
         size_t len_left = len;
@@ -132,7 +148,10 @@ public:
                 block->add(vals[i]);
             }
             Key* k = genKey_(len_added / BLOCK_SIZE);
-            Value* val = new Value(block->serialize());
+			Serializer* s = new Serializer();
+			block->serialize(s);
+            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added += BLOCK_SIZE;
@@ -146,7 +165,10 @@ public:
                 block->add(vals[i]);
             }
             Key* k = genKey_(len_added / BLOCK_SIZE);
-            Value* val = new Value(block->serialize());
+			Serializer* s = new Serializer();
+			block->serialize(s);
+            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added = len;
@@ -156,7 +178,7 @@ public:
     /** Add an entire list of booleans to this column*/
     void add_all(size_t len, bool* vals) {
         if (type_ != ColType::Boolean) {
-            fprintf(stderr, "Cannot add boolean to column of type %c", getColChar_());
+            fprintf(stderr, "Cannot add boolean to column of type %c", getCharType());
             exit(1);
         }
         size_t len_left = len;
@@ -169,7 +191,10 @@ public:
                 block->add(vals[i]);
             }
             Key* k = genKey_(len_added / BLOCK_SIZE);
-            Value* val = new Value(block->serialize());
+			Serializer* s = new Serializer();
+			block->serialize(s);
+            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added += BLOCK_SIZE;
@@ -183,7 +208,10 @@ public:
                 block->add(vals[i]);
             }
             Key* k = genKey_(len_added / BLOCK_SIZE);
-            Value* val = new Value(block->serialize());
+			Serializer* s = new Serializer();
+			block->serialize(s);
+            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added = len;
@@ -193,7 +221,7 @@ public:
     /** Add an entire list of floats to this column*/
     void add_all(size_t len, float* vals) {
         if (type_ != ColType::Float) {
-            fprintf(stderr, "Cannot add float to column of type %c", getColChar_());
+            fprintf(stderr, "Cannot add float to column of type %c", getCharType());
             exit(1);
         }
         size_t len_left = len;
@@ -206,7 +234,10 @@ public:
                 block->add(vals[i]);
             }
             Key* k = genKey_(len_added / BLOCK_SIZE);
-            Value* val = new Value(block->serialize());
+			Serializer* s = new Serializer();
+			block->serialize(s);
+            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added += BLOCK_SIZE;
@@ -220,7 +251,10 @@ public:
                 block->add(vals[i]);
             }
             Key* k = genKey_(len_added / BLOCK_SIZE);
-            Value* val = new Value(block->serialize());
+			Serializer* s = new Serializer();
+			block->serialize(s);
+            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added = len;
@@ -230,7 +264,7 @@ public:
     /** Add an entire list of Strings to this column. Clones each String*/
     void add_all(size_t len, String** vals) {
         if (type_ != ColType::Str) {
-            fprintf(stderr, "Cannot add String to column of type %c", getColChar_());
+            fprintf(stderr, "Cannot add String to column of type %c", getCharType());
             exit(1);
         }
         size_t len_left = len;
@@ -243,7 +277,10 @@ public:
                 block->add(vals[i]->clone());
             }
             Key* k = genKey_(len_added / BLOCK_SIZE);
-            Value* val = new Value(block->serialize());
+			Serializer* s = new Serializer();
+			block->serialize(s);
+            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added += BLOCK_SIZE;
@@ -257,17 +294,16 @@ public:
                 block->add(vals[i]->clone());
             }
             Key* k = genKey_(len_added / BLOCK_SIZE);
-            Value* val = new Value(block->serialize());
+			Serializer* s = new Serializer();
+			block->serialize(s);
+            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added = len;
         }
     }
-    
-    
-    
-
-    
+	
     /** Returns the number of elements in the column. */
     size_t size()
     {
@@ -279,6 +315,12 @@ public:
     {
     }
     
+	float get_float(size_t idx) { }
+	
+	bool get_bool(size_t idx) { }
+	
+	String* get_string(size_t idx);
+	
     /** Get int from the column at specified index */
     int get_int(size_t idx)
     {
@@ -294,7 +336,9 @@ public:
         //Key to look up data
         Key* k = genKey_(chunk);
         Value* v = store_->getValue(k);
-        IntBlock* intData = v->deserialize();
+		Serializer* s = new Serializer(v->getSize(), v->getData());
+        IntBlock* intData = new IntBlock();
+		intData->deserialize(s);
         return intData->get(idxInChunk);
     }
 
@@ -330,29 +374,19 @@ public:
             exit(1);
         }
     }*/
-
-    
-    
-    /** 
-     * Get character representation of column's type
-     */
-    char getColChar_()
-    {
-        switch(type_)
+	
+	ColType getColType_(char c) {
+		switch(c)
         {
-            case ColType::Integer:
-                return 'i';
-            case ColType::Str:
-                return 's';
-            case ColType::Boolean:
-                return 'b';
-            case ColType::Float:
-                return 'f';
+            case 'i': return ColType::Integer;
+            case 's': return ColType::Str;
+            case 'b': return ColType::Boolean;
+            case 'f': return ColType::Float;
             default:
                 fprintf(stderr, "Unknown data type");
                 exit(-1);
         }
-    }
+	}
 
     
 };

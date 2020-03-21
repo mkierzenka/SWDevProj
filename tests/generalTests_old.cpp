@@ -10,7 +10,7 @@
 Sys *SYSTEM = new Sys();
 
 
-/*void basicTest2()
+void basicTest2()
 {
   SYSTEM->pln("Basic test2 started...");
   Schema s("III");
@@ -52,7 +52,7 @@ void basicTest()
   assert(df.get_int(0, 10) == 10);
   SYSTEM->pln("Basic test passed!");
 }
-/*
+
 void testSchema2()
 {
   SYSTEM->pln("Schema2 test started...");
@@ -83,8 +83,8 @@ void testSchema2()
   delete s5;
   delete scm;
   SYSTEM->pln("Schema2 test passed!");
-}*/
-/*
+}
+
 void testSchema()
 {
   SYSTEM->pln("Schema test started...");
@@ -123,7 +123,7 @@ void testSchema()
   delete s5;
   delete scm;
   SYSTEM->pln("Schema test passed!");
-}*/
+}
 /*
 void columnTests()
 {
@@ -181,7 +181,7 @@ void columnTests()
   SYSTEM->pln("Columns test passed!");
 }*/
 
-/*void dataFrameTest()
+void dataFrameTest()
 {
   SYSTEM->pln("Data frame test started...");
 
@@ -264,8 +264,39 @@ void dataFrameLargeDataTest()
   assert(df.get_int(40574, 200) == 40774);
   assert(df.get_int(numCols - 1, numRows - 1) == (numCols - 1) + (numRows - 1));
   SYSTEM->pln("Large data frame test passed!");
-}*/
-/*
+}
+
+void rowTest()
+{
+  Sys *c = new Sys();
+  SYSTEM->pln("Row test started...");
+
+  Schema s("IFBSFS");
+  Row r(s);
+
+  assert(r.width() == 6);
+  assert(r.col_type(0) == 'I');
+  assert(r.col_type(2) == 'B');
+  assert(r.col_type(5) == 'S');
+
+  //tolerance for this float comparison
+  float tol = 0.0001;
+
+  float f = 6.7;
+  String *inStr = new String("Marcin");
+
+  r.set(0, 4);
+  r.set(1, f);
+  r.set(2, false);
+  r.set(3, inStr);
+
+  assert(r.get_int(0) == 4);
+  assert(abs(f - r.get_float(1)) < tol);
+  assert(r.get_bool(2) == false);
+  assert(r.get_string(3)->equals(inStr));
+  SYSTEM->pln("Row test passed!");
+}
+
 void basicDfTest()
 {
   SYSTEM->pln("Basic df test started...");
@@ -306,7 +337,7 @@ void basicDfTest()
   assert(df.nrows() != dfTwo.nrows());
   SYSTEM->pln("Basic df test passed!");
 }
-/*
+
 void asIntTest()
 {
   SYSTEM->pln("As int test started...");
@@ -348,8 +379,194 @@ void genSchemaTest()
   assert(s.row_idx("Now the rows") == 0);
 
   SYSTEM->pln("General schema test passed!");
-}*/
-/*
+}
+
+void findIntRowerTest()
+{
+  SYSTEM->pln("Find int rower test started...");
+
+  //fill data -> a DataFrame full of multiples of 11
+  Schema s("IIIII");
+  DataFrame data(s);
+  Row r(data.get_schema());
+  int numRows = 100 * 1000;
+  int mult = 11;
+  for (int i = 0; i < numRows; i++)
+  {
+    for (int j = 0; j < r.width(); j++)
+    {
+      r.set(j, (i + j) * mult);
+    }
+
+    data.add_row(r);
+  }
+
+  //setup row dataframe
+  Schema rowSchem("IIIIII");
+  DataFrame vals(rowSchem);
+  Row rTwo(vals.get_schema());
+  int numRowsRDF = 9; // Num rows in Row DataFrame
+  int colNum = 6;
+
+  for (int i = 0; i < numRowsRDF; i++) {
+	  rTwo.clear();
+	  for (int j = 0; j < colNum; j++) {
+		if (i == j) {
+			rTwo.set(j, j * mult); //odd cols should be found/counted
+		} else if (j == 3) {
+			rTwo.set(j, j * mult);
+		} else {
+			rTwo.set(j, j * (mult - 1)); //should not be counted
+		}
+	  }
+	  vals.add_row(rTwo);
+  }
+  /*SYSTEM->pln("Vals before map");
+  vals.print();*/
+
+  // Run FindRower
+  FindRower ir(&data, &vals);
+  vals.pmap(ir);
+
+  /*SYSTEM->pln("\nVals after map");
+  vals.print();*/
+
+  // Check final count of Rower
+  assert(ir.getCount() == 22);
+  SYSTEM->pln("Find int rower test passed!");
+}
+
+// pmap version
+void findIntRowerTest_pmap()
+{
+  SYSTEM->pln("Find int rower pmap test started...");
+
+  //fill data -> a DataFrame full of multiples of 11
+  Schema s("IIIII");
+  DataFrame data(s);
+  Row r(data.get_schema());
+  int numRows = 100 * 1000;
+  int mult = 11;
+  for (int i = 0; i < numRows; i++)
+  {
+    for (int j = 0; j < r.width(); j++)
+    {
+      r.set(j, (i + j) * mult);
+    }
+
+    data.add_row(r);
+  }
+
+  //setup row dataframe
+  Schema rowSchem("IIIIII");
+  DataFrame vals(rowSchem);
+  Row rTwo(vals.get_schema());
+  int numRowsRDF = 9; // Num rows in Row DataFrame
+  int colNum = 6;
+
+  for (int i = 0; i < numRowsRDF; i++) {
+	  rTwo.clear();
+	  for (int j = 0; j < colNum; j++) {
+		if (i == j) {
+			rTwo.set(j, j * mult); //odd cols should be found/counted
+		} else if (j == 3) {
+			rTwo.set(j, j * mult);
+		} else {
+			rTwo.set(j, j * (mult - 1)); //should not be counted
+		}
+	  }
+	  vals.add_row(rTwo);
+  }
+  /*SYSTEM->pln("Vals before map");
+  vals.print();*/
+
+  // Run FindRower
+  FindRower ir(&data, &vals);
+  vals.pmap(ir);
+
+  /*SYSTEM->pln("\nVals after map");
+  vals.print();*/
+  
+  // Check final count of Rower
+  assert(ir.getCount() == 22);
+  SYSTEM->pln("Find int rower pmap test passed!");
+}
+
+//this test is to measure accuracy, not as much performance
+void findRower_variousTypes()
+{
+  SYSTEM->pln("Find rower test for various types started...");
+
+  //fill data
+  Schema s("IBFSB");
+  DataFrame data(s);
+  Row rOne(data.get_schema());
+  Row rTwo(data.get_schema());
+  Row rThree(data.get_schema());
+  
+  String str1("hello");
+  String str2("world");
+  String str3("goodbye");
+
+  rOne.set(0, 4);
+  rOne.set(1, true);
+  rOne.set(2, 2.3f);
+  rOne.set(3, &str1);
+  rOne.set(4, false);
+  data.add_row(rOne);
+
+  rTwo.set(0, 7);
+  rTwo.set(1, false);
+  rTwo.set(2, 3.43f);
+  rTwo.set(3, &str2);
+  rTwo.set(4, true);
+  data.add_row(rTwo);
+
+  rThree.set(0, 667);
+  rThree.set(1, false);
+  rThree.set(2, 343.76f);
+  rThree.set(3, &str3);
+  rThree.set(4, false);
+  data.add_row(rThree);
+
+  Schema rowSchem("IBSFISBFI");
+  DataFrame vals(rowSchem);
+  Row rFour(vals.get_schema());
+  Row rFive(vals.get_schema());
+  
+  String str4("not");
+  String str5("in");
+
+  rFour.set(0, 4); //Y
+  rFour.set(1, true); //Y
+  rFour.set(2, &str1); //Y
+  rFour.set(3, 4.88f);
+  rFour.set(4, 66);
+  rFour.set(5, &str4);
+  rFour.set(6, false); //Y
+  rFour.set(7, 2.3f); //Y
+  rFour.set(8, 7); //Y
+
+  rFive.set(0, 46); 
+  rFive.set(1, true);//Y
+  rFive.set(2, &str3); //Y
+  rFive.set(3, 3.43f); //Y
+  rFive.set(4, 2);
+  rFive.set(5, &str5);
+  rFive.set(6, true); //Y
+  rFive.set(7, 2.1f);
+  rFive.set(8, 0);
+
+  vals.add_row(rFour);
+  vals.add_row(rFive);
+
+  FindRower ir(&data, &vals);
+  vals.map(ir);
+
+  assert(ir.getCount() == 10);
+  SYSTEM->pln("Find rower test for various types passed!");
+}
+
 void lengthRowerTest() {
   SYSTEM->pln("Length rower test started...");
 
@@ -398,11 +615,10 @@ void lengthRowerTest() {
   assert(lr.getLen() == 45);
   SYSTEM->pln("Length rower test passed!");
 }
-*/
+
 int main()
 {
-  //basicDfTest();
-  /*columnTests();
+  columnTests();
   testSchema();
   rowTest();
   testSchema2();
@@ -420,6 +636,6 @@ int main()
   findIntRowerTest();
   findIntRowerTest_pmap();
   findRower_variousTypes();
-  lengthRowerTest();*/
+  lengthRowerTest();
   return 0;
 }

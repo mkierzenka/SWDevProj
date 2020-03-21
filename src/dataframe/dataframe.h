@@ -98,9 +98,9 @@ public:
       exit(1);
     }
 
-	  columns_->add(col); // Must add to end of column array
-    char type = col->getType();//columns_->getType(columns_->length() - 1);
-    schema_->add_column(type, name);
+	columns_->add_column(col); // Must add to end of column array
+    char type = col->getCharType();//columns_->getType(columns_->length() - 1);
+    schema_->add_column(type);
   }
 
   /** Return the value at the given column and row. Accessing rows or
@@ -301,7 +301,7 @@ public:
 
   /** Create a new dataframe, constructed from rows for which the given Rower
     * returned true from its accept method. */
-  DataFrame *filter(Rower &r)
+/*  DataFrame *filter(Rower &r)
   {
     DataFrame *newFrame = new DataFrame(*schema_);
     for (int i = 0; i < schema_->length(); i++)
@@ -315,7 +315,7 @@ public:
     }
 
     return newFrame;
-  }
+  }*/
 
   /** Print the dataframe in SoR format to standard output. */
   void print()

@@ -90,8 +90,8 @@ public:
      */
     Key *removeFirstAddedElement_()
     {
-        Key *k = keyOrder_->pop();
-        //queue is empty: don't need to return anything
+        Key *k = dynamic_cast<Key*>(keyOrder_->pop());
+        //queue is empty: don't need to return anything or it's not a Key (error)
         if (k == nullptr)
         {
             return k;

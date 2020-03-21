@@ -3,59 +3,54 @@
 #pragma once
 
 #include "../utils/object.h"
-#include "../store/kvstore.h"
 #include "../serial/serial.h"
-#include "colarr.h"
 #include "column.h"
 
+
 /**
- * ColumnArray - to represent a list of column.
+ * todo
  *
  * @author broder.c@husky.neu.edu & kierzenka.m@husky.neu.edu
  */
-class ColumnArray : public Object
+class ColArray : public Object
 {
 public:
-	KVStore* store_; // NOT OWNED
-	//Column **colList_; //list of columns, owned
-	ColArray* colList_; //list of columns, owned
-	Key* dfKey_; //key of dataframe this column array belongs to
-	//DistributedArray* colList_; //owned
+	Array* colList_; //list of columns, owned
 
 	// constructor
-	ColumnArray(KVStore* store, Key* k)
+	ColArray() : Object()
 	{
-		store_ = store;
-		dfKey_ = k;
-		//capacity_ = 2;
-		//colList_ = new Column*[capacity_];
-		colList_ = new ColArray();
-		//colList_ = new DistributedArray(store_);
-		//len_ = 0;
+		colList_ = new Array();
 	}
 
 	// destructor
-	~ColumnArray()
+	~ColArray()
 	{
 		//deleteColList_();
 		delete colList_;
 	}
 
-	/** Serialize a ColumnArray into char* representation */
+	/** Serialize a ColArray into char* representation */
 	void serialize(Serializer* s)
 	{
 		//will elements be serialized as objects or columns?
 		//colList_->serializeAsColumnArray(s);
-		colList_->serialize(s);
-		dfKey_->serialize(s);
+		size_t len = colList_->length();
+		s->write(len);
+		for (size_t i = 0; i < len; i++) {
+			(dynamic_cast<Column*>(colList_->get(i)))->serialize(s);
+		}
 	}
 
-	/** Deserialize as a ColumnArray, set values into this ColumnArray*/
+	/** Deserialize as a ColArray, set values into this ColumnArray*/
 	void deserialize(Serializer* s)
 	{
-		//colList_->deserializeAsColumnArray(s);
-		colList_->deserialize(s);
-		dfKey_->deserialize(s);
+		size_t len = s->readSizeT();
+		for (size_t i = 0; i < len; i++) {
+			Column* c = new Column();
+			c->deserialize(s);
+			colList_->add(c);
+		}
 	}
 	
 	// get the length of this array
@@ -64,19 +59,6 @@ public:
 		return colList_->length();
 	}
 
-	// hash_me override
-	/*size_t hash_me()
-	{
-		size_t hash = 0;
-		for (size_t i = 0; i < len_; i += 1)
-		{
-			size_t elementhash = get(i)->hash();
-			hash += elementhash + (hash << 3) - (hash << 1);
-		}
-
-		return hash;
-	}*/
-
 	// get the specified column (does not make a copy!)
 	Column *get(size_t index)
 	{
@@ -84,100 +66,14 @@ public:
 		return dynamic_cast<Column*>(colObj);
 	}
 	
-	/**
-	 * Get the type of the specified column. Exits if invalid index
-	 */
-	/*char getType(size_t index) {
-		Column* col = get(index); // <-- will error if invalid index
-		return col->get_type();
-		/*IntColumn *ic = col->as_int();
-		FloatColumn *fc = col->as_float();
-		BoolColumn *bc = col->as_bool();
-		StringColumn *sc = col->as_string();
-		if (ic != nullptr)
-		{
-		  return ic->get_type();
-		}
-		else if (fc != nullptr)
-		{
-		  return fc->get_type();
-		}
-		else if (bc != nullptr)
-		{
-		  return bc->get_type();
-		}
-		else if (sc != nullptr)
-		{
-		  return sc->get_type();
-		}
-		//doesn't match any types, so delegate to Column
-		return col->get_type();*/
-	//}
 
 	/**
 	 * Appends column to this columnarray. Does not make copy
 	 */
 	void add_column(Column *c)
 	{
-		colList_->add_column(c);
+		colList_->add(c);
 	}
-	
-	/**
-	 * Adds a new column with specified type to the end of the array
-	 */
-	/* This is only used in constructor for DataFrame...
-	void addNew(char colType)
-	{
-		if (!hasRoomForMoreElems_(1))
-		{
-			expandArray_();
-		}
-
-		switch (colType) {
-			case 'I':
-			  add(new IntColumn());
-			  break;
-			case 'B':
-			  add(new BoolColumn());
-			  break;
-			case 'F':
-			  add(new FloatColumn());
-			  break;
-			case 'S':
-			  add(new StringColumn());
-			  break;
-			default:
-			  fprintf(stderr, "Invalid column type %c", colType);
-			  exit(2);
-		}
-	}*/
-
-	// set the element in the given index to the given column
-	// void set(size_t index, Column *c)
-	// {
-	// 	// check for out-of-bounds
-	// 	if (index >= len_)
-	// 	{
-	// 		printf("Out-Of-Bounds Error: cannot get value from index %zu", index);
-	// 	}
-
-	// 	colList_[index] = c;
-	// }
-
-	// remove the element with the given index
-	// Column *remove(size_t index)
-	// {
-	// 	//get value to be removed
-	// 	Column *val = get(index);
-
-	// 	//move elements over
-	// 	for (size_t i = index; i < len_; i += 1)
-	// 	{
-	// 		colList_[i] = colList_[i + 1];
-	// 	}
-
-	// 	return val;
-	// }
 
 	// get the index of the given Column
 	int index_of(Column *c)

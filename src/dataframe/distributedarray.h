@@ -3,11 +3,13 @@
 #pragma once
 
 #include "cache.h"
+#include "keyarr.h"
 
 #include "../store/key.h"
 #include "../store/kvstore.h"
 #include "../utils/object.h"
-#include "../utils/array.h"
+#include "../serial/serial.h"
+
 
 /**
  * This class represents a distributed array. It holds a list of keys
@@ -20,14 +22,14 @@
 class DistributedArray : public Object
 {
     public:
-        Array* keyList_; //holds a list of keys that correspond to this DA
+        KeyArr* keyList_; //holds a list of keys that correspond to this DA
         KVStore* store_; //store to look up values of keys
         Cache* cache_; //holds some values of its keys at any given time
 
         DistributedArray(KVStore* store)
         {
             store_ = store;
-            keyList_ = new Array();
+            keyList_ = new KeyArr();
             cache_ = new Cache();
         }
 
@@ -36,6 +38,15 @@ class DistributedArray : public Object
             delete keyList_;
             delete cache_;
         }
+
+
+		void serialize(Serializer* s) {
+			keyList_->serialize(s);
+		}
+		
+		void deserialize(Serializer* s) {
+			keyList_->deserialize(s);
+		}
 
         /**
          * Check if the distributed array contains the given key
@@ -89,6 +100,6 @@ class DistributedArray : public Object
          */
         Key* getKeyAtIndex(size_t idx)
         {
-            return dynamic_cast<Key*>(keyList_->get(idx));
+            return keyList_->get(idx);
         }
 };
