@@ -3,31 +3,40 @@
 #pragma once
 
 #include <unistd.h>
-#include "../utils/object.h"
 #include "../utils/string.h"
 #include "msgkind.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-class Serializer: public Object {
+class Serializer {
 public:
 	const size_t BUFFER_SIZE_ = 1024;
 	char* buffer_;			// owned
 	char* curBuffPtrWrite_;	// just points to a place in buffer_
 	char* curBuffPtrRead_;	// just points to a place in buffer_
+	size_t numBytesWritten_;
 	
-	Serializer() : Object() {
+	Serializer() {
 		buffer_ = new char[BUFFER_SIZE_];
 		memset(buffer_, 0, BUFFER_SIZE_);
 		curBuffPtrWrite_ = buffer_;
 		curBuffPtrRead_ = buffer_;
+		numBytesWritten_ = 0;
 	}
 	
-	Serializer(const char* inp) : Object() {
+	Serializer(const char* inp) {
 		buffer_ = new char[strlen(inp)];
 		memset(buffer_, 0, strlen(inp));
 		memcpy(buffer_, inp, strlen(inp));
+		curBuffPtrWrite_ = buffer_;
+		curBuffPtrRead_ = buffer_;
+	}
+
+	Serializer(size_t size, const char* inp) {
+		buffer_ = new char[size];
+		memset(buffer_, 0, size);
+		memcpy(buffer_, inp, size);
 		curBuffPtrWrite_ = buffer_;
 		curBuffPtrRead_ = buffer_;
 	}
@@ -39,6 +48,11 @@ public:
 	void write(double d) {
 		memcpy(curBuffPtrWrite_, &d, sizeof(double));
 		curBuffPtrWrite_ += sizeof(double);
+	}
+
+	void write(float f) {
+		memcpy(curBuffPtrWrite_, &f, sizeof(float));
+		curBuffPtrWrite_ += sizeof(float);
 	}
 
 	void write(MsgKind mk) {
@@ -109,7 +123,17 @@ public:
 		memcpy(curBuffPtrWrite_, &l, sizeof(l));
 		curBuffPtrWrite_ += sizeof(l);
 	}
+
+	void write(int i) {
+		memcpy(curBuffPtrWrite_, &i, sizeof(i));
+		curBuffPtrWrite_ += sizeof(i);
+	}
 	
+	void write(bool b) {
+		memcpy(curBuffPtrWrite_, &b, sizeof(b));
+		curBuffPtrWrite_ += sizeof(b);
+	}
+
 	char* readString() {
 		size_t lenNextStr = strlen(curBuffPtrRead_); // get the next string (up to first \0)
 		char* out = new char[lenNextStr];
@@ -126,6 +150,13 @@ public:
 		return out;
 	}
 
+	float readFloat() {
+		float out;
+		memcpy(&out, curBuffPtrRead_, sizeof(float));
+		curBuffPtrRead_ += sizeof(float);
+		return out;
+	}
+
 	short readShort() {
 		short out;
 		memcpy(&out, curBuffPtrRead_, sizeof(short));
@@ -137,6 +168,20 @@ public:
 		long out;
 		memcpy(&out, curBuffPtrRead_, sizeof(long));
 		curBuffPtrRead_ += sizeof(long);
+		return out;
+	}
+
+	int readInt() {
+		int out;
+		memcpy(&out, curBuffPtrRead_, sizeof(int));
+		curBuffPtrRead_ += sizeof(int);
+		return out;
+	}
+
+	bool readBool() {
+		bool out;
+		memcpy(&out, curBuffPtrRead_, sizeof(bool));
+		curBuffPtrRead_ += sizeof(bool);
 		return out;
 	}
 
@@ -185,6 +230,10 @@ public:
 	
 	char* getBuffer() {
 		return buffer_;
+	}
+	
+	size_t getNumBytesWritten() {
+		return numBytesWritten_;
 	}
 	
 	char* clear() {

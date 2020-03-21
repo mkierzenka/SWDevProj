@@ -1,7 +1,7 @@
 #pragma once
 
 #include "block.h"
-
+#include "../serial/serial.h"
 
 /**
 * IntBlock - to represent a block of ints.
@@ -27,6 +27,27 @@ public:
 	~IntBlock()
 	{
 		delete[] vals_;
+	}
+	
+	/** Serialize this block of integers into s */
+	void serialize(Serializer* s) {
+		s->write(capacity_);
+		s->write(size_);
+		for (size_t i = 0; i < size_; i++) {
+			s->write(vals_[i]);
+		}
+	}
+	
+	/** Deserialize a block of strings into this block (mutate) */
+	void deserialize(Serializer* s) {
+		delete[] vals_;
+		capacity_ = s->readSizeT();
+		vals_ = new int[capacity_];
+		memset(vals_, 0, capacity_ * sizeof(int));
+		size_ = s->readSizeT();
+		for (size_t i = 0; i < size_; i++) {
+			vals_[i] = s->readInt();
+		}
 	}
 
 	// get the int with the index in the array

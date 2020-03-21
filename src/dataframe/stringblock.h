@@ -2,6 +2,8 @@
 
 #include "block.h"
 #include "../utils/string.h"
+#include "../serial/serial.h"
+
 
 
 /**
@@ -31,6 +33,33 @@ public:
 			delete vals_[i];
 		}
 		delete[] vals_;
+	}
+	
+	/** Serialize this block of strings into s */
+	void serialize(Serializer* s) {
+		s->write(capacity_);
+		s->write(size_);
+		for (size_t i = 0; i < size_; i++) {
+			vals_[i]->serialize(s);
+		}
+	}
+	
+	/** Deserialize a block of strings into this block (mutate) */
+	void deserialize(Serializer* s) {
+		for (size_t i = 0; i < size_; i++) {
+			delete vals_[i];
+		}
+		delete[] vals_;
+
+		capacity_ = s->readSizeT();
+		vals_ = new String*[capacity_];
+		memset(vals_, 0, capacity_ * sizeof(String*));
+		size_ = s->readSizeT();
+		for (size_t i = 0; i < size_; i++) {
+			String* tmp = new String("");
+			tmp->deserialize(s);
+			vals_[i] = tmp;
+		}
 	}
 
 	// get the String with the index in the array

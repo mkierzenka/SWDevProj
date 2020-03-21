@@ -1,6 +1,7 @@
 #pragma once
 
 #include "block.h"
+#include "../serial/serial.h"
 
 
 /**
@@ -27,6 +28,27 @@ public:
 	~FloatBlock()
 	{
 		delete[] vals_;
+	}
+	
+	/** Serialize this block of floats into s */
+	void serialize(Serializer* s) {
+		s->write(capacity_);
+		s->write(size_);
+		for (size_t i = 0; i < size_; i++) {
+			s->write(vals_[i]);
+		}
+	}
+	
+	/** Deserialize a block of floats into this block (mutate) */
+	void deserialize(Serializer* s) {
+		delete[] vals_;
+		capacity_ = s->readSizeT();
+		vals_ = new float[capacity_];
+		memset(vals_, 0, capacity_ * sizeof(float));
+		size_ = s->readSizeT();
+		for (size_t i = 0; i < size_; i++) {
+			vals_[i] = s->readFloat();
+		}
 	}
 
 	// get the float with the index in the array
