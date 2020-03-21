@@ -2,6 +2,63 @@
 #pragma once
 #include "object.h"
 
+
+
+//This class will be used to represent an element on the queue.
+//It will contain the value of the element and a reference to the next index
+class Node : public Object
+{
+public:
+    Object *o;  //element
+    Node *next; //reference to next element in queue
+
+    //checks if two nodes are equal
+    bool equals(Object *other)
+    {
+        //same memory; must be equal
+        if (this == other)
+        {
+            return true;
+        }
+
+        Node *otherNode = dynamic_cast<Node *>(other);
+        //can't cast to Node
+        if (!otherNode)
+        {
+            return false;
+        }
+
+        if (otherNode->o != NULL && !otherNode->o->equals(o))
+        {
+            return false;
+        }
+
+        if (o != NULL && !o->equals(otherNode->o))
+        {
+            return false;
+        }
+
+        //Current element same and no other elements exist
+        if (next == NULL && otherNode->next == NULL)
+        {
+            return true;
+        }
+
+        if ((next == NULL && otherNode->next != NULL) || (next != NULL && otherNode->next == NULL))
+        {
+            return false;
+        }
+
+        //both not null: continue
+        return next->equals(otherNode->next);
+    }
+};
+
+
+
+
+
+
 /**
 * A Queue object serving as a FIFO queue.
 *
@@ -178,55 +235,5 @@ public:
             delete (cur);
             cur = next;
         }
-    }
-};
-
-//This class will be used to represent an element on the queue.
-//It will contain the value of the element and a reference to the next index
-class Node : public Object
-{
-public:
-    Object *o;  //element
-    Node *next; //reference to next element in queue
-
-    //checks if two nodes are equal
-    bool equals(Object *other)
-    {
-        //same memory; must be equal
-        if (this == other)
-        {
-            return true;
-        }
-
-        Node *otherNode = dynamic_cast<Node *>(other);
-        //can't cast to Node
-        if (!otherNode)
-        {
-            return false;
-        }
-
-        if (otherNode->o != NULL && !otherNode->o->equals(o))
-        {
-            return false;
-        }
-
-        if (o != NULL && !o->equals(otherNode->o))
-        {
-            return false;
-        }
-
-        //Current element same and no other elements exist
-        if (next == NULL && otherNode->next == NULL)
-        {
-            return true;
-        }
-
-        if ((next == NULL && otherNode->next != NULL) || (next != NULL && otherNode->next == NULL))
-        {
-            return false;
-        }
-
-        //both not null: continue
-        return next->equals(otherNode->next);
     }
 };

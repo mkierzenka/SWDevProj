@@ -21,6 +21,12 @@ public:
         homeNode_ = node;
     }
 
+    Key()
+    {
+        kStr_ = new String("");
+        homeNode_ = 0;
+    }
+
     ~Key()
     {
         delete kStr_;

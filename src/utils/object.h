@@ -1,7 +1,7 @@
 #pragma once
 
 #include "helper.h"
-#include "../serial/serial.h"
+//#include "../serial/serial.h"
 
 // LANGUAGE: CwC
 
@@ -32,8 +32,8 @@ public:
     virtual char* c_str() { return nullptr; }
 
     /** Serialize an object with the given serializer */
-    virtual void serialize(Serializer* s) { }
+    //virtual void serialize(Serializer* s) { }
 
     /** Deserialize an object with the given serializer */
-    virtual void deserialize(Serializer* s) { }
+    //virtual void deserialize(Serializer* s) { }
 }; 
