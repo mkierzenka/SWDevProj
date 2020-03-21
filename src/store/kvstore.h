@@ -10,6 +10,8 @@
 #include "key.h"
 #include "value.h"
 
+//class DataFrame; 
+
 /** This class represents our key-value store. It will utilize a Map object to hold the
  * key-value pairings. It will also have networking capabilities to interact with other 
  * stores. */
@@ -48,21 +50,23 @@ public:
     {
         Value* val = getValue(k);
         //set up new serializer to deserialize returned data into a dataframe
-        Serializer* s = new Serializer();
+        Serializer* s = new Serializer(val->getData());
 
-        //need to be able to deserialize
-        ///TODO: figure out how to use serializer here
-        //s->deserialize(val);
+        //create new dataframe and mutate by deserializing
+        DataFrame* d = new DataFrame(k);
+        d->deserialize(s);
 
         //delete val?
         delete s;
+        
+        return d;
     }
 
     /** Send request to specified store to get data. Return nullptr if cannot find */
-    DataFrame* waitAndGet(Key *k)
-    {
-        //will need to create a Message 
-    }
+    // DataFrame* waitAndGet(Key *k)
+    // {
+    //     //will need to create a Message 
+    // }
 
     /** Get the actual Value that the given key maps to */
     Value* getValue(Key *k)

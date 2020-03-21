@@ -32,6 +32,13 @@ public:
   Schema* schema_;        //owned, schema of dataframe
   Key* key_; //key for this dataframe in the KV store
 
+  /** This constructor is for the purpose of deserializing */
+  DataFrame(Key* k)
+  {
+    schema_ = new Schema();
+    key_ = k;
+  }
+
   /** Create a data frame with the same columns as the give df but no rows */
   DataFrame(DataFrame &df, Key* k) : DataFrame(df.get_schema(), k)
   {
