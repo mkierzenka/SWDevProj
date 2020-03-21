@@ -349,8 +349,6 @@ fix.
 Most of the networking functionality required for this project is set up.
 
 Remaining tasks for M2
--Client level: modify columns to have distributed arrays; could be complex, might result in changes to
-dataframe as well
 -from methods
 -Test serialization
 -Create Application level: fairly straightforward, mainly uses classes from bottom two layers
