@@ -143,7 +143,7 @@ public:
 	/** Visit every field of this row. The first argument is
     * index of the row in the dataframe.
     * Calling this method before the row's fields have been set is undefined. */
-	void visit(size_t idx)
+	/*void visit(size_t idx)
 	{
 		// idx is ignored
 		//f.start(idx);
@@ -173,7 +173,7 @@ public:
 			}
 		}
 		f.done();
-	}
+	}*/
 	
 	/**
 	 * Clears all entries (frees memory) from this row. Leaves size unchanged.
