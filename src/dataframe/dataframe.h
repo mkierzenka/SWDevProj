@@ -132,50 +132,6 @@ public:
     return columns_->get_string(col, row);
   }
 
-  /** Set the value at the given column and row to the given value.
-    * If the column is not  of the right type or the indices are out of
-    * bound, the result is undefined. */
-  /*void set(size_t col, size_t row, int val)
-  {
-	columns_->set(col, row, val);
-  }
-
-  void set(size_t col, size_t row, bool val)
-  {
-	columns_->set(col, row, val);
-  }
-
-  void set(size_t col, size_t row, float val)
-  {
-    columns_->set(col, row, val);
-  }
-
-  void set(size_t col, size_t row, String *val)
-  {
-    columns_->set(col, row, val);
-  }*/
-
-  /** Set the fields of the given row object with values from the columns at
-    * the given offset.  If the row is not form the same schema as the
-    * dataframe, results are undefined.
-    */
- /* void fill_row(size_t idx, Row &row)
-  {
-    if (idx >= schema_->length())
-    {
-      fprintf(stderr, "Row %zu does not exist in dataframe", idx);
-      exit(1);
-    }
-
-    size_t rowWidth = row.width();
-    checkRowLen_(rowWidth);
-    for (int i = 0; i < rowWidth; i++)
-    {
-      checkColTypes_(row.col_type(i), i);
-      setColumnValByType_(i, idx, row);
-    }
-  }*/
-
   /** Add a row at the end of this dataframe. The row is expected to have
    *  the right schema and be filled with values, otherwise undedined.  */
   void add_row(Row &row)
@@ -337,28 +293,6 @@ public:
       printf("\n");
     }
   }
-
-  /** Set the field from the row given the type */
-/*  void setColumnValByType_(size_t colIdx, size_t rowIdx, Row &row)
-  {
-    switch (row.col_type(colIdx))
-    {
-    case 'I':
-      set(colIdx, rowIdx, row.get_int(colIdx));
-      break;
-    case 'B':
-      set(colIdx, rowIdx, row.get_bool(colIdx));
-      break;
-    case 'F':
-      set(colIdx, rowIdx, row.get_float(colIdx));
-      break;
-    case 'S':
-      set(colIdx, rowIdx, row.get_string(colIdx));
-      break;
-    default:
-      fprintf(stderr, "Invalid col type: %c", row.col_type(colIdx));
-    }
-  }*/
 
   /** Add to end of column depending on the type */
   void addToEndOfColByType_(size_t colIdx, Row &row)

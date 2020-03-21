@@ -51,7 +51,7 @@ public:
 		}
 	}
 
-	// get the bool with the index in the array
+	/** get the bool with the index in the array */
 	bool get(size_t index)
 	{
 		// check for out-of-bounds
@@ -63,7 +63,7 @@ public:
 		return vals_[index];
 	}
 
-	// add bool to end of this block. if can't fit, return -1
+	/** add bool to end of this block. if can't fit, return -1 */
 	int add(bool n)
 	{
 		if (size_ >= capacity_)
@@ -74,7 +74,7 @@ public:
 		size_++;
 	}
 
-	// set the element in the given index to the given bool
+	/** set the element in the given index to the given bool */
 	void set(size_t index, bool v)
 	{
 		// check for out-of-bounds
@@ -85,6 +85,44 @@ public:
 		}
 		
 		vals_[index] = v;
+	}
+
+	/** Check if two blocks equal */
+	bool equals(Object* other)
+	{
+		BoolBlock* b = dynamic_cast<BoolBlock*>(other);
+		if (size_ != b->size_ || capacity_ != b->capacity_)
+		{
+			return false;
+		}
+
+		for (size_t i = 0; i < size_; i++)
+		{
+			if (vals_[i] != b->vals_[i])
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	/** Compute hash code of this bool block */
+	size_t hash_me_()
+	{
+		size_t hash_ = 0;
+		hash_ += size_;
+		hash_ += capacity_;
+
+		for (size_t i = 0; i < size_; i++)
+		{
+			if (vals_[i])
+			{
+				hash_ += 1;
+			}
+		}
+
+		return hash_;
 	}
 
 };

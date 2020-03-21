@@ -19,18 +19,14 @@ public:
 	size_t numCols_;
 	size_t capCols_;
 	size_t numRows_;
-	/*String** rowNames_;
-  size_t capRows_;*/
 
 	/** Create an empty schema **/
 	Schema()
 	{
 		capCols_ = 2;
-		// capRows_ = 2;
 		types_ = new char[capCols_];
 		numCols_ = 0;
 		numRows_ = 0;
-		//  rowNames_ = new String*[capRows_];
 	}
 
 	/** Copying constructor */
@@ -46,16 +42,13 @@ public:
 	{
 		size_t typesLen = strlen(types);
 		capCols_ = typesLen;
-		// capRows_ = 2;
-		numCols_ = 0;
+		numCols_ = typesLen;
 		numRows_ = 0;
-		//colData_ = new ColumnMetadata*[capCols_];
 		types_ = new char[capCols_];
-		//  rowNames_ = new String*[capRows_];
-		// for (size_t i = 0; i < typesLen; i++)
-		// {
-		// 	/ this->add_column(types[i]);
-		// }
+		for (size_t i = 0; i < capCols_; i++)
+		{
+			types_[i] = types[i];
+		}
 	}
 
 	/** Constructor that copies over values from passed in schema. If passed in
@@ -63,12 +56,9 @@ public:
 	Schema(Schema &from, bool copyRows)
 	{
 		capCols_ = (from.width() == 0 ? 2 : from.width()); // from.width != from.capacity
-		//capRows_ = (from.length() == 0 ? 2 : from.length()); // we need some capacity
 		numCols_ = 0;
 		numRows_ = 0;
-		//colData_ = new ColumnMetadata*[capCols_];
 		types_ = new char[capCols_];
-		//rowNames_ = new String*[capRows_];
 		if (from.width() != 0)
 		{
 			for (int i = 0; i < from.width(); i++)
@@ -77,31 +67,11 @@ public:
 			}
 			assert(numCols_ == capCols_);
 		}
-
-		//only copy rows if specified to
-		/*if (copyRows && from.length() != 0)
-		{
-			for (int i = 0; i < from.length(); i++)
-			{
-				add_row(from.row_name(i) == nullptr ? nullptr : from.row_name(i)->clone()); // add the above check here!! TODO
-			}
-			assert(numRows_ == capRows_);
-		}*/
 	}
 
 	~Schema()
 	{
-		//   for (size_t i = 0; i < numCols_; i++) {
-		// 	  delete colData_[i];
-		//   }
-		//   delete[] colData_;
-
 		delete[] types_;
-
-		/* for (size_t i = 0; i < numRows_; i++) {
-		  delete rowNames_[i];
-	  }
-	  delete[] rowNames_;*/
 	}
 
 	/** Serialize this schema */
@@ -142,7 +112,6 @@ public:
 			growColList_();
 		}
 
-		//colData_[numCols_] = new ColumnMetadata(name, typ);
 		types_[numCols_] = typ;
 		numCols_++;
 	}
@@ -150,32 +119,8 @@ public:
 	/** Add a row with a name (possibly nullptr), name is external.  Names are
    *  expectd to be unique, duplicates result in undefined behavior. */
 	void add_row() {
-	  /*if (numRows_ >= capRows_) {
-		  growRowList_();
-	  }
-	  rowNames_[numRows_] = (name == nullptr) ? name : name->clone();*/
 	  numRows_++;
   	}
-
-	/** Return name of row at idx; nullptr indicates no name. An idx >= width
-    * is undefined. */
-	/* String* row_name(size_t idx) {
-	  if (idx >= numRows_) {
-		  fprintf(stderr, "Index out of bounds: Bad row index (%zu) in Schema", idx);
-		  exit(1);
-	  }
-	  return rowNames_[idx];
-  }*/
-
-	/** Return name of column at idx; nullptr indicates no name given.
-    *  An idx >= width is undefined.*/
-	/*String* col_name(size_t idx) {
-	  if (idx >= numCols_) {
-		  fprintf(stderr, "Index out of bounds: Bad col index (%zu) in Schema", idx);
-		  exit(1);
-	  }
-	  return colData_[idx]->getName();
-  }*/
 
 	/** Return type of column at idx. An idx >= width is undefined. */
 	char col_type(size_t idx)
@@ -188,42 +133,6 @@ public:
 		return types_[idx];
 	}
 
-	/** Given a column name return its index, or -1. */
-	/*int col_idx(const char* name){
-	  String* curColName = NULL;
-	  for (int i = 0; i < numCols_; i++) {
-		  curColName = colData_[i]->getName();
-		  if (curColName == nullptr)
-		  {
-			  //column doesn't have a name
-			  continue;
-		  }
-
-		  if (strcmp(curColName->c_str(), name) == 0) {
-			  return i;
-		  }
-	  }
-	  return -1;
-  }*/
-
-	/** Given a row name return its index, or -1. */
-	/*int row_idx(const char* name) {
-	  String* curRowName = NULL;
-	  for (int i = 0; i < numRows_; i++) {
-		  curRowName = rowNames_[i];
-		  if (curRowName == nullptr)
-		  {
-			  //row doesn't have a name
-			  continue;
-		  }
-
-		  if (strcmp(curRowName->c_str(), name) == 0) {
-			  return i;
-		  }
-	  }
-	  return -1;
-  }*/
-
 	/** The number of columns */
 	size_t width()
 	{
@@ -234,6 +143,57 @@ public:
 	size_t length()
 	{
 		return numRows_;
+	}
+
+	bool equals(Object* other)
+	{
+		Schema* s = dynamic_cast<Schema*>(other);
+		if (numCols_ != s->numCols_ || capCols_ != s->capCols_
+		|| numRows_ != s->numRows_)
+		{
+			return false;
+		}
+
+		for (size_t i = 0; i < numCols_; i++)
+		{
+			if (types_[i] != s->col_type(i))
+			{
+				return false;
+			}
+		}
+	}
+
+	size_t hash_me_()
+	{
+		size_t hash_ = 0;
+		hash_ += numCols_;
+		hash_ += capCols_;
+		hash_ += numRows_;
+
+		for (int i = 0; i < numCols_; i++)
+		{
+			char typ = types_[i];
+			switch (typ)
+			{
+				case 'B':
+					hash_ += 1;
+					break;
+				case 'I':
+					hash_ += 2;
+					break;
+				case 'F':
+					hash_ += 3;
+					break;
+				case 'S':
+					hash_ += 4;
+					break;
+				default:
+					//shouldn't reach here
+					break;
+			}
+		}
+
+		return hash_;
 	}
 
 	void growColList_()
@@ -248,14 +208,4 @@ public:
 		delete[] types_;
 		types_ = newTypesArr;
 	}
-
-	/* void growRowList_() {
-	  capRows_ *= 2;
-	  String** newRowArr = new String*[capRows_];
-	  for (int i = 0; i < numRows_; i++) {
-		  newRowArr[i] = rowNames_[i];
-	  }
-	  delete[] rowNames_;
-	  rowNames_ = newRowArr;
-  }*/
 };
