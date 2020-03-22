@@ -16,6 +16,7 @@ public:
     Value(const char *data, size_t cap)
     {
         capacity_ = cap;
+        val_ = (char*)malloc(cap);
         memcpy(val_, data, capacity_);
     }
 
@@ -47,5 +48,11 @@ public:
     size_t hash_me_()
     {
         return reinterpret_cast<size_t>(val_) + capacity_;
+    }
+
+    /** Clone the Value object and return it */
+    Value* clone()
+    {
+        return new Value(val_, capacity_);
     }
 };

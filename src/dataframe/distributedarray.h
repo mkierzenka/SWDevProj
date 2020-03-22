@@ -102,4 +102,35 @@ class DistributedArray : public Object
         {
             return keyList_->get(idx);
         }
+
+        /** Check if two distributed arrats equal */
+	bool equals(Object* other)
+	{
+		if (this == other)
+		{
+			return true;
+		}
+
+		DistributedArray* da = dynamic_cast<DistributedArray*>(other);
+	
+		if (da == nullptr || size_ != c->size_ || !(blocks_->equals(c->blocks_)) || type_ != c->type_ || !(baseKey_->equals(c->baseKey_)))
+        {
+			return false;
+		}
+
+		return true;
+	}
+	
+	/** Compute hash code of this column */
+	size_t hash_me_()
+	{
+        size_t hash_ = 0;
+        hash_ += size_;
+        hash_ += reinterpret_cast<size_t>(baseKey_);
+        hash_ += reinterpret_cast<size_t>(blocks_);
+        //hash_ += reinterpret_cast<size_t>(type_);
+        hash_ += reinterpret_cast<size_t>(store_);
+
+        return hash_;
+	}
 };

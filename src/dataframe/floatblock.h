@@ -87,4 +87,47 @@ public:
 		vals_[index] = s;
 	}
 
+	/** Check if two blocks equal */
+	bool equals(Object* other)
+	{
+		if (this == other) {
+			return true;
+		}
+
+		FloatBlock* b = dynamic_cast<FloatBlock*>(other);
+		if (b == nullptr || size_ != b->size_ || capacity_ != b->capacity_)
+		{
+			return false;
+		}
+
+		for (size_t i = 0; i < size_; i++)
+		{
+			//set a tolerance
+			float tolerance = 0.0001;
+			if (abs(vals_[i] - b->vals_[i]) > tolerance)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	/** Compute hash code of this bool block */
+	size_t hash_me_()
+	{
+		size_t hash_ = 0;
+		hash_ += size_;
+		hash_ += capacity_;
+
+		for (size_t i = 0; i < size_; i++)
+		{
+			if (vals_[i])
+			{
+				hash_ += 1;
+			}
+		}
+
+		return hash_;
+	}
 };

@@ -6,6 +6,7 @@
 #include "../src/dataframe/sumrower.h"
 #include "../src/dataframe/findrower.h"
 #include "../src/dataframe/lengthrower.h"
+#include "../src/application/trivial.h"
 
 Sys *SYSTEM = new Sys();
 
@@ -399,8 +400,36 @@ void lengthRowerTest() {
   SYSTEM->pln("Length rower test passed!");
 }
 */
+
+DataFrame* KVStore::get(Key *k)
+{
+        Value *val = getValue(k);
+        //set up new serializer to deserialize returned data into a dataframe
+        Serializer *s = new Serializer(val->getData());
+
+        //create new dataframe and mutate by deserializing
+        DataFrame *d = new DataFrame(k);
+        d->deserialize(s);
+
+        //delete val?
+        delete s;
+
+        return d;
+}
+
+
+void tmp() {
+  
+  Trivial* tv = new Trivial(0);
+  tv->run_();
+
+  printf("Trivial case passed!\n");
+  delete tv;
+}
+
 int main()
 {
+  tmp();
   //basicDfTest();
   /*columnTests();
   testSchema();

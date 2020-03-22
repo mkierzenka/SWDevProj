@@ -33,15 +33,12 @@ class Column : public Object
 {
 public:
     size_t size_;     //how many elements are in the column, in theory
-    //size_t capacity_; //how many elements the column can store
-	//size_t numBlocks_;
-	//size_t capacityBlocks_;
     DistributedArray* blocks_; //owned, arr of the keys for data in this column
     KVStore* store_;
     ColType type_; //what time of column (bool, int, float, string)
-    Key* baseKey_;
+    Key* baseKey_; //owned
 
-    /** Default constructor: start column to fit two elements */
+    /** Default constructor: start column to fit two elements. Steals key ownership */
     Column(KVStore* store, Key* baseKey, ColType t) {
         blocks_ = new DistributedArray(store);
         store_ = store;
@@ -50,10 +47,17 @@ public:
         type_ = t;
     }
 
+    // For deserializing, hopefully these values will be updated in a few calls
     Column() {
+        blocks_ = new DistributedArray(nullptr);
+        store_ = nullptr;
+        baseKey_ = nullptr;
+        size_ = 0;
+        type_ = ColType::Str; //arbitrary
     }
     
     ~Column() {
+        delete baseKey_;
         delete blocks_;
     }
 
@@ -74,15 +78,15 @@ public:
         switch(type_)
         {
             case ColType::Integer:
-                return 'i';
+                return 'I';
             case ColType::Str:
-                return 's';
+                return 'S';
             case ColType::Boolean:
-                return 'b';
+                return 'B';
             case ColType::Float:
-                return 'f';
+                return 'F';
             default:
-                fprintf(stderr, "Unknown data type");
+                fprintf(stderr, "Unknown enum data type");
                 exit(-1);
         }
     }
@@ -315,11 +319,62 @@ public:
     {
     }
     
-	float get_float(size_t idx) { }
+	float get_float(size_t idx) {
+        if (!properType(ColType::Float))
+        {
+            fprintf(stderr, "Cannot get float from non-float col");
+            return -1;
+        }
+
+        size_t chunk = idx / BLOCK_SIZE;
+        size_t idxInChunk = idx % BLOCK_SIZE;
+
+        //Key to look up data
+        Key* k = genKey_(chunk);
+        Value* v = store_->getValue(k);
+		Serializer* s = new Serializer(v->getSize(), v->getData());
+        FloatBlock* floatData = new FloatBlock();
+		floatData->deserialize(s);
+        return floatData->get(idxInChunk);
+     }
 	
-	bool get_bool(size_t idx) { }
+	bool get_bool(size_t idx) {
+        if (!properType(ColType::Boolean))
+        {
+            fprintf(stderr, "Cannot get bool from non-bool col");
+            return -1;
+        }
+
+        size_t chunk = idx / BLOCK_SIZE;
+        size_t idxInChunk = idx % BLOCK_SIZE;
+
+        //Key to look up data
+        Key* k = genKey_(chunk);
+        Value* v = store_->getValue(k);
+		Serializer* s = new Serializer(v->getSize(), v->getData());
+        BoolBlock* boolData = new BoolBlock();
+		boolData->deserialize(s);
+        return boolData->get(idxInChunk);
+     }
 	
-	String* get_string(size_t idx);
+	String* get_string(size_t idx) {
+        if (!properType(ColType::Str))
+        {
+            fprintf(stderr, "Cannot get String from non-String col");
+            exit(1);
+        }
+
+        size_t chunk = idx / BLOCK_SIZE;
+        size_t idxInChunk = idx % BLOCK_SIZE;
+
+        //Key to look up data
+        Key* k = genKey_(chunk);
+        Value* v = store_->getValue(k);
+		Serializer* s = new Serializer(v->getSize(), v->getData());
+        StringBlock* strData = new StringBlock();
+		strData->deserialize(s);
+        return strData->get(idxInChunk);
+    }
 	
     /** Get int from the column at specified index */
     int get_int(size_t idx)
@@ -357,35 +412,49 @@ public:
         Key* k = new Key(keyStr, 0); //clones String; figure out node value later
         return k;
     }
-
-    /** Helper to determine if given index is out-of-bounds */
-    /*bool isIndexOutOfBounds_(size_t idx)
-    {
-        return idx >= size_;
-    }*/
-
-    /** Helper that exits program if index out-of-bounds */
-   /* void exitIfIndexOutOfBounds_(size_t idx)
-    {
-        if (isIndexOutOfBounds_(idx))
-        {
-            //error message and exit of bounds
-            fprintf(stderr, "Index %zu out of bounds", idx);
-            exit(1);
-        }
-    }*/
 	
 	ColType getColType_(char c) {
 		switch(c)
         {
-            case 'i': return ColType::Integer;
-            case 's': return ColType::Str;
-            case 'b': return ColType::Boolean;
-            case 'f': return ColType::Float;
+            case 'I': return ColType::Integer;
+            case 'S': return ColType::Str;
+            case 'B': return ColType::Boolean;
+            case 'F': return ColType::Float;
             default:
-                fprintf(stderr, "Unknown data type");
+                fprintf(stderr, "Unknown char data type");
                 exit(-1);
         }
+	}
+
+    /** Check if two columns equal */
+	bool equals(Object* other)
+	{
+		if (this == other)
+		{
+			return true;
+		}
+
+		Column* c = dynamic_cast<Column*>(other);
+	
+		if (c == nullptr || size_ != c->size_ || !(blocks_->equals(c->blocks_)) || type_ != c->type_ || !(baseKey_->equals(c->baseKey_)))
+        {
+			return false;
+		}
+
+		return true;
+	}
+	
+	/** Compute hash code of this column */
+	size_t hash_me_()
+	{
+        size_t hash_ = 0;
+        hash_ += size_;
+        hash_ += reinterpret_cast<size_t>(baseKey_);
+        hash_ += reinterpret_cast<size_t>(blocks_);
+        //hash_ += reinterpret_cast<size_t>(type_);
+        hash_ += reinterpret_cast<size_t>(store_);
+
+        return hash_;
 	}
 
     

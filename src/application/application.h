@@ -13,11 +13,13 @@
 class Application : public Object
 {
 public:
-    size_t idx; //what index node this application is running on
+    size_t idx_; //what index node this application is running on
+    KVStore* kv_;
 
     Application(size_t i)
     {
-        idx = i;
+        idx_ = i;
+        kv_ = new KVStore(i);
     }
 
     void run_() 

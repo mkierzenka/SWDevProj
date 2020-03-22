@@ -31,6 +31,7 @@ public:
 		memcpy(buffer_, inp, strlen(inp));
 		curBuffPtrWrite_ = buffer_;
 		curBuffPtrRead_ = buffer_;
+		numBytesWritten_ = strlen(inp);
 	}
 
 	Serializer(size_t size, const char* inp) {
@@ -39,6 +40,7 @@ public:
 		memcpy(buffer_, inp, size);
 		curBuffPtrWrite_ = buffer_;
 		curBuffPtrRead_ = buffer_;
+		numBytesWritten_ = size;
 	}
 	
 	~Serializer() {
@@ -48,11 +50,13 @@ public:
 	void write(double d) {
 		memcpy(curBuffPtrWrite_, &d, sizeof(double));
 		curBuffPtrWrite_ += sizeof(double);
+		numBytesWritten_ += sizeof(double);
 	}
 
 	void write(float f) {
 		memcpy(curBuffPtrWrite_, &f, sizeof(float));
 		curBuffPtrWrite_ += sizeof(float);
+		numBytesWritten_ += sizeof(float);
 	}
 
 	void write(MsgKind mk) {
@@ -94,16 +98,19 @@ public:
 		out[1] = 0;
 		memcpy(curBuffPtrWrite_, &out, 2);
 		curBuffPtrWrite_ += 2;
+		numBytesWritten_ += 2;
 	}
 	
 	void write(size_t s) {
 		memcpy(curBuffPtrWrite_, &s, sizeof(size_t));
 		curBuffPtrWrite_ += sizeof(size_t);
+		numBytesWritten_ += sizeof(size_t);
 	}
 	
 	void write(char c) {
 		memcpy(curBuffPtrWrite_, &c, sizeof(char));
 		curBuffPtrWrite_ += sizeof(char);
+		numBytesWritten_ += sizeof(char);
 	}
 
 	/** Calculates the length using strlen*/
@@ -112,26 +119,31 @@ public:
 		size_t lenStr = strlen(str); //length of str
 		memcpy(curBuffPtrWrite_, str, lenStr + 1); //add 1 to also copy null terminator
 		curBuffPtrWrite_ += lenStr+1;
+		numBytesWritten_ += lenStr+1;
 	}
 
 	void write(short s) {
 		memcpy(curBuffPtrWrite_, &s, sizeof(s));
 		curBuffPtrWrite_ += sizeof(s);
+		numBytesWritten_ += sizeof(s);
 	}
 
 	void write(long l) {
 		memcpy(curBuffPtrWrite_, &l, sizeof(l));
 		curBuffPtrWrite_ += sizeof(l);
+		numBytesWritten_ += sizeof(l);
 	}
 
 	void write(int i) {
 		memcpy(curBuffPtrWrite_, &i, sizeof(i));
 		curBuffPtrWrite_ += sizeof(i);
+		numBytesWritten_ += sizeof(i);
 	}
 	
 	void write(bool b) {
 		memcpy(curBuffPtrWrite_, &b, sizeof(b));
 		curBuffPtrWrite_ += sizeof(b);
+		numBytesWritten_ += sizeof(b);
 	}
 
 	char* readString() {

@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "columnmetadata.h"
 #include "../utils/object.h"
 #include "../utils/string.h"
 #include "../serial/serial.h"
@@ -47,7 +46,6 @@ public:
 		types_ = new char[capCols_];
 		for (size_t i = 0; i < capCols_; i++)
 		{
-			//types_[i] = types[i];
 			add_column(types[i]);
 		}
 	}

@@ -78,4 +78,19 @@ public:
     {
         return reinterpret_cast<size_t>(kStr_) + homeNode_;
     }
+
+    /** Add an index to the Key's string and return a new key */
+    Key* addIndex(size_t idx)
+    {
+        //build up new key with string buffer
+        //format of string should be "{kStr_->c_}-{idx}""
+        StrBuff* sb = new StrBuff();
+        sb->c(*kStr_);
+        sb->c('-');
+        sb->c(idx);
+        String* newStrRes = sb->get();
+
+        delete sb;
+        return new Key(newStrRes, homeNode_);
+    }
 };

@@ -32,11 +32,23 @@ public:
   Schema* schema_;        //owned, schema of dataframe
   Key* key_; //key for this dataframe in the KV store
 
+  /** This constructor is for the purpose of adding arrays */
+  DataFrame(Key* k, KVStore* kv)
+  {
+    schema_ = new Schema();
+    store_ = kv;
+    size_t numCols = schema_->width();
+    key_ = k;
+    columns_ = new ColumnArray(store_, key_);
+  }
+
   /** This constructor is for the purpose of deserializing */
   DataFrame(Key* k)
   {
     schema_ = new Schema();
     key_ = k;
+    store_ = nullptr;
+    columns_ = new ColumnArray(nullptr, key_);
   }
 
   /** Create a data frame with the same columns as the give df but no rows */
@@ -64,6 +76,28 @@ public:
     delete schema_;
 	  delete columns_;
   }
+
+  /** Converts an array into a dataframe object. Returns the df result */
+  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, float* elems) {
+    //initialize dataframe
+    DataFrame* df = new DataFrame(k, kv);
+    df->add_array(numElems, elems);
+    Serializer* s = new Serializer();
+    df->serialize(s);
+    Value* v = new Value(s->getBuffer(), s->getNumBytesWritten());
+    kv->put(k, v);
+
+    delete s;
+    return df;
+  }
+
+  /** Add array to dataframe as a column. Add the data into chunks at a time, and generate
+   * keys for them. Column needs to get dataframe's key and key-value store */
+  void add_array(size_t numElements, float* elements)
+  {
+    columns_->add_column_fromarray(numElements, elements);
+  }
+
 
   /** Returns the dataframe's schema. Modifying the schema after a dataframe
     * has been created in undefined. */

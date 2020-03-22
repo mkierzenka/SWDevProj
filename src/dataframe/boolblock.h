@@ -90,7 +90,17 @@ public:
 	/** Check if two blocks equal */
 	bool equals(Object* other)
 	{
+		if (this == other)
+		{
+			return true;
+		}
+
 		BoolBlock* b = dynamic_cast<BoolBlock*>(other);
+		if (b == nullptr)
+		{
+			return false;
+		}
+		
 		if (size_ != b->size_ || capacity_ != b->capacity_)
 		{
 			return false;
