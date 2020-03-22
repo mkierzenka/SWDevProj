@@ -42,12 +42,13 @@ public:
 	{
 		size_t typesLen = strlen(types);
 		capCols_ = typesLen;
-		numCols_ = typesLen;
+		numCols_ = 0;
 		numRows_ = 0;
 		types_ = new char[capCols_];
 		for (size_t i = 0; i < capCols_; i++)
 		{
-			types_[i] = types[i];
+			//types_[i] = types[i];
+			add_column(types[i]);
 		}
 	}
 
