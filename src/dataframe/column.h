@@ -118,7 +118,7 @@ public:
 
     /** Type appropriate push_back methods. Calling the wrong method is
     * undefined behavior. **/
-    /*void push_back(int val) {
+    void push_back(int val) {
         if (type_ != ColType::Integer) {
             fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
             exit(1);
@@ -144,7 +144,7 @@ public:
             fprintf(stderr, "Cannot add String to column of type %c", getCharType());
             exit(1);
         }
-    }*/
+    }
 
     /** Add an entire list of integers to this column*/
     void add_all(size_t len, int* vals) {
@@ -468,7 +468,7 @@ public:
         hash_ += size_;
         hash_ += reinterpret_cast<size_t>(baseKey_);
         hash_ += reinterpret_cast<size_t>(blocks_);
-        hash_ += reinterpret_cast<size_t>(getCharType());
+        hash_ += getCharType();
         return hash_;
 	}
 

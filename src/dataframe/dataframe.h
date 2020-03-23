@@ -41,15 +41,6 @@ public:
     columns_ = new ColumnArray(store_, key_);
   }
 
-  /** This constructor is for the purpose of deserializing */
-  DataFrame(Key* k)
-  {
-    schema_ = new Schema();
-    key_ = k;
-    store_ = nullptr;
-    columns_ = new ColumnArray(nullptr, key_);
-  }
-
   /** Create a data frame with the same columns as the give df but no rows */
   DataFrame(DataFrame &df, Key* k) : DataFrame(df.get_schema(), k)
   {
