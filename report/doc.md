@@ -1,7 +1,8 @@
 ## Usage:
 * "make build" - compiles all tests
-* "make test" - runs sorer test
-* "make testGeneral" - runs sorer test and a bunch of others testing different things
+* "make test" - runs tests supplied to us (ex. trivial test)
+* "make ourTests" - runs sorer test and a bunch of others testing different parts 
+  of our program
 * "make memory" - runs sorer test through valgrind
 * "make clean" - deletes compiled files
 
@@ -21,9 +22,9 @@ one to produce data and another to consume it.
 The eau2 system is made up of three layers of abstraction.
 
 The first and lowest layer is the distributed key-value store. There will be 
-multiple key-value stores, each holding some portion of data. Each key will map to
-a piece of serialized data or a dataframe. Each store will be able to serialize and
-deserialize its own data. If a key-value store requires data that it does not have, then 
+multiple key-value stores, one per node; each will hold some portion of data. Each key 
+will map to a piece of serialized data or a dataframe. Each store will be able to serialize 
+and deserialize its own data. If a key-value store requires data that it does not have, then 
 it will be able to communicate with the other key-value stores to retrieve this 
 information. This will be done via a networking abstraction, which will allow key-value 
 stores to behave as nodes on a network. In addition to the stores, there will also be a lead
@@ -65,9 +66,8 @@ Fields:
  * put(Key, String): adds given data to the key-value store specified in the key, 
  not blocking
  * get(Key): request for the data; returns deserialized data from its own store if 
- stored locall
+ stored locally
  * getAndWait(Key): retrieves data with the given Key from the Key's node
- * getStoreId(): return the id of this store (storeId)
  * getValue(Key): return the value that the given key maps to; this method will not do
  any serialization or deserialization, rather will return the result exactly as it is stored
 
@@ -109,8 +109,9 @@ With this change, now that Columns no longer store their own data, we will be ab
 the duplicate Column classes for each type. Instead, we can just have a field in Column that 
 describes the type.
 
-The DataFrame will hold a KVStore object so that it can look up data as requested by the 
-user.
+The DataFrame will hold a KVStore object that contains the frame's actual data.
+Not only does the DataFrame need this object, but also any other objects within
+the frame that need to store and request data
 
 The DataFrame will have methods that support converting data types into frames. An example 
 is fromArray; it will take in an array of a certain type, and it will return the DataFrame 
@@ -120,8 +121,8 @@ the column's distributed array. Once the input array is completely broken up and
 DataFrame will be serialized and stored under its key in the distributed system.
 
 Fields:
-* DistributedArray (to hold columns)
-* KVStore: to look up data using the keys in the DistributedArray
+* ColumnArray (to hold columns)
+* KVStore: dataframe passes store to classes that need it for data lookup; static initialization methods add key-value pair to the store
 * Schema: keeps track of the DataFrame's column structure
 * Key: key for this dataframe in the store; will be used to create the keys for the
 frame's columns' chunks
@@ -134,7 +135,7 @@ Methods (new ones we anticipate):
 
 
 * Column: A column now stores data in the distributed KV Store, instead of locally. A Column will be a DistributedArray where each Key points to a Value containing a fixed sized number of elements that belong in this Column. Since we are no longer storing elements
-directly in the column, we only need one column class now.
+directly in the column, we do not need separate column implementations for each type
 
 Fields:
 * DistributedArray (to hold blocks of values)
@@ -145,16 +146,17 @@ Fields:
 
 Methods:
 * most methods from before, for getting data from the column. not 'set' methods (or anything else that modifies the column). Might include the push_back methods
-* add_all: one for each data type; adds all given elements of that datatype to the array; breaks data up into chunks, creates keys for those chunks, and adds them to the KVStore
+* add_all: one for each data type; adds all given elements of that datatype to the column; breaks data up into chunks, creates keys for those chunks, and adds them to the KVStore
+*setStore(KVStore): pass a KVStore to the dataframe; will initially start in the dataframe, which will be passed to the column array and eventually the column
 
 
-* Serializer: This class will be similar to the one started in Assignment 6. It will be 
+* Serializer: This class will be similar to the one started in Assignment 6. It supports writing primitive types, character pointers (strings), and message types to its buffer, and can also read these when deserializing. It will be 
 in charge of serializing and deserializing data, and buffering the result. The Serializer 
-will be used in multiple places in this project. All of DataFrame's from... methods will 
-need to initialize a Serializer to serialize the constructed dataframe, to store in the 
-key-value store. The wait and waitAndGet methods within Store will need to initalize a 
+will be used in multiple places in this project. All of DataFrame's from... methods need to initialize a Serializer to serialize the constructed dataframe, to store in the 
+key-value store. The wait and waitAndGet methods within Store need to initialize a 
 Serializer; the serializer will need to convert the serialized string data into the dataframe 
-that it represents
+that it represents. Serialization is also needed whenever attempting to retrieve
+data from the DataFrame, as all the data is serialized in the KVStore
 
 * DistributedArray: this class will hold reference information about data throughout the 
 system. The purpose of this class is to bridge data that lives in different areas of the 
@@ -182,6 +184,8 @@ does not contain the data, then make a call too the KV
 store
 * get(size_t): get key at specified index in array, then return data for that key
 * getKeyAtIndex(size_t): return key at the given index in the array
+* setStore(KVStore): this method will be used to pass a store into the distributed array; the store will come from the dataframe initially and move down the hierarchy (dataframe -> columnarray -> column -> distributed array)
+* Serialization and deserialization methods
 
 *NOTE that the cache methods defined here will delegate to the Cache object, which work 
 on the Cache's map object*
@@ -209,7 +213,7 @@ full, replace an element
 
 *Application: this is the highest level of the program. The Application is what the 
 user interacts with, in which he or she defines operations to perform over a certain 
-set of data
+set of data. An application will run on each node
 
 Fields:
 
@@ -219,7 +223,7 @@ running on. When initialized, it will take in the node id from the Application's
 
 Methods:
 
-* this_node(): returns id of this node; retrieved from the KV store
+* this_node(): returns id of this node
 * run_(): given the node id, perform a certain set of operations. The node id will be 
 placed in a switch statement, and each case will contain a different helper for each 
 application running (ex.producer to initialize and create the data, summarizer to 
@@ -233,13 +237,13 @@ are an outline of what each node will run.
 
 Application:
 
- dataA = Key("dataA", 0);
- dataB = Key("dataB", 1);
- firstDifPos = Key("firstDifPos", 2);
- dataAFirstDif = Key("dataAFirstDif", 2);
- dataBFirstDif = Key("dataBFirstDif", 2);
- same = Key("areSame", 2);
- sameSize = Key("sameSize", 2);
+ * dataA = Key("dataA", 0);
+ * dataB = Key("dataB", 1);
+ * firstDifPos = Key("firstDifPos", 2);
+ * dataAFirstDif = Key("dataAFirstDif", 2);
+ * dataBFirstDif = Key("dataBFirstDif", 2);
+ * same = Key("areSame", 2);
+ * sameSize = Key("sameSize", 2);
 
  * ProducerA (node_num = 0):
 	Sorer s = new Sorer();
@@ -304,30 +308,9 @@ Application:
 
 ## Open questions
 
-In HW6, we implemented a Server and Clients. It would make sense for each Key-Value 
-Store to have the code from Client, but what about the code for Server?
-Having a single Server node makes it easier to register new Clients (add new nodes 
-to the system). We are not sure on the details of implementing this; should the Server 
-be another node of the network with it's own Key-Value store? Seems like having a dedicated 
-Server which only handles registering new Clients would be cleaner, but that doesn't seem 
-to fit with the provided example code. Any advice?
+Should we serialize and deserialize KV stores? We think no but also not sure if our current strategy is the best way; from the dataframe, we pass the KVStore to any classes that need it, in particular before deserializing it
 
-
-Should each Client (KV store) always be connected to every other Client? Are we expecting 
-100K Client systems?
-
-
-How exactly will creating dataframes from data types work. For example, if we convert an 
-array into a dataframe, will these values all be stored in a single column? Would we want
-multiple columns? How exactly would we decide this...
-
-
-Cyclic dependency: if the DataFrame has a KVStore (which it seems like it needs), wouldn't
-it be possible for the DataFrame to technically access the deserialized form of itself?
-Could this cause issues?
-
-
-Should we serialize and deserialize KV stores?
+We pulled out the implementation of KVStore::get into one of our test cpp files. This means we can use it in that file but nowhere else. What is the standard for where a method like that should be implemented? Its own additional cpp file that is compiled separately?
 
 ## Status
 We have decided to use another group's Sorer implementation, as ours was written in Python and 
@@ -340,7 +323,10 @@ locally and notified the team so they could fix their codebase.
 We succeeded in creating an adapter to use their Sorer with our DataFrame classes, a test 
 demonstrating this can be found in tests/sorerTest.cpp.
 This test highlighted some memory leaks in our implementation, which have now all been fixed.
-There is a little bit of small bug-fixing left for our DataFrame implementation.
+
+We have implemented serialization for most of the necessary classes, and are able to use the key-value store for data storage and retrieval. The Trivial case provided to us in M2 passes.
+
+We have a good amount of code cleanup to do; this includes removing unused code and print statements, and getting our previously written tests to compile and run.
 
 The networks portion implemented for previous assignments is a good start for what will be 
 required for this project.
@@ -349,7 +335,4 @@ fix.
 Most of the networking functionality required for this project is set up.
 
 Remaining tasks for M2
--from methods
--Test serialization
--Create Application level: fairly straightforward, mainly uses classes from bottom two layers
--Jan feedback from M1
+-fromScalar

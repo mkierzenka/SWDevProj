@@ -9,12 +9,8 @@
 
 * Check serializer for correctness
 
-
-* we should test the df.filter method also implement it
-
 * Consider:are the strings provided in A4P1 immutable? - probably should be for this project
 ^^ Do we really need to clone?
-
 
 * Consider:Row allowed to copy the data?
 
