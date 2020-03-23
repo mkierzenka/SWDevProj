@@ -246,64 +246,64 @@ Application:
  * sameSize = Key("sameSize", 2);
 
  * ProducerA (node_num = 0):
-	Sorer s = new Sorer();
-	DataFrame\* df = s.read("fileA");
-	// store df in distributed key-value store under key dataA
-	return;
+ *	Sorer s = new Sorer();
+ *	DataFrame\* df = s.read("fileA");
+ *	// store df in distributed key-value store under key dataA
+ *	return;
 
  * ProducerB (node_num = 1):
-	Sorer s = new Sorer();
-	DataFrame\* df = s.read("fileB");
-	// store df in distributed key-value store under key dataB
-	return;
+ *	Sorer s = new Sorer();
+ *	DataFrame\* df = s.read("fileB");
+ *	// store df in distributed key-value store under key dataB
+ *	return;
 
  * Comparer (node_num = 2):
-	DataFrame\* dfA = waitAndGet(dataA);
-	DataFrame\* dfB = waitAndGet(dataB);
-	int areSame = 0;
-	if (size of dfA != size of dfB) {
-		DataFrame::fromScalar(&sameSize, &kv, 0);
-		DataFrame::fromScalar(&same, &kv, 0);
-		return;
-	}
-	DataFrame::fromScalar(&sameSize, &kv, 1);
-	// loop through elements
-		if (dfA->get(i, j) not equal dfB->get(i, j)) {
-			int\* pos = new int\[2\];
-			pos\[0\] = i;
-			pos\[1\] = j;
-			DataFrame::fromArray(&firstDifPos, &kv, 2, pos);
-			// generalize for any type
-			DataFrame::fromScalar(&dataAFirstDif, &kv, dfA->get(i, j)); 
-			// generalize for any type
-			DataFrame::fromScalar(&dataBFirstDif, &kv, dfB->get(i, j)); 
-		}
-	DataFrame::fromScalar(&same, &kv, 1);
-	return;
+ *	DataFrame\* dfA = waitAndGet(dataA);
+ *	DataFrame\* dfB = waitAndGet(dataB);
+ *	int areSame = 0;
+ *	if (size of dfA != size of dfB) {
+ *		DataFrame::fromScalar(&sameSize, &kv, 0);
+ *		DataFrame::fromScalar(&same, &kv, 0);
+ *		return;
+ *	}
+ *	DataFrame::fromScalar(&sameSize, &kv, 1);
+ *	// loop through elements
+ *		if (dfA->get(i, j) not equal dfB->get(i, j)) {
+ *			int\* pos = new int\[2\];
+ *			pos\[0\] = i;
+ *			pos\[1\] = j;
+ *			DataFrame::fromArray(&firstDifPos, &kv, 2, pos);
+ *			// generalize for any type
+ *			DataFrame::fromScalar(&dataAFirstDif, &kv, dfA->get(i, j)); 
+ *			// generalize for any type
+ *			DataFrame::fromScalar(&dataBFirstDif, &kv, dfB->get(i, j)); 
+ *		}
+ *	DataFrame::fromScalar(&same, &kv, 1);
+ *	return;
 
  * Reporter (node_num = 3):
-	DataFrame\* sameDF = waitAndGet(same);
-	if (sameDF->get(0, 0)) {
-		pln("Same Data! :)");
-		return;
-	}
-	pln("Different Data.");
-	DataFrame\* sizeDF = waitAndGet(sameSize);
-	if (sizeDF->get(0, 0)) {
-		pln("Non-Equal Size");
-		return;
-	}
-	DataFrame\* posDF = waitAndGet(firstDifPos);
-	DataFrame\* aDif = waitAndGet(dataAFirstDif);
-	DataFrame\* bDif = waitAndGet(dataBFirstDif);
-	pln("Different Data!");
-	p("Example: ");
-	p("dataA\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ")
-	.p(aDif->get(0));
-	p(" , dataB\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ")
-	.p(bDif->get(0));
-	pln("");
-	return;
+ *	DataFrame\* sameDF = waitAndGet(same);
+ *	if (sameDF->get(0, 0)) {
+ *		pln("Same Data! :)");
+ *		return;
+ *	}
+ *	pln("Different Data.");
+ *	DataFrame\* sizeDF = waitAndGet(sameSize);
+ *	if (sizeDF->get(0, 0)) {
+ *		pln("Non-Equal Size");
+ *		return;
+ *	}
+ *	DataFrame\* posDF = waitAndGet(firstDifPos);
+ *	DataFrame\* aDif = waitAndGet(dataAFirstDif);
+ *	DataFrame\* bDif = waitAndGet(dataBFirstDif);
+ *	pln("Different Data!");
+ *	p("Example: ");
+ *	p("dataA\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ")
+ *	.p(aDif->get(0));
+ *	p(" , dataB\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ")
+ *	.p(bDif->get(0));
+ *	pln("");
+ *	return;
 
 
 ## Open questions
