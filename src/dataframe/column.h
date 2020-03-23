@@ -51,7 +51,7 @@ public:
     Column() {
         blocks_ = new DistributedArray(nullptr);
         store_ = nullptr;
-        baseKey_ = nullptr;
+        baseKey_ = new Key();
         size_ = 0;
         type_ = ColType::Str; //arbitrary
     }
@@ -155,7 +155,7 @@ public:
 			Serializer* s = new Serializer();
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
-			delete s;
+			//delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added += BLOCK_SIZE;
@@ -172,11 +172,13 @@ public:
 			Serializer* s = new Serializer();
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
-			delete s;
+			//delete s;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added = len;
         }
+		
+		size_ += len_added;
     }
 
     /** Add an entire list of booleans to this column*/
@@ -220,6 +222,7 @@ public:
             blocks_->addKey(k);
             len_added = len;
         }
+		size_ += len_added;
     }
     
     /** Add an entire list of floats to this column*/
@@ -263,6 +266,7 @@ public:
             blocks_->addKey(k);
             len_added = len;
         }
+		size_ += len_added;
     }
 
     /** Add an entire list of Strings to this column. Clones each String*/
@@ -306,6 +310,8 @@ public:
             blocks_->addKey(k);
             len_added = len;
         }
+		
+		size_ += len_added;
     }
 	
     /** Returns the number of elements in the column. */
