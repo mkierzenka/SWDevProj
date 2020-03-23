@@ -7,8 +7,6 @@
 
 * Clean up client and server, try to get more than two clients to connect successfully
 
-* Check serializer for correctness
-
 * Consider:are the strings provided in A4P1 immutable? - probably should be for this project
 ^^ Do we really need to clone?
 
@@ -25,3 +23,6 @@
 * Do we need both ColumnArray and ColArr?
 
 * Fix old tests to compile/run/pass
+
+* fromScalar
+

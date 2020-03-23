@@ -312,6 +312,8 @@ Should we serialize and deserialize KV stores? We think no but also not sure if 
 
 We pulled out the implementation of KVStore::get into one of our test cpp files. This means we can use it in that file but nowhere else. What is the standard for where a method like that should be implemented? Its own additional cpp file that is compiled separately?
 
+fromScalar: which data types will we need this for? We currently store blocks of data for booleans, strings, integers, and floats. Will we be expected to do the same for size_t values, shorts, longs, etc.
+
 ## Status
 We have decided to use another group's Sorer implementation, as ours was written in Python and 
 not fully correct.
