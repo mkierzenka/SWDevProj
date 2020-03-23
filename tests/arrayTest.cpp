@@ -42,17 +42,15 @@ void test2()
 {
   String *s = new String("Hello");
   String *t = new String("World");
-  String *u = s->concat(t);
   Array *a = new Array();
   t_true(a->length() == 0);
   a->add(s);
-  a->set(1, t);
-  a->add(u);
-  t_true(a->get(2)->equals(u));
-  t_true(a->length() == 3);
-  a->remove(2);
-  t_true(a->length() == 2);
+  a->add(t);
   t_true(a->get(1)->equals(t));
+  t_true(a->length() == 2);
+  a->remove(1);
+  t_true(a->length() == 1);
+  t_true(a->get(0)->equals(s));
   OK("Test 2 passed!");
 }
 
@@ -71,15 +69,14 @@ void test4()
 {
   String *s = new String("Hello");
   String *t = new String("World");
-  String *u = s->concat(t);
   Array *a = new Array();
   a->add(s);
   Array *b = new Array();
   b->add(t);
-  b->add(u);
+  b->add(s);
   a->append(b);
   t_true(a->length() == 3);
-  t_true(a->get(2)->equals(u));
+  t_true(a->get(2)->equals(s));
   OK("Test 4 passed!");
 }
 
@@ -88,14 +85,13 @@ void test5()
 {
   String *s = new String("Hello");
   String *t = new String("World");
-  String *u = s->concat(t);
   Array *a = new Array();
   a->add(s);
   a->add(t);
-  a->add(u);
+  a->add(s);
   t_true(a->index_of(s) == 0);
   t_true(a->index_of(t) == 1);
-  t_true(a->get(2)->equals(u));
+  t_true(a->get(2)->equals(s));
   a->clear();
   t_true(a->length() == 0);
   OK("Test 5 passed!");
@@ -107,7 +103,7 @@ void testBig() {
 	String* c = new String("WCA");
 	String* d = new String("WCB");
 	String* e = new String("WCC");
-	String* e = new String("WCD");
+  String* f = new String("HAHA!");
 
 	Array* arr = new Array();
 	arr->add(a);
@@ -126,12 +122,13 @@ void testBig() {
 	assert(arr->index_of(b) == -1);
 	assert(arr->index_of(f) == 1);
 	assert(arr->get(3)->equals(d));
-	String* c_rem = arr->remove(c);
+	String* c_rem = dynamic_cast<String*>(arr->remove(2));
 	assert(arr->length() == 4);
 	assert(arr->get(2)->equals(d));
 	
 	delete c_rem;
 	delete arr;
+  delete a,b,c,d,e,f;
 	OK("Test Big passed!");
 }
 

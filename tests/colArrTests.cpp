@@ -4,6 +4,9 @@
 
 #include "../src/dataframe/schema.h"
 #include "../src/dataframe/dataframe.h"
+
+#include "../src/store/key.h"
+
 #include <assert.h>
 
 
@@ -20,7 +23,10 @@ int main() {
 	r.set(1, f);
 	r.set(2, b);
 	r.set(3, &str);
-	DataFrame* df = new DataFrame(scm);
+
+	String* keyStr = new String("dfKey");
+	Key* dfKey = new Key(keyStr, 0);
+	DataFrame* df = new DataFrame(scm, dfKey);
 	
 	df->add_row(r);
 	assert(df->get_int(0,0) == num);
@@ -28,6 +34,8 @@ int main() {
 	assert(df->get_bool(2,0) == b);
 	assert(df->get_string(3,0)->equals(&str));
 
+	delete keyStr;
+	delete dfKey;
 	delete df;
 	system.pln("It worked!");
 	return 0;
