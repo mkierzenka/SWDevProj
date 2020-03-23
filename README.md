@@ -26,4 +26,6 @@
 
 * Remove all column name references
 
-*Do we need both ColumnArray and ColArr?
+* Do we need both ColumnArray and ColArr?
+
+* Fix old tests to compile/run/pass
