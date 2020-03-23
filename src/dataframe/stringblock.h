@@ -98,4 +98,45 @@ public:
 		vals_[index] = s->clone();
 	}
 
+	/** Check if two blocks equal */
+	bool equals(Object* other)
+	{
+		if (this == other)
+		{
+			return true;
+		}
+
+		StringBlock* b = dynamic_cast<StringBlock*>(other);
+		
+		if (b == nullptr || size_ != b->size_ || capacity_ != b->capacity_)
+		{
+			return false;
+		}
+
+		for (size_t i = 0; i < size_; i++)
+		{
+			if (!(vals_[i]->equals(b->vals_[i])))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+	
+	/** Compute hash code of this bool block */
+	size_t hash_me_()
+	{
+		size_t hash_ = 0;
+		hash_ += size_;
+		hash_ += capacity_;
+
+		for (size_t i = 0; i < size_; i++)
+		{
+			hash_ += vals_[i]->hash();
+		}
+
+		return hash_;
+	}
+
 };
