@@ -73,7 +73,7 @@ public:
   ~DataFrame()
   {
     delete schema_;
-	  delete columns_;
+	delete columns_;
   }
 
   /** Converts an array into a dataframe object. Returns the df result */

@@ -405,10 +405,10 @@ DataFrame* KVStore::get(Key *k)
 {
         Value *val = getValue(k);
         //set up new serializer to deserialize returned data into a dataframe
-        Serializer *s = new Serializer(val->getData());
+        Serializer *s = new Serializer(val->getSize(), val->getData());
 
         //create new dataframe and mutate by deserializing
-        DataFrame *d = new DataFrame(k);
+        DataFrame *d = new DataFrame(k, this);
         d->deserialize(s);
 
         //delete val?

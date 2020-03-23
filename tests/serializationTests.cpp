@@ -176,18 +176,6 @@ void serializeColumnArrTest() {
     String* keyStr = new String("data-0");
     Key* k = new Key(keyStr, 0);
 	
-	/*String* keyStr = new String("data-0-0");
-    Key* k = new Key(keyStr, 0);
-	
-	String* keyStr1 = new String("data-0-1");
-    Key* k1 = new Key(keyStr1, 0);
-	
-	String* keyStr2 = new String("data-0-2");
-    Key* k2 = new Key(keyStr2, 0);
-	
-	String* keyStr3 = new String("data-0-3");
-    Key* k3 = new Key(keyStr3, 0);*/
-	
 	ColumnArray* ca = new ColumnArray(store, k);
 	size_t numElems = 7;
 	float* flts = new float[numElems];
