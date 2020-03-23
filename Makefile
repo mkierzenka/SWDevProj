@@ -22,6 +22,13 @@ testGeneral:
 memory:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testSorer data/datafile.sor
 
+buildSerial:
+	g++ -std=c++11 -g tests/serializationTests.cpp -o tests/serial
+
+runSerial:
+	./tests/serial
+
+
 .SILENT: clean
 clean:
 	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray tests/testQueue

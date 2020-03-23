@@ -129,9 +129,6 @@ void serializeColumnTest()
     newC->setStore(store);
     newC->deserialize(s);
 
-    c->blocks_->keyList_->print();
-    newC->blocks_->keyList_->print();
-
     assert(c->equals(newC));
 
     printf("Column serialization test passed!\n");
