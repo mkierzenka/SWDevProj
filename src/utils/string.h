@@ -56,7 +56,7 @@ public:
         s->write(cstr_);
     }
 
-    /** Deserealize as a String into this String*/
+    /** Deserialize as a String into this String*/
     void deserialize(Serializer* s) {
         size_ = s->readSizeT();
         cstr_ = s->readString();
