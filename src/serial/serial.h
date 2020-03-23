@@ -119,7 +119,6 @@ public:
 	}
 	
 	void write(char c) {
-		printf("COPYING CHAR %c\n", c);
 		memcpy(curBuffPtrWrite_, &c, sizeof(char));
 		curBuffPtrWrite_ += sizeof(char);
 		numBytesWritten_ += sizeof(char);
@@ -218,7 +217,6 @@ public:
 	char readChar() {
 		char out;
 		memcpy(&out, curBuffPtrRead_, sizeof(char));
-		printf("READING CHAR %c\n", out);
 		curBuffPtrRead_ += sizeof(char);
 		numBytesRead_ += sizeof(char);
 		return out;

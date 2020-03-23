@@ -8,7 +8,8 @@ build:
 	#g++ --std=c++11 -g tests/queueTest.cpp -o tests/testQueue
 
 test:
-	./tests/testSorer data/datafile.sor
+	#./tests/testSorer data/datafile.sor
+	./tests/testGeneral
 
 #testGeneral: test
 #	./tests/testGeneral

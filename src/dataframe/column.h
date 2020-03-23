@@ -101,7 +101,6 @@ public:
 	void serialize(Serializer* s) {
 		s->write(size_);
 		blocks_->serialize(s);
-        printf("SERIALIZING COLUMN OF TYPE %c\n", getCharType());
 		s->write(getCharType());
 		baseKey_->serialize(s);
 	}
