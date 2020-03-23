@@ -16,6 +16,7 @@ public:
 	char* curBuffPtrWrite_;	// just points to a place in buffer_
 	char* curBuffPtrRead_;	// just points to a place in buffer_
 	size_t numBytesWritten_;
+	size_t numBytesRead_;
 	
 	Serializer() {
 		buffer_ = new char[BUFFER_SIZE_];
@@ -23,6 +24,7 @@ public:
 		curBuffPtrWrite_ = buffer_;
 		curBuffPtrRead_ = buffer_;
 		numBytesWritten_ = 0;
+		numBytesRead_ = 0;
 	}
 	
 	Serializer(const char* inp) {
@@ -32,6 +34,7 @@ public:
 		curBuffPtrWrite_ = buffer_;
 		curBuffPtrRead_ = buffer_;
 		numBytesWritten_ = strlen(inp);
+		numBytesRead_ = 0;
 	}
 
 	Serializer(size_t size, const char* inp) {
@@ -41,9 +44,17 @@ public:
 		curBuffPtrWrite_ = buffer_;
 		curBuffPtrRead_ = buffer_;
 		numBytesWritten_ = size;
+		numBytesRead_ = 0;
 	}
 	
 	~Serializer() {
+		// if (numBytesWritten_ != numBytesRead_)
+		// {
+		// 	printf("Num bytes written does not equal num bytes read\n");
+		// 	printf("Num bytes written: %zu\n", numBytesWritten_);
+		// 	printf("Num bytes read: %zu\n", numBytesRead_);
+		// }
+
 		delete[] buffer_;
 	}
 	
@@ -108,6 +119,7 @@ public:
 	}
 	
 	void write(char c) {
+		printf("COPYING CHAR %c\n", c);
 		memcpy(curBuffPtrWrite_, &c, sizeof(char));
 		curBuffPtrWrite_ += sizeof(char);
 		numBytesWritten_ += sizeof(char);
@@ -149,9 +161,9 @@ public:
 	char* readString() {
 		size_t lenNextStr = strlen(curBuffPtrRead_); // get the next string (up to first \0)
 		char* out = new char[lenNextStr];
-		memcpy(out, curBuffPtrRead_, lenNextStr);
-		curBuffPtrRead_ += lenNextStr;
-		curBuffPtrRead_++; //skip null terminator
+		memcpy(out, curBuffPtrRead_, lenNextStr+1);
+		curBuffPtrRead_ += lenNextStr+1; //skip null terminator
+		numBytesRead_ += lenNextStr+1;
 		return out;
 	}
 	
@@ -159,6 +171,7 @@ public:
 		double out;
 		memcpy(&out, curBuffPtrRead_, sizeof(double));
 		curBuffPtrRead_ += sizeof(double);
+		numBytesRead_ += sizeof(double);
 		return out;
 	}
 
@@ -166,6 +179,7 @@ public:
 		float out;
 		memcpy(&out, curBuffPtrRead_, sizeof(float));
 		curBuffPtrRead_ += sizeof(float);
+		numBytesRead_ += sizeof(float);
 		return out;
 	}
 
@@ -173,6 +187,7 @@ public:
 		short out;
 		memcpy(&out, curBuffPtrRead_, sizeof(short));
 		curBuffPtrRead_ += sizeof(short);
+		numBytesRead_ += sizeof(short);
 		return out;
 	}
 
@@ -180,6 +195,7 @@ public:
 		long out;
 		memcpy(&out, curBuffPtrRead_, sizeof(long));
 		curBuffPtrRead_ += sizeof(long);
+		numBytesRead_ += sizeof(long);
 		return out;
 	}
 
@@ -187,6 +203,7 @@ public:
 		int out;
 		memcpy(&out, curBuffPtrRead_, sizeof(int));
 		curBuffPtrRead_ += sizeof(int);
+		numBytesRead_ += sizeof(int);
 		return out;
 	}
 
@@ -194,13 +211,16 @@ public:
 		bool out;
 		memcpy(&out, curBuffPtrRead_, sizeof(bool));
 		curBuffPtrRead_ += sizeof(bool);
+		numBytesRead_ += sizeof(bool);
 		return out;
 	}
 
 	char readChar() {
 		char out;
 		memcpy(&out, curBuffPtrRead_, sizeof(char));
+		printf("READING CHAR %c\n", out);
 		curBuffPtrRead_ += sizeof(char);
+		numBytesRead_ += sizeof(char);
 		return out;
 	}
 	
@@ -208,6 +228,7 @@ public:
 		char sMsgKind[2];
 		memcpy(sMsgKind, curBuffPtrRead_, 2);
 		curBuffPtrRead_ += 2;
+		numBytesRead_ += 2;
 		if (strcmp(sMsgKind, "0") == 0) {
 			return Ack;
 		} else if (strcmp(sMsgKind, "1") == 0) {
@@ -237,6 +258,7 @@ public:
 		size_t out;
 		memcpy(&out, curBuffPtrRead_, sizeof(size_t));
 		curBuffPtrRead_ += sizeof(size_t);
+		numBytesRead_ += sizeof(size_t);
 		return out;
 	}
 	
@@ -246,6 +268,10 @@ public:
 	
 	size_t getNumBytesWritten() {
 		return numBytesWritten_;
+	}
+
+	size_t getNumBytesRead() {
+		return numBytesRead_;
 	}
 	
 	char* clear() {
