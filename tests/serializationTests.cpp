@@ -134,6 +134,40 @@ void serializeColumnTest()
     printf("Column serialization test passed!\n");
 }
 
+void serializeDisArrTest() {
+	printf("Distributed Array serialization test started\n");
+	
+	KVStore* store = new KVStore(0);
+    String* keyStr = new String("data-0-0");
+    Key* k = new Key(keyStr, 0);
+	
+	String* keyStr1 = new String("data-0-1");
+    Key* k1 = new Key(keyStr1, 0);
+	
+	String* keyStr2 = new String("data-0-2");
+    Key* k2 = new Key(keyStr2, 0);
+	
+	String* keyStr3 = new String("data-0-3");
+    Key* k3 = new Key(keyStr3, 0);
+	
+
+	DistributedArray* da = new DistributedArray(store);
+	da->addKey(k);
+	da->addKey(k1);
+	da->addKey(k2);
+	da->addKey(k3);
+	
+	Serializer* s = new Serializer();
+    da->serialize(s);
+
+    DistributedArray* da2 = new DistributedArray(store);
+	da2->deserialize(s);
+
+    assert(da->equals(da2));
+	
+	printf("Distributed Array serialization test passed!\n");
+}
+
 /** 
  * Test serializing and deserializing on the different classes we may use it for (arrays, blocks, 
  * dataframes, etc.). Will create new object from deserialized result and make sure they equal
@@ -145,4 +179,5 @@ int main()
     serializeFloatBlockTest();
     serializeSchemaTest();
     serializeColumnTest();
+	serializeDisArrTest();
 }
