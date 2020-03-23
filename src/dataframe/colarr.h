@@ -60,6 +60,33 @@ public:
 			colList_->add(c);
 		}
 	}
+
+	/** Check if two colarrays are equal */
+	bool equals(Object* other)
+	{
+		if (this == other)
+		{
+			return true;
+		}
+
+		ColArray* ca = dynamic_cast<ColArray*>(other);
+		
+		// not sure about checking store_
+		if (ca == nullptr || !(colList_->equals(ca->colList_)))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	// hash_me override
+	size_t hash_me()
+	{
+		size_t hash = 0;
+		hash += colList_->hash();
+		return hash;
+	}
 	
 	// get the length of this array
 	size_t length()

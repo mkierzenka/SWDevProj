@@ -7,6 +7,7 @@
 #include "../serial/serial.h"
 #include "colarr.h"
 #include "column.h"
+#include <assert.h>
 
 /**
  * ColumnArray - to represent a list of column.
@@ -54,6 +55,7 @@ public:
 	void deserialize(Serializer* s)
 	{
 		//need to pass on KVStore to columns: assuming KVStore here is already set
+		assert(store_ != nullptr);
 		colList_->setStore(store_);
 		colList_->deserialize(s);
 		dfKey_->deserialize(s);
@@ -71,18 +73,33 @@ public:
 		store_ = store;
 	}
 
-	// hash_me override
-	/*size_t hash_me()
+	/** Check if two column arrays are equal */
+	bool equals(Object* other)
 	{
-		size_t hash = 0;
-		for (size_t i = 0; i < len_; i += 1)
+		if (this == other)
 		{
-			size_t elementhash = get(i)->hash();
-			hash += elementhash + (hash << 3) - (hash << 1);
+			return true;
 		}
 
+		ColumnArray* ca = dynamic_cast<ColumnArray*>(other);
+		
+		// not sure about checking store_
+		if (ca == nullptr || !(colList_->equals(ca->colList_)) || !(dfKey_->equals(ca->dfKey_)))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	// hash_me override
+	size_t hash_me()
+	{
+		size_t hash = 0;
+		hash += colList_->hash();
+		hash += dfKey_->hash();
 		return hash;
-	}*/
+	}
 
 	// get the specified column (does not make a copy!)
 	Column *get(size_t index)

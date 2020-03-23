@@ -11,6 +11,7 @@
 #include "../src/dataframe/floatblock.h"
 #include "../src/dataframe/intblock.h"
 #include "../src/dataframe/distributedarray.h"
+#include "../src/dataframe/columnarray.h"
 #include "../src/dataframe/schema.h"
 #include "../src/dataframe/column.h"
 
@@ -134,7 +135,7 @@ void serializeColumnTest()
     printf("Column serialization test passed!\n");
 }
 
-void serializeDisArrTest() {
+void serializeDistArrTest() {
 	printf("Distributed Array serialization test started\n");
 	
 	KVStore* store = new KVStore(0);
@@ -168,6 +169,45 @@ void serializeDisArrTest() {
 	printf("Distributed Array serialization test passed!\n");
 }
 
+void serializeColumnArrTest() {
+	printf("Column Array serialization test started\n");
+	
+	KVStore* store = new KVStore(0);
+    String* keyStr = new String("data-0");
+    Key* k = new Key(keyStr, 0);
+	
+	/*String* keyStr = new String("data-0-0");
+    Key* k = new Key(keyStr, 0);
+	
+	String* keyStr1 = new String("data-0-1");
+    Key* k1 = new Key(keyStr1, 0);
+	
+	String* keyStr2 = new String("data-0-2");
+    Key* k2 = new Key(keyStr2, 0);
+	
+	String* keyStr3 = new String("data-0-3");
+    Key* k3 = new Key(keyStr3, 0);*/
+	
+	ColumnArray* ca = new ColumnArray(store, k);
+	size_t numElems = 7;
+	float* flts = new float[numElems];
+	for (size_t i = 0; i < numElems; i++) {
+		flts[i] = (i * 1.5f);
+	}
+	
+	ca->add_column_fromarray(7, flts);
+	
+	Serializer* s = new Serializer();
+    ca->serialize(s);
+
+    ColumnArray* ca2 = new ColumnArray(store, k);
+	ca2->deserialize(s);
+
+    assert(ca->equals(ca2));
+	
+	printf("Column Array serialization test passed!\n");
+}
+
 /** 
  * Test serializing and deserializing on the different classes we may use it for (arrays, blocks, 
  * dataframes, etc.). Will create new object from deserialized result and make sure they equal
@@ -179,5 +219,6 @@ int main()
     serializeFloatBlockTest();
     serializeSchemaTest();
     serializeColumnTest();
-	serializeDisArrTest();
+	serializeDistArrTest();
+	serializeColumnArrTest();
 }
