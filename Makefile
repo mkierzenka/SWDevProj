@@ -1,7 +1,7 @@
 build:
 	g++ --std=c++11 -g -pthread tests/generalTests.cpp -o tests/testGeneral
-	g++ --std=c++11 -g tests/serializationTests.cpp -o tests/serial
-	g++ --std=c++11 -g tests/trivialTest.cpp -o tests/trivial
+	g++ --std=c++11 -g tests/serializationTests.cpp -o tests/testSerial
+	g++ --std=c++11 -g tests/trivialTest.cpp -o tests/testTrivial
 	#g++ --std=c++11 -g tests/colArrTests.cpp -o tests/testCA
 	#g++ --std=c++11 -g tests/memTest.cpp -o tests/testMemory
 	#g++ --std=c++11 -g tests/sorerTest.cpp -o tests/testSorer
@@ -10,10 +10,10 @@ build:
 	#g++ --std=c++11 -g tests/queueTest.cpp -o tests/testQueue
 
 test:
-	./tests/trivial
+	./tests/testTrivial
 
 ourTests:
-	./tests/serial
+	./tests/testSerial
 	./tests/testGeneral
 	#	./tests/testCA
 	#	./tests/testMemory
@@ -26,4 +26,5 @@ memory:
 
 .SILENT: clean
 clean:
-	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray tests/testQueue
+	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray \
+	tests/testQueue tests/testSerial tests/testTrivial
