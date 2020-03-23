@@ -118,7 +118,7 @@ public:
 
     /** Type appropriate push_back methods. Calling the wrong method is
     * undefined behavior. **/
-    void push_back(int val) {
+    /*void push_back(int val) {
         if (type_ != ColType::Integer) {
             fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
             exit(1);
@@ -144,7 +144,7 @@ public:
             fprintf(stderr, "Cannot add String to column of type %c", getCharType());
             exit(1);
         }
-    }
+    }*/
 
     /** Add an entire list of integers to this column*/
     void add_all(size_t len, int* vals) {
@@ -452,8 +452,8 @@ public:
 
 		Column* c = dynamic_cast<Column*>(other);
 	
-		if (c == nullptr || size_ != c->size_ || !(blocks_->equals(c->blocks_)) || type_ != c->type_ || !(baseKey_->equals(c->baseKey_))
-        || !(c->store_->equals(store_)))
+        // store_ is not included
+		if (c == nullptr || size_ != c->size_ || !(blocks_->equals(c->blocks_)) || type_ != c->type_ || !(baseKey_->equals(c->baseKey_)))
         {
 			return false;
 		}

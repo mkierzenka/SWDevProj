@@ -71,7 +71,7 @@ public:
 
 		ColArray* ca = dynamic_cast<ColArray*>(other);
 		
-		// not sure about checking store_
+		// store_ is not included
 		if (ca == nullptr || !(colList_->equals(ca->colList_)))
 		{
 			return false;

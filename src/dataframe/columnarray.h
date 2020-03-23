@@ -83,7 +83,7 @@ public:
 
 		ColumnArray* ca = dynamic_cast<ColumnArray*>(other);
 		
-		// not sure about checking store_
+		// store_ is not included
 		if (ca == nullptr || !(colList_->equals(ca->colList_)) || !(dfKey_->equals(ca->dfKey_)))
 		{
 			return false;
