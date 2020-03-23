@@ -134,7 +134,6 @@ public:
     {
         size_t hash_ = 0;
         hash_ += reinterpret_cast<size_t>(keyList_);
-        hash_ += reinterpret_cast<size_t>(store_);
         hash_ += reinterpret_cast<size_t>(cache_);
 
         return hash_;

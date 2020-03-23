@@ -468,9 +468,7 @@ public:
         hash_ += size_;
         hash_ += reinterpret_cast<size_t>(baseKey_);
         hash_ += reinterpret_cast<size_t>(blocks_);
-        //hash_ += reinterpret_cast<size_t>(type_);
-        hash_ += reinterpret_cast<size_t>(store_);
-
+        hash_ += reinterpret_cast<size_t>(getCharType());
         return hash_;
 	}
 
