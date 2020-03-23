@@ -55,10 +55,6 @@ public:
     size_t numCols = schema_->width();
     key_ = k;
     columns_ = new ColumnArray(store_, key_);
-    /*for (int i = 0; i < numCols; i++)
-    {
-	    columns_->addNew(schema_->col_type(i));
-    }*/
   }
 
   ~DataFrame()
