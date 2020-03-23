@@ -76,6 +76,33 @@ public:
         keyOrder_->clear();
     }
 
+    bool equals(Object *other)
+    {
+        if (this == other)
+        {
+            return true;
+        }
+
+        Cache* c = dynamic_cast<Cache *>(other);
+
+        if (c == nullptr || !(data_->equals(c->data_)) || !(keyOrder_->equals(c->keyOrder_)))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /** Compute hash code of this column */
+    size_t hash_me_()
+    {
+        size_t hash_ = 0;
+        hash_ += reinterpret_cast<size_t>(data_);
+        hash_ += reinterpret_cast<size_t>(keyOrder_);
+
+        return hash_;
+    }
+
     /**
      * Return if cache is up to capacity
      */

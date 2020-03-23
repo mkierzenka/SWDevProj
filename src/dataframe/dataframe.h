@@ -7,7 +7,6 @@
 #include "../store/key.h"
 #include "../serial/serial.h"
 
-#include "distributedarray.h"
 #include "columnarray.h"
 
 #include "schema.h"

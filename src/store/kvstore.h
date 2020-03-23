@@ -10,7 +10,7 @@
 #include "key.h"
 #include "value.h"
 
-class DataFrame; 
+class DataFrame;
 
 /** This class represents our key-value store. It will utilize a Map object to hold the
  * key-value pairings. It will also have networking capabilities to interact with other 
@@ -46,22 +46,6 @@ public:
         kvMap->put(k->getKeyStr(), data->clone());
     }
 
-    /** Get data from the local store. Returns nullptr if data doesn't exist in map */
-    // DataFrame *get(Key *k)
-    // {
-    //     Value *val = getValue(k);
-    //     //set up new serializer to deserialize returned data into a dataframe
-    //     Serializer *s = new Serializer(val->getData());
-
-    //     //create new dataframe and mutate by deserializing
-    //     DataFrame *d = new DataFrame(k);
-    //     d->deserialize(s);
-
-    //     //delete val?
-    //     delete s;
-
-    //     return d;
-    // }
     DataFrame *get(Key *k);
 
     /** Send request to specified store to get data. Return nullptr if cannot find */
@@ -76,4 +60,32 @@ public:
         Object *o = kvMap->get(k->getKeyStr());
         return dynamic_cast<Value *>(o);
     }
+
+    /** Check if two distributed arrats equal */
+    // bool equals(Object *other)
+    // {
+    //     if (this == other)
+    //     {
+    //         return true;
+    //     }
+
+    //     KVStore *kv = dynamic_cast<KVStore *>(other);
+
+    //     if (kv == nullptr || storeId != kv->storeId || !(kvMap->equals(kv->kvMap)))
+    //     {
+    //         return false;
+    //     }
+
+    //     return true;
+    // }
+
+    // /** Compute hash code of this column */
+    // size_t hash_me_()
+    // {
+    //     size_t hash_ = 0;
+    //     hash_ += storeId;
+    //     hash_ += reinterpret_cast<size_t>(kvMap);
+
+    //     return hash_;
+    // }
 };

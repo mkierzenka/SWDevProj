@@ -9,6 +9,8 @@
 #include "../src/utils/string.h"
 #include "../src/dataframe/boolblock.h"
 #include "../src/dataframe/floatblock.h"
+#include "../src/dataframe/intblock.h"
+#include "../src/dataframe/distributedarray.h"
 #include "../src/dataframe/schema.h"
 #include "../src/dataframe/column.h"
 
@@ -137,9 +139,9 @@ void serializeColumnTest()
  */
 int main()
 {
-    serializeKeyTest();
-    serializeBoolBlockTest();
-    serializeFloatBlockTest();
-    serializeSchemaTest();
+    // serializeKeyTest();
+    // serializeBoolBlockTest();
+    // serializeFloatBlockTest();
+    // serializeSchemaTest();
     serializeColumnTest();
 }
