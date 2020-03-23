@@ -101,6 +101,7 @@ public:
 	void serialize(Serializer* s) {
 		s->write(size_);
 		blocks_->serialize(s);
+        printf("SERIALIZING COLUMN OF TYPE %c\n", getCharType());
 		s->write(getCharType());
 		baseKey_->serialize(s);
 	}
@@ -112,7 +113,7 @@ public:
         blocks_->setStore(store_);
 
 		blocks_->deserialize(s);
-		type_ = getColType_(s->readChar());
+        type_ = getColType_(s->readChar());
 		baseKey_->deserialize(s);
 	}
 
@@ -437,7 +438,7 @@ public:
             case 'B': return ColType::Boolean;
             case 'F': return ColType::Float;
             default:
-                fprintf(stderr, "Unknown char data type");
+                fprintf(stderr, "Unknown char data type: %c\n", c);
                 exit(-1);
         }
 	}
