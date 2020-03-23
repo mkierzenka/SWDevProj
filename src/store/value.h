@@ -41,7 +41,7 @@ public:
     bool equals(Object *other)
     {
         Value *o = dynamic_cast<Value *>(other);
-        return (strcmp(val_, o->getData()) == 0) && capacity_ == o->getSize();
+        return (capacity_ == o->getSize()) && (memcmp(val_, o->getData(), capacity_) == 0);
     }
 
     /** Compute hash for this value */
