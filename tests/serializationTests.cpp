@@ -126,7 +126,11 @@ void serializeColumnTest()
     c->serialize(s);
 
     Column* newC = new Column();
+    newC->setStore(store);
     newC->deserialize(s);
+
+    c->blocks_->keyList_->print();
+    newC->blocks_->keyList_->print();
 
     assert(c->equals(newC));
 
@@ -139,9 +143,9 @@ void serializeColumnTest()
  */
 int main()
 {
-    // serializeKeyTest();
-    // serializeBoolBlockTest();
-    // serializeFloatBlockTest();
-    // serializeSchemaTest();
+    serializeKeyTest();
+    serializeBoolBlockTest();
+    serializeFloatBlockTest();
+    serializeSchemaTest();
     serializeColumnTest();
 }

@@ -117,6 +117,9 @@ public:
   //Deserialize store?
   /** Deserialize as a dataframe and set the values in this dataframe */
   void deserialize(Serializer* s) {
+    //deserialized column array needs store
+    columns_->setStore(store_);
+    
     columns_->deserialize(s);
     schema_->deserialize(s);
     key_->deserialize(s);

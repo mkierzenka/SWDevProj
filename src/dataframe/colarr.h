@@ -16,6 +16,7 @@ class ColArray : public Object
 {
 public:
 	Array* colList_; //list of columns, owned
+	KVStore* store_; //kvstore; not positive how to handle it here
 
 	// constructor
 	ColArray() : Object()
@@ -28,6 +29,12 @@ public:
 	{
 		//deleteColList_();
 		delete colList_;
+	}
+
+	/** Set KVStore */
+	void setStore(KVStore* store)
+	{
+		store_ = store;
 	}
 
 	/** Serialize a ColArray into char* representation */
@@ -48,6 +55,7 @@ public:
 		size_t len = s->readSizeT();
 		for (size_t i = 0; i < len; i++) {
 			Column* c = new Column();
+			c->setStore(store_);
 			c->deserialize(s);
 			colList_->add(c);
 		}

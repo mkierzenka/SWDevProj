@@ -53,15 +53,22 @@ public:
 	/** Deserialize as a ColumnArray, set values into this ColumnArray*/
 	void deserialize(Serializer* s)
 	{
-		//colList_->deserializeAsColumnArray(s);
+		//need to pass on KVStore to columns: assuming KVStore here is already set
+		colList_->setStore(store_);
 		colList_->deserialize(s);
 		dfKey_->deserialize(s);
 	}
 	
-	// get the length of this array
+	/** get the length of this array */
 	size_t length()
 	{
 		return colList_->length();
+	}
+
+	/**Set column array's store */
+	void setStore(KVStore* store)
+	{
+		store_ = store;
 	}
 
 	// hash_me override

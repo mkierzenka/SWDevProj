@@ -96,12 +96,8 @@ public:
 		}
 
 		BoolBlock* b = dynamic_cast<BoolBlock*>(other);
-		if (b == nullptr)
-		{
-			return false;
-		}
 		
-		if (size_ != b->size_ || capacity_ != b->capacity_)
+		if (b == nullptr || size_ != b->size_ || capacity_ != b->capacity_)
 		{
 			return false;
 		}

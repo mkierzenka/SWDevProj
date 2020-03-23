@@ -25,3 +25,5 @@
 * Rename float references to double
 
 * Remove all column name references
+
+*Do we need both ColumnArray and ColArr?

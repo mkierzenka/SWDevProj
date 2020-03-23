@@ -61,6 +61,12 @@ public:
         delete blocks_;
     }
 
+    /** Set column's KVStore */
+    void setStore(KVStore* store)
+    {
+        store_ = store;
+    }
+
     /** Constructor allows you to set the starting capacity of
      * the column */
      //maybe we need this?
@@ -101,6 +107,10 @@ public:
 	
 	void deserialize(Serializer* s) {
 		size_ = s->readSizeT();
+
+        //pass store to distributed array; assume already set here
+        blocks_->setStore(store_);
+
 		blocks_->deserialize(s);
 		type_ = getColType_(s->readChar());
 		baseKey_->deserialize(s);
@@ -442,7 +452,8 @@ public:
 
 		Column* c = dynamic_cast<Column*>(other);
 	
-		if (c == nullptr || size_ != c->size_ || !(blocks_->equals(c->blocks_)) || type_ != c->type_ || !(baseKey_->equals(c->baseKey_)))
+		if (c == nullptr || size_ != c->size_ || !(blocks_->equals(c->blocks_)) || type_ != c->type_ || !(baseKey_->equals(c->baseKey_))
+        || !(c->store_->equals(store_)))
         {
 			return false;
 		}

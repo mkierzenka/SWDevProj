@@ -40,6 +40,11 @@ public:
         delete cache_;
     }
 
+    void setStore(KVStore* store)
+    {
+        store_ = store;
+    }
+    
     void serialize(Serializer *s)
     {
         keyList_->serialize(s);
@@ -115,6 +120,8 @@ public:
 
         DistributedArray *da = dynamic_cast<DistributedArray *>(other);
 
+        //leave store out for now for column serialization test
+        //if (da == nullptr || !(da->keyList_->equals(keyList_)) || !(da->cache_->equals(cache_)))
         if (da == nullptr || !(da->keyList_->equals(keyList_)) || !(da->store_->equals(store_)) || !(da->cache_->equals(cache_)))
         {
             return false;
