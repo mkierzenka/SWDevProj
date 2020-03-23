@@ -314,6 +314,9 @@ We pulled out the implementation of KVStore::get into one of our test cpp files.
 
 fromScalar: which data types will we need this for? We currently store blocks of data for booleans, strings, integers, and floats. Will we be expected to do the same for size_t values, shorts, longs, etc.
 
+Uncertain if/how some methods will be used. For example, there hasn't been a need for add_row (adds row to a dataframe) as of yet; however some of our tests use this method and it is currently broken.
+Is it worth fixing these broken methods or should we refactor our tests?
+
 ## Status
 We have decided to use another group's Sorer implementation, as ours was written in Python and 
 not fully correct.
