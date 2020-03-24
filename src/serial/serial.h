@@ -159,10 +159,11 @@ public:
 
 	char* readString() {
 		size_t lenNextStr = strlen(curBuffPtrRead_); // get the next string (up to first \0)
-		char* out = new char[lenNextStr];
-		memcpy(out, curBuffPtrRead_, lenNextStr+1);
-		curBuffPtrRead_ += lenNextStr+1; //skip null terminator
-		numBytesRead_ += lenNextStr+1;
+		size_t bytesNeeded = lenNextStr + 1; //extra for null terminator
+		char* out = new char[bytesNeeded];
+		memcpy(out, curBuffPtrRead_, bytesNeeded);
+		curBuffPtrRead_ += bytesNeeded; //skip null terminator
+		numBytesRead_ += bytesNeeded;
 		return out;
 	}
 	

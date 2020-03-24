@@ -66,12 +66,12 @@ public:
   /** Converts an array into a dataframe object. Returns the df result */
   static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, float* elems) {
     //initialize dataframe
-    DataFrame* df = new DataFrame(k, kv);
+    DataFrame* df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
     Serializer* s = new Serializer();
     df->serialize(s);
     Value* v = new Value(s->getBuffer(), s->getNumBytesWritten());
-    kv->put(k, v);
+    kv->put(k->clone(), v);
 
     delete s;
     return df;

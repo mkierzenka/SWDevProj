@@ -79,11 +79,11 @@ public:
 	
 
 	/**
-	 * Appends Key to this KeyArr. Does not make copy
+	 * Appends a clone of the Key to this KeyArr.
 	 */
 	void add(Key *k)
 	{
-		keyList_->add(k);
+		keyList_->add(k->clone());
 	}
 
 	// get the index of the given Key

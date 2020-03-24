@@ -21,9 +21,10 @@ public:
         idx_ = i;
         kv_ = new KVStore(i);
     }
-
-    void run_() 
-    {
-
+	
+    ~Application() {
+        delete kv_;
     }
+
+    void run_() {}
 };

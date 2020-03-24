@@ -78,6 +78,11 @@ public:
     {
         return reinterpret_cast<size_t>(kStr_) + homeNode_;
     }
+	
+	/** Returns a new Key with cloned values */
+	Key* clone() {
+		return new Key(kStr_->clone(), homeNode_);
+	}
 
     /** Add an index to the Key's string and return a new key */
     Key* addIndex(size_t idx)
