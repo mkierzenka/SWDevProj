@@ -5,8 +5,8 @@ build:
 	#g++ --std=c++11 -g tests/colArrTests.cpp -o tests/testCA
 	#g++ --std=c++11 -g tests/memTest.cpp -o tests/testMemory
 	#g++ --std=c++11 -g tests/sorerTest.cpp -o tests/testSorer
-	#g++ --std=c++11 -g tests/mapTest.cpp -o tests/testMap
-	#g++ --std=c++11 -g tests/arrayTest.cpp -o tests/testArray
+	g++ --std=c++11 -g tests/mapTest.cpp -o tests/testMap
+	g++ --std=c++11 -g tests/arrayTest.cpp -o tests/testArray
 	g++ --std=c++11 -g tests/queueTest.cpp -o tests/testQueue
 
 test:
@@ -17,8 +17,8 @@ ourTests:
 	./tests/testGeneral
 	#./tests/testCA
 	#	./tests/testMemory
-	#./tests/testMap
-	#./tests/testArray
+	./tests/testMap
+	./tests/testArray
 	./tests/testQueue
 	#./tests/testSorer data/datafile.sor
 	

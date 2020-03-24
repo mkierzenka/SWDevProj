@@ -88,10 +88,8 @@ void test5()
   Array *a = new Array();
   a->add(s);
   a->add(t);
-  a->add(s);
   t_true(a->index_of(s) == 0);
   t_true(a->index_of(t) == 1);
-  t_true(a->get(2)->equals(s));
   a->clear();
   t_true(a->length() == 0);
   OK("Test 5 passed!");
@@ -103,7 +101,7 @@ void testBig() {
 	String* c = new String("WCA");
 	String* d = new String("WCB");
 	String* e = new String("WCC");
-  String* f = new String("HAHA!");
+	String* f = new String("HAHA!");
 
 	Array* arr = new Array();
 	arr->add(a);
@@ -116,7 +114,7 @@ void testBig() {
 	assert(arr->index_of(b) == 1);
 	assert(arr->get(1)->equals(b));
 	assert(arr->get(3)->equals(d));
-	assert(arr->index_of(e) == arr->length());
+	assert(arr->index_of(e) == (arr->length() - 1));
 	arr->set(1, f);
 	assert(arr->length() == 5);
 	assert(arr->index_of(b) == -1);
@@ -128,7 +126,6 @@ void testBig() {
 	
 	delete c_rem;
 	delete arr;
-  delete a,b,c,d,e,f;
 	OK("Test Big passed!");
 }
 

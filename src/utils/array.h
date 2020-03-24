@@ -38,62 +38,6 @@ public:
 		return len_;
 	}
 
-	/** Serialize this Array of Objects into s*/
-	/*void serialize(Serializer* s) {
-		s->write(listSize_);
-		s->write(len_);
-		for (size_t i = 0; i < len_; i++) {
-			//objList_[i]->serialize(s);
-		}
-	}*/
-
-	/** Deserialize this Array as an Array of Objects, mutates this*/
-	/*void deserialize(Serializer* s) {
-		listSize_ = s->readSizeT();
-		len_ = s->readSizeT();
-		//make sure there's enough capacity in the array
-		assert(listSize_ >= len_);
-
-		// delete all old data in this array here
-		deleteObjList_();
-		objList_ = new Object *[listSize_];
-		for (size_t i = 0; i < len_; i++)
-		{
-			//objList_[i] = new Object();
-			//objList_[i]->deserialize(s);
-		}
-	}*/
-
-	/** bad desc.
-	 * Deserialize by treating the elements at columns. May need something similar
-	 * for Serialization */
-	/*void serializeAsColumnArray(Serializer* s) {
-		s->write(listSize_);
-		s->write(len_);
-		for (size_t i = 0; i < len_; i++) {
-			//s->writeColumn(objList_[i]);
-			(dynamic_cast<Column*>(objList_[i]))->serialize(s);
-		}
-	}*/
-
-	/**
-	 * Deserialize by treating the elements at columns. May need something similar
-	 * for Serialization */
-	/*void deserializeAsColumnArray(Serializer* s) {
-		listSize_ = s->readSizeT();
-		len_ = s->readSizeT();
-		//make sure there's enough capacity in the array
-		assert(listSize_ >= len_);
-
-		// delete all old data in this array here
-		deleteObjList_();
-		objList_ = new Object *[listSize_];
-		for (size_t i = 0; i < len_; i++)
-		{
-			objList_[i] = s->readColumn(s);
-		}
-	}*/
-
 	// check if this array equals to other array
 	bool equals(Object *other)
 	{
