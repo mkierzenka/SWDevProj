@@ -41,7 +41,7 @@ public:
             fprintf(stderr, "Attempting to put Key with node %zu into store for node %zu", k->getNode(), storeId);
         }
 
-        kvMap->put(k->getKeyStr(), data->clone());
+        kvMap->put(k->getKeyStr()->clone(), data->clone());
     }
 
     DataFrame *get(Key *k);
