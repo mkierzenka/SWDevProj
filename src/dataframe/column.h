@@ -165,7 +165,8 @@ public:
 			Serializer* s = new Serializer();
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
-			//delete s;
+			delete s;
+			delete block;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added += BLOCK_SIZE;
@@ -182,7 +183,8 @@ public:
 			Serializer* s = new Serializer();
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
-			//delete s;
+			delete s;
+			delete block;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added = len;
@@ -211,6 +213,7 @@ public:
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
 			delete s;
+			delete block;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added += BLOCK_SIZE;
@@ -228,6 +231,7 @@ public:
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
 			delete s;
+			delete block;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added = len;
@@ -255,6 +259,7 @@ public:
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
 			delete s;
+			delete block;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added += BLOCK_SIZE;
@@ -272,6 +277,7 @@ public:
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
 			delete s;
+			delete block;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added = len;
@@ -299,6 +305,7 @@ public:
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
 			delete s;
+			delete block;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added += BLOCK_SIZE;
@@ -316,6 +323,7 @@ public:
 			block->serialize(s);
             Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
 			delete s;
+			delete block;
             store_->put(k, val);
             blocks_->addKey(k);
             len_added = len;
