@@ -347,7 +347,7 @@ public:
 
         //Key to look up data
         Key* k = genKey_(chunk);
-        Value* v = store_->getValue(k);
+        Value* v = blocks_->get(k);
 		Serializer* s = new Serializer(v->getSize(), v->getData());
         FloatBlock* floatData = new FloatBlock();
 		floatData->deserialize(s);
@@ -366,7 +366,7 @@ public:
 
         //Key to look up data
         Key* k = genKey_(chunk);
-        Value* v = store_->getValue(k);
+        Value* v = blocks_->get(k);
 		Serializer* s = new Serializer(v->getSize(), v->getData());
         BoolBlock* boolData = new BoolBlock();
 		boolData->deserialize(s);
@@ -385,7 +385,7 @@ public:
 
         //Key to look up data
         Key* k = genKey_(chunk);
-        Value* v = store_->getValue(k);
+        Value* v = blocks_->get(k);
 		Serializer* s = new Serializer(v->getSize(), v->getData());
         StringBlock* strData = new StringBlock();
 		strData->deserialize(s);
@@ -406,7 +406,7 @@ public:
 
         //Key to look up data
         Key* k = genKey_(chunk);
-        Value* v = store_->getValue(k);
+        Value* v = blocks_->get(k);
 		Serializer* s = new Serializer(v->getSize(), v->getData());
         IntBlock* intData = new IntBlock();
 		intData->deserialize(s);

@@ -88,7 +88,7 @@ public:
         Value *val = store_->getValue(k);
         if (val != nullptr)
         {
-            cache_->put(k, val);
+            cache_->put(k->clone(), val->clone());
         }
 
         return val;
