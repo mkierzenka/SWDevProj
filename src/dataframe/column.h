@@ -406,8 +406,9 @@ public:
         buff->c(*(baseKey_->getKeyStr()));
         buff->c("-");
         buff->c(blockNum);
-        String* keyStr(buff->get());
+        String* keyStr = buff->get();
         Key* k = new Key(keyStr, 0); //clones String; figure out node value later
+        delete keyStr;
         return k;
     }
 	
