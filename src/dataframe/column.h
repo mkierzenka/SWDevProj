@@ -161,14 +161,11 @@ public:
             for (size_t i = len_added; i < len_added + BLOCK_SIZE; i++) {
                 block->add(vals[i]);
             }
-            Key* k = genKey_(len_added / BLOCK_SIZE);
 			Serializer* s = new Serializer();
 			block->serialize(s);
-            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            store_->put(k, val);
-            blocks_->addKey(k);
             len_added += BLOCK_SIZE;
         }
 
@@ -179,14 +176,11 @@ public:
             for (size_t i = len_added; i < len; i++) {
                 block->add(vals[i]);
             }
-            Key* k = genKey_(len_added / BLOCK_SIZE);
 			Serializer* s = new Serializer();
 			block->serialize(s);
-            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            store_->put(k, val);
-            blocks_->addKey(k);
             len_added = len;
         }
 		
@@ -208,14 +202,11 @@ public:
             for (size_t i = len_added; i < len_added + BLOCK_SIZE; i++) {
                 block->add(vals[i]);
             }
-            Key* k = genKey_(len_added / BLOCK_SIZE);
 			Serializer* s = new Serializer();
 			block->serialize(s);
-            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            store_->put(k, val);
-            blocks_->addKey(k);
             len_added += BLOCK_SIZE;
         }
 
@@ -226,14 +217,11 @@ public:
             for (size_t i = len_added; i < len; i++) {
                 block->add(vals[i]);
             }
-            Key* k = genKey_(len_added / BLOCK_SIZE);
 			Serializer* s = new Serializer();
 			block->serialize(s);
-            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            store_->put(k, val);
-            blocks_->addKey(k);
             len_added = len;
         }
 		size_ += len_added;
@@ -254,14 +242,11 @@ public:
             for (size_t i = len_added; i < len_added + BLOCK_SIZE; i++) {
                 block->add(vals[i]);
             }
-            Key* k = genKey_(len_added / BLOCK_SIZE);
 			Serializer* s = new Serializer();
 			block->serialize(s);
-            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            store_->put(k, val);
-            blocks_->addKey(k);
             len_added += BLOCK_SIZE;
         }
 
@@ -272,14 +257,11 @@ public:
             for (size_t i = len_added; i < len; i++) {
                 block->add(vals[i]);
             }
-            Key* k = genKey_(len_added / BLOCK_SIZE);
 			Serializer* s = new Serializer();
 			block->serialize(s);
-            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            store_->put(k, val);
-            blocks_->addKey(k);
             len_added = len;
         }
 		size_ += len_added;
@@ -300,14 +282,11 @@ public:
             for (size_t i = len_added; i < len_added + BLOCK_SIZE; i++) {
                 block->add(vals[i]->clone());
             }
-            Key* k = genKey_(len_added / BLOCK_SIZE);
 			Serializer* s = new Serializer();
 			block->serialize(s);
-            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            store_->put(k, val);
-            blocks_->addKey(k);
             len_added += BLOCK_SIZE;
         }
 
@@ -318,14 +297,11 @@ public:
             for (size_t i = len_added; i < len; i++) {
                 block->add(vals[i]->clone());
             }
-            Key* k = genKey_(len_added / BLOCK_SIZE);
 			Serializer* s = new Serializer();
 			block->serialize(s);
-            Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            store_->put(k, val);
-            blocks_->addKey(k);
             len_added = len;
         }
 		
@@ -478,5 +454,15 @@ public:
         return hash_;
 	}
 
-    
+	/** Constructs a new KV pair from the keyIdx and value within the serializer.
+     * Adds it to the store.
+     */
+	void addBlockToStore_(Serializer* s, size_t keyIdx) {
+        Key* k = genKey_(keyIdx);
+        Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
+        store_->put(k, val);
+        blocks_->addKey(k);
+        delete k;
+        delete val;
+    }
 };
