@@ -347,11 +347,9 @@ public:
 
         //Key to look up data
         Key* k = genKey_(chunk);
-        Value* v = blocks_->get(k);
-		Serializer* s = new Serializer(v->getSize(), v->getData());
-        FloatBlock* floatData = new FloatBlock();
-		floatData->deserialize(s);
-        return floatData->get(idxInChunk);
+		float out = blocks_->getFloat(k, idxInChunk);
+		delete k;
+		return out;
      }
 	
 	bool get_bool(size_t idx) {

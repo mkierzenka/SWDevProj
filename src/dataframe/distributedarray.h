@@ -9,6 +9,10 @@
 #include "../store/kvstore.h"
 #include "../utils/object.h"
 #include "../serial/serial.h"
+#include "intblock.h"
+#include "boolblock.h"
+#include "stringblock.h"
+#include "floatblock.h"
 
 //class KVStore;
 
@@ -92,6 +96,35 @@ public:
         }
 
         return val;
+    }
+	
+	/**
+	 * Get specific float from a value stored with key k
+	 */
+    float getFloat(Key *k, size_t itemIdx)
+    {
+		Value* val = nullptr;
+		// if value isn't in cache yet, add it
+        if (!(cache_->containsKey(k)))
+        {
+            //get data from store, and cache it
+			val = store_->getValue(k);
+			if (val != nullptr)
+			{
+				cache_->put(k->clone(), val->clone());
+			}
+        }
+		if (val == nullptr)
+		{
+			val = cache_->getValue(k);
+		}
+		Serializer* s = new Serializer(val->getSize(), val->getData());
+		FloatBlock* floatData = new FloatBlock();
+		floatData->deserialize(s);
+		float out = floatData->get(itemIdx);
+		delete floatData;
+		delete s;
+		return out;
     }
 
     /**
