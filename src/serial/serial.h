@@ -64,12 +64,6 @@ public:
 		numBytesWritten_ += sizeof(double);
 	}
 
-	void write(float f) {
-		memcpy(curBuffPtrWrite_, &f, sizeof(float));
-		curBuffPtrWrite_ += sizeof(float);
-		numBytesWritten_ += sizeof(float);
-	}
-
 	void write(MsgKind mk) {
 		char out[2];
 		switch (mk) {
@@ -172,14 +166,6 @@ public:
 		memcpy(&out, curBuffPtrRead_, sizeof(double));
 		curBuffPtrRead_ += sizeof(double);
 		numBytesRead_ += sizeof(double);
-		return out;
-	}
-
-	float readFloat() {
-		float out;
-		memcpy(&out, curBuffPtrRead_, sizeof(float));
-		curBuffPtrRead_ += sizeof(float);
-		numBytesRead_ += sizeof(float);
 		return out;
 	}
 

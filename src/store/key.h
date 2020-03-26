@@ -15,6 +15,12 @@ public:
     String *kStr_;    //string that identifies data
     size_t homeNode_; //where data lives
 
+    Key(const char* keyStr, size_t node)
+    {
+        kStr_ = new String(keyStr);
+        homeNode_ = node;
+    }
+
     Key(String *str, size_t node)
     {
         kStr_ = str->clone();
