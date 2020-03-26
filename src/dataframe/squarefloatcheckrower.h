@@ -5,16 +5,16 @@
 #include "row.h"
 
 /*******************************************************************************
- *  SquareFloatCheckRower::
+ *  SquareDoubleCheckRower::
  *  A Rower implementation that returns true and sets a dataframe entry (col i=2)
  *    if row[0] * row[1] = row[2]. Operates on rows with schema FFB
  */
-class SquareFloatCheckRower : public Rower {
+class SquareDoubleCheckRower : public Rower {
  public:
 	DataFrame* df_;
 	size_t colToReportIdx_ = 2;
 	
-	SquareFloatCheckRower(DataFrame* df) {
+	SquareDoubleCheckRower(DataFrame* df) {
 		df_ = df;
 	}
 	
@@ -23,7 +23,7 @@ class SquareFloatCheckRower : public Rower {
       call. The return value is used in filters to indicate that a row
       should be kept. */
   bool accept(Row& r) {
-	  bool result = (r.get_float(0) * r.get_float(1)) == r.get_float(2);
+	  bool result = (r.get_double(0) * r.get_double(1)) == r.get_double(2);
 	  df_->set(colToReportIdx_, r.get_idx(), result);
 	  return result;
   }

@@ -2,7 +2,7 @@
 #include "dataframe.h"
 
 /** This class is a rower implementation. It calculates the total length of the row's elements.
- * For ints it calculates the number of digits. Floats are rounded down to the
+ * For ints it calculates the number of digits. Doubles are rounded down to the
  * nearest int and the number of digits are counted. Boolean adds 1 or 0, depending on
  * the value. Strings add the number of characters in the string */
 class LengthRower : public Rower
@@ -60,8 +60,8 @@ public:
                 return intSize_(r.get_int(idx));
             case 'B':
                 return boolSize_(r.get_bool(idx));
-            case 'F':
-                return floatSize_(r.get_float(idx));
+            case 'D':
+                return doubleSize_(r.get_double(idx));
             case 'S':
                 return stringSize_(r.get_string(idx));
             default:
@@ -92,8 +92,8 @@ public:
         return 0;
     }
 
-    /** Return size for a float */
-    size_t floatSize_(float val) {
+    /** Return size for a double */
+    size_t doubleSize_(double val) {
         int intVal = (int)val;
 
         return intSize_(intVal);

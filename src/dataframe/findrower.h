@@ -43,8 +43,7 @@ public:
         size_t ncols = r.width();
 		for (size_t i = 0; i < ncols; i++)
         {
-            //row data should only be ints
-            if (intElementInDf_(r, i) || boolElementInDf_(r, i) || stringElementInDf_(r, i) || floatElementInDf_(r, i))
+            if (intElementInDf_(r, i) || boolElementInDf_(r, i) || stringElementInDf_(r, i) || doubleElementInDf_(r, i))
             {
                 totalFound_++;
             }
@@ -101,7 +100,7 @@ public:
     //helper to determine whether bool in the dataframe
     bool boolElementInDf_(Row &r, size_t idx)
     {
-        //if type not an int, return false
+        //if type not an bool, return false
         if (r.col_type(idx) != 'B')
         {
             return false;
@@ -131,7 +130,7 @@ public:
     //helper to determine whether string in the dataframe
     bool stringElementInDf_(Row &r, size_t idx)
     {
-        //if type not an int, return false
+        //if type not a String, return false
         if (r.col_type(idx) != 'S')
         {
             return false;
@@ -158,27 +157,27 @@ public:
         return false;
     }
 
-    //helper to determine whether float in the dataframe
-    bool floatElementInDf_(Row &r, size_t idx)
+    //helper to determine whether double in the dataframe
+    bool doubleElementInDf_(Row &r, size_t idx)
     {
-        //if type not an int, return false
-        if (r.col_type(idx) != 'F')
+        //if type not an double, return false
+        if (r.col_type(idx) != 'D')
         {
             return false;
         }
 
-        float val = r.get_float(idx);
+        double val = r.get_double(idx);
         for (int c = 0; c < searchFrame_->ncols(); c++)
         {
             //don't check column if types don't match
-            if (searchFrame_->get_schema().col_type(c) != 'F') {
+            if (searchFrame_->get_schema().col_type(c) != 'D') {
                 continue;
             }
 
             for (int r = 0; r < searchFrame_->nrows(); r++)
             {
                 //found match
-                if (searchFrame_->get_float(c, r) == val)
+                if (searchFrame_->get_double(c, r) == val)
                 {
                     return true;
                 }
