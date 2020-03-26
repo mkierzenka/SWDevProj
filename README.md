@@ -8,8 +8,6 @@
 
 * Clean up client and server, try to get more than two clients to connect successfully
 
-* (Marcin) Rename float references to double
-
 * Do we need both ColumnArray and ColArr?
 
 * Fix generalTests to use Column and check all 4 types
