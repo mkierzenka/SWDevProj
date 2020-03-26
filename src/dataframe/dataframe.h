@@ -63,23 +63,80 @@ public:
 	delete columns_;
   }
 
-  /** Converts an array into a dataframe object. Returns the df result */
+  /** Converts an array into a dataframe object.
+   *  Returns the df result, caller is responsible for deleting it.
+   */
   static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, float* elems) {
-    //initialize dataframe
     DataFrame* df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
-    Serializer* s = new Serializer();
+	addDFToStore_(df, kv, k);
+    return df;
+  }
+  
+  /** Converts an array of ints into a dataframe object.
+   *  Returns the df result, caller is responsible for deleting it.
+   */
+  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, int* elems) {
+    DataFrame* df = new DataFrame(k->clone(), kv);
+    df->add_array(numElems, elems);
+	return addDFToStore_(df, kv, k);
+  }
+  
+  /** Converts an array of booleans into a dataframe object.
+   *  Returns the df result, caller is responsible for deleting it.
+   */
+  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, bool* elems) {
+    DataFrame* df = new DataFrame(k->clone(), kv);
+    df->add_array(numElems, elems);
+	return addDFToStore_(df, kv, k);
+  }
+  
+  /** Converts an array of Strings into a dataframe object.
+   *  Returns the df result, caller is responsible for deleting it.
+   */
+  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, String** elems) {
+    DataFrame* df = new DataFrame(k->clone(), kv);
+    df->add_array(numElems, elems);
+	addDFToStore_(df, kv, k);
+    return df;
+  }
+  
+  /** Adds the DataFrame to the given KVStore with the given key.
+   *  Returns the DataFrame just added (df).
+   */
+  static DataFrame* addDFToStore_(DataFrame* df, KVStore* kv, Key* k) {
+	Serializer* s = new Serializer();
     df->serialize(s);
     Value* v = new Value(s->getBuffer(), s->getNumBytesWritten());
     kv->put(k->clone(), v);
-
     delete s;
-    return df;
+	return df;
   }
 
-  /** Add array to dataframe as a column. Add the data into chunks at a time, and generate
+  /** Add array of floats to dataframe as a column. Add the data into chunks, and generate
    * keys for them. Column needs to get dataframe's key and key-value store */
   void add_array(size_t numElements, float* elements)
+  {
+    columns_->add_column_fromarray(numElements, elements);
+  }
+
+  /** Add array of ints to dataframe as a column. Add the data into chunks, and generate
+   * keys for them. Column needs to get dataframe's key and key-value store */
+  void add_array(size_t numElements, int* elements)
+  {
+    columns_->add_column_fromarray(numElements, elements);
+  }
+  
+  /** Add array of booleans to dataframe as a column. Add the data into chunks, and generate
+   * keys for them. Column needs to get dataframe's key and key-value store */
+  void add_array(size_t numElements, bool* elements)
+  {
+    columns_->add_column_fromarray(numElements, elements);
+  }
+  
+  /** Add array of Strings to dataframe as a column. Add the data into chunks, and generate
+   * keys for them. Column needs to get dataframe's key and key-value store */
+  void add_array(size_t numElements, String** elements)
   {
     columns_->add_column_fromarray(numElements, elements);
   }
