@@ -329,7 +329,7 @@ We succeeded in creating an adapter to use their Sorer with our DataFrame classe
 demonstrating this can be found in tests/sorerTest.cpp.
 This test highlighted some memory leaks in our implementation, which have now all been fixed.
 
-We have implemented serialization for most of the necessary classes, and are able to use the key-value store for data storage and retrieval. The Trivial case provided to us in M2 passes.
+We have implemented serialization for most of the necessary classes, and are able to use the key-value store for data storage and retrieval. The Trivial case provided to us in M2 passes for smaller array sizes (1000 elements) but larger arrays (1000*1000) segfaults.
 
 We have a good amount of code cleanup to do; this includes removing unused code and print statements, and getting our previously written tests to compile and run.
 
@@ -341,3 +341,9 @@ Most of the networking functionality required for this project is set up.
 
 Remaining tasks for M2
 -fromScalar
+
+Remaining tasks for M3
+-Create pseudo-networking to test distributed KV
+-Determine message type(s) for communication between KV stores, make sure serializes and deserializes properly
+-Fix networking classes
+-Try to incorporate networking into KVStores
