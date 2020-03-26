@@ -116,7 +116,7 @@ public:
 	}
 
 	/** Add a row with a name (possibly nullptr), name is external.  Names are
-   *  expectd to be unique, duplicates result in undefined behavior. */
+   *  expected to be unique, duplicates result in undefined behavior. */
 	void add_row() {
 	  numRows_++;
   	}

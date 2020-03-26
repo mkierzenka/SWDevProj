@@ -14,11 +14,7 @@
 
 * document which methods using String\* take ownership and makes copies in comments
 
-* Change all NULL references to nullptr
-
 * Rename float references to double
-
-* Remove all column name references
 
 * Do we need both ColumnArray and ColArr?
 
