@@ -7,11 +7,7 @@
 
 * Clean up client and server, try to get more than two clients to connect successfully
 
-* Change all NULL references to nullptr
-
 * (Marcin) Rename float references to double
-
-* Remove all column name references
 
 * Do we need both ColumnArray and ColArr?
 

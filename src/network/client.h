@@ -120,7 +120,7 @@ public:
     void updateClientConnections_(char *msg)
     {
         //this would happen upon first client connecting (no other clients to connect to)
-        if (msg == NULL)
+        if (msg == nullptr)
         {
             return;
         }
@@ -134,7 +134,7 @@ public:
         //rebuild client data list
         char *ip = strtok_r(msg, ",", &saveBuf);
         int i = 0;
-        while (ip != NULL)
+        while (ip != nullptr)
         {
             parseClientData_(ip);
             connectAndSend_(ip);

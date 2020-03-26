@@ -138,5 +138,7 @@ int main()
   test4();
   test5();
   testBig();
+
+  OK("All array tests passed!");
   return 0;
 }

@@ -34,13 +34,13 @@ class Entry : public Object {
 		}
 		
 		~Entry() { 
-			if (key_ != NULL && key_ != nullptr) {
+			if (key_ != nullptr) {
 				delete key_;
 			}
-			if (value_ != NULL && value_ != nullptr) {
+			if (value_ != nullptr) {
 				delete value_;
 			}
-			if (next_ != NULL && next_ != nullptr) {
+			if (next_ != nullptr) {
 				delete next_;
 			}
 		}
@@ -184,7 +184,7 @@ class Map : public Object {
 			Object** thisKeys = this->get_keys();
 			Object** otherKeys = otherMap->get_keys();
 			
-			Object* curKey = NULL;
+			Object* curKey = nullptr;
 			for (size_t i = 0; i < this->size_; i++) {
 				curKey = thisKeys[i];
 				if (!isInArr_(curKey, otherKeys, otherMap->size_)) {
@@ -202,7 +202,7 @@ class Map : public Object {
 			Object** thisValues = this->get_values();
 			Object** otherValues = otherMap->get_values();
 
-			Object* curValue = NULL;
+			Object* curValue = nullptr;
 			for (size_t i = 0; i < this->size_; i++) {
 				curValue = thisValues[i];
 				if (!isInArr_(curValue, otherValues, otherMap->size_)) {
@@ -212,7 +212,7 @@ class Map : public Object {
 				}
 			}
 			
-			curValue = NULL;
+			curValue = nullptr;
 			for (size_t i = 0; i < otherMap->size_; i++) {
 				curValue = otherValues[i];
 				if (!isInArr_(curValue, thisValues, this->size_)) {

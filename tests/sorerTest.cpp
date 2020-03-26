@@ -14,6 +14,7 @@
 
 #include "../src/sorer/sorer.h"
 #include "../src/dataframe/lengthrower.h"
+#include "../src/dataframe/column.h"
 
 
 const char *USAGE = "Usage: ./sorer [-f] [-from] [-len] [-print_col_type] " \

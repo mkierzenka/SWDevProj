@@ -380,7 +380,7 @@ int main(int argc, char** argv) {
   //test->test_hash_0();
   //test->test_hash_1();
   test->test_big();
-  test->OK("ALL TESTS PASSED");
+  test->OK("All map tests passed!");
   delete test;
   return 0;
 }

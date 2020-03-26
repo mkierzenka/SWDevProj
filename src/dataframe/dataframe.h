@@ -27,12 +27,12 @@ class DataFrame : public Object
 {
 public:
   ColumnArray *columns_; //keeps track of columns in data frame
-  KVStore* store_;
-  Schema* schema_;        //owned, schema of dataframe
-  Key* key_; //key for this dataframe in the KV store
+  KVStore *store_;
+  Schema *schema_; //owned, schema of dataframe
+  Key *key_;       //key for this dataframe in the KV store
 
   /** This constructor is for the purpose of adding arrays */
-  DataFrame(Key* k, KVStore* kv)
+  DataFrame(Key *k, KVStore *kv)
   {
     schema_ = new Schema();
     store_ = kv;
@@ -42,13 +42,13 @@ public:
   }
 
   /** Create a data frame with the same columns as the give df but no rows */
-  DataFrame(DataFrame &df, Key* k) : DataFrame(df.get_schema(), k)
+  DataFrame(DataFrame &df, Key *k) : DataFrame(df.get_schema(), k)
   {
   }
 
   /** Create a data frame from a schema and columns. All columns are created
     * empty. */
-  DataFrame(Schema &schema, Key* k)
+  DataFrame(Schema &schema, Key *k)
   {
     //don't copy rows
     schema_ = new Schema(schema, false);
@@ -60,7 +60,7 @@ public:
   ~DataFrame()
   {
     delete schema_;
-	delete columns_;
+    delete columns_;
   }
 
   /** Converts an array into a dataframe object.
@@ -107,7 +107,7 @@ public:
   static DataFrame* addDFToStore_(DataFrame* df, KVStore* kv, Key* k) {
 	Serializer* s = new Serializer();
     df->serialize(s);
-    Value* v = new Value(s->getBuffer(), s->getNumBytesWritten());
+    Value *v = new Value(s->getBuffer(), s->getNumBytesWritten());
     kv->put(k->clone(), v);
     delete s;
 	return df;
@@ -115,7 +115,7 @@ public:
 
   /** Add array of floats to dataframe as a column. Add the data into chunks, and generate
    * keys for them. Column needs to get dataframe's key and key-value store */
-  void add_array(size_t numElements, float* elements)
+  void add_array(size_t numElements, float *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
   }
@@ -141,7 +141,6 @@ public:
     columns_->add_column_fromarray(numElements, elements);
   }
 
-
   /** Returns the dataframe's schema. Modifying the schema after a dataframe
     * has been created in undefined. */
   Schema &get_schema()
@@ -151,19 +150,20 @@ public:
 
   // Serialize store?
   /** Serialize this DataFrame into s*/
-  void serialize(Serializer* s) {
+  void serialize(Serializer *s)
+  {
     columns_->serialize(s);
     schema_->serialize(s);
     key_->serialize(s);
   }
 
-  
   //Deserialize store?
   /** Deserialize as a dataframe and set the values in this dataframe */
-  void deserialize(Serializer* s) {
+  void deserialize(Serializer *s)
+  {
     //deserialized column array needs store
     columns_->setStore(store_);
-    
+
     columns_->deserialize(s);
     schema_->deserialize(s);
     key_->deserialize(s);
@@ -185,8 +185,8 @@ public:
       exit(1);
     }
 
-	columns_->add_column(col); // Must add to end of column array
-    char type = col->getCharType();//columns_->getType(columns_->length() - 1);
+    columns_->add_column(col);      // Must add to end of column array
+    char type = col->getCharType(); //columns_->getType(columns_->length() - 1);
     schema_->add_column(type);
   }
 
@@ -279,17 +279,17 @@ public:
     DataFrame *df_;
     Rower &r_;
 
-    DataFrameThread(DataFrame *df, Rower &r, size_t startRowIdx, size_t endRowIdx) :
-		df_(df), r_(r), startRowIdx_(startRowIdx), endRowIdx_(endRowIdx) {}
+    DataFrameThread(DataFrame *df, Rower &r, size_t startRowIdx, size_t endRowIdx) : df_(df), r_(r), startRowIdx_(startRowIdx), endRowIdx_(endRowIdx) {}
 
     void run()
     {
       df_->map(r_, startRowIdx_, endRowIdx_);
     }
-	
-	Rower& getRower() {
-		return r_;
-	}
+
+    Rower &getRower()
+    {
+      return r_;
+    }
   };
 
   /**
@@ -323,8 +323,8 @@ public:
     for (int i = numThreads - 1; i >= 0; i--)
     {
       threads[i]->join();
-	  r.join_delete(&(threads[i]->getRower()));
-	  delete threads[i];
+      r.join_delete(&(threads[i]->getRower()));
+      delete threads[i];
     }
 
     delete[] threads;
@@ -344,7 +344,7 @@ public:
 
   /** Create a new dataframe, constructed from rows for which the given Rower
     * returned true from its accept method. */
-/*  DataFrame *filter(Rower &r)
+  /*  DataFrame *filter(Rower &r)
   {
     DataFrame *newFrame = new DataFrame(*schema_);
     for (int i = 0; i < schema_->length(); i++)
@@ -380,16 +380,16 @@ public:
     switch (row.col_type(colIdx))
     {
     case 'I':
-	  columns_->push_back(colIdx, row.get_int(colIdx));
+      columns_->push_back(colIdx, row.get_int(colIdx));
       break;
     case 'B':
-	  columns_->push_back(colIdx, row.get_bool(colIdx));
+      columns_->push_back(colIdx, row.get_bool(colIdx));
       break;
     case 'F':
-	  columns_->push_back(colIdx, row.get_float(colIdx));
+      columns_->push_back(colIdx, row.get_float(colIdx));
       break;
     case 'S':
-	  columns_->push_back(colIdx, row.get_string(colIdx));
+      columns_->push_back(colIdx, row.get_string(colIdx));
       break;
     default:
       fprintf(stderr, "Invalid col type: %c", row.col_type(colIdx));
@@ -453,17 +453,16 @@ public:
       r.set(colIdx, columns_->get_int(colIdx, rowIdx));
       break;
     case 'B':
-		r.set(colIdx, columns_->get_bool(colIdx, rowIdx));
+      r.set(colIdx, columns_->get_bool(colIdx, rowIdx));
       break;
     case 'F':
-		r.set(colIdx, columns_->get_float(colIdx, rowIdx));
+      r.set(colIdx, columns_->get_float(colIdx, rowIdx));
       break;
     case 'S':
-		r.set(colIdx, columns_->get_string(colIdx, rowIdx));
+      r.set(colIdx, columns_->get_string(colIdx, rowIdx));
       break;
     default:
       fprintf(stderr, "Invalid col type: %c", colType);
     }
   }
-
 };
