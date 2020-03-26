@@ -210,5 +210,6 @@ int main()
 	test_queue_clear();
 	test_queue_equals_object();
 	test_queue_equals_string();
+	OK("All queue tests passed!");
 	return 0;
 }
