@@ -5,17 +5,14 @@
 
 
 /**
-* BoolBlock - to represent a block of bools.
+* BoolBlock - to represent a block of booleans.
 *
 */
 class BoolBlock : public Block
 {
 public:
 	bool* vals_; //list of bools, owned
-	size_t size_;
-	size_t capacity_;
 
-	// constructor
 	BoolBlock()
 	{
 		capacity_ = BLOCK_SIZE;
@@ -24,7 +21,6 @@ public:
 		memset(vals_, 0, capacity_ * sizeof(bool));
 	}
 
-	// deconstructor
 	~BoolBlock()
 	{
 		delete[] vals_;
@@ -51,7 +47,7 @@ public:
 		}
 	}
 
-	/** get the bool with the index in the array */
+	/** Get the boolean at the specified index of the array */
 	bool get(size_t index)
 	{
 		// check for out-of-bounds
@@ -63,7 +59,7 @@ public:
 		return vals_[index];
 	}
 
-	/** add bool to end of this block. if can't fit, return -1 */
+	/** Add a boolean to end of this block. If can't fit, return -1 */
 	int add(bool n)
 	{
 		if (size_ >= capacity_)
@@ -129,6 +125,12 @@ public:
 		}
 
 		return hash_;
+	}
+	
+	/** Clears the memory in this BoolBlock */
+	void clear() {
+		memset(vals_, 0, capacity_ * sizeof(bool));
+		size_ = 0;
 	}
 
 };
