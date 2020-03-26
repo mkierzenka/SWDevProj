@@ -62,7 +62,6 @@ public:
          */
     bool containsKey(Key *k)
     {
-        ///TODO: might need to do casting or create a KeyArray
         return keyList_->index_of(k) != -1;
     }
 
@@ -75,9 +74,9 @@ public:
     }
 
     /**
-         * Get the data for the specified key. Adds nullptr if value
-         * cannot be found.
-         */
+    * Get the data for the specified key. Adds nullptr if value
+    * cannot be found.
+    */
     Value *get(Key *k)
     {
         //check the cache first: return if exists
