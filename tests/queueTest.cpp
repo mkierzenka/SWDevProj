@@ -85,8 +85,12 @@ void test_queue_pop_string()
 	t_true(q1->size() == 3);
 	t_true(q1->pop() == s);
 	t_true(q1->size() == 2);
+
+	q1->push(s);
 	t_true(q1->pop() == t);
+	t_true(q1->size() == 2);
 	t_true(q1->pop() == u);
+	t_true(q1->pop() == s);
 	t_true(q1->pop() == nullptr);
 	OK("pop string");
 }
