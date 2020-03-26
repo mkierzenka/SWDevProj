@@ -2,7 +2,6 @@ build:
 	g++ --std=c++11 -g -pthread tests/generalTests.cpp -o tests/testGeneral
 	g++ --std=c++11 -g tests/serializationTests.cpp -o tests/testSerial
 	g++ --std=c++11 -g tests/trivialTest.cpp -o tests/testTrivial
-	#g++ --std=c++11 -g tests/colArrTests.cpp -o tests/testCA
 	#g++ --std=c++11 -g tests/memTest.cpp -o tests/testMemory
 	#g++ --std=c++11 -g tests/sorerTest.cpp -o tests/testSorer
 	g++ --std=c++11 -g tests/mapTest.cpp -o tests/testMap
@@ -15,7 +14,6 @@ test:
 ourTests:
 	./tests/testSerial
 	./tests/testGeneral
-	#./tests/testCA
 	#	./tests/testMemory
 	./tests/testMap
 	./tests/testArray
