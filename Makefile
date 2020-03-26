@@ -27,4 +27,16 @@ memory:
 .SILENT: clean
 clean:
 	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray \
-	tests/testQueue tests/testSerial tests/testTrivial
+	tests/testQueue tests/testSerial tests/testTrivial tests/testCache
+
+buildCache:
+	g++ -std=c++11 -g tests/cacheTest.cpp -o tests/testCache
+
+testCache:
+	./tests/testCache
+
+buildTrivial:
+	g++ -std=c++11 -g tests/trivialTest.cpp -o tests/testTrivial
+
+testTrivial:
+	./tests/testTrivial
