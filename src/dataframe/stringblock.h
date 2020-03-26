@@ -62,7 +62,7 @@ public:
 		}
 	}
 
-	// get the String with the index in the array
+	// get a clone of the String with the index in the block
 	String* get(size_t index)
 	{
 		// check for out-of-bounds
@@ -71,7 +71,7 @@ public:
 			fprintf(stderr, "Out-Of-Bounds Error: cannot get value from index %zu", index);
 			exit(1);
 		}
-		return vals_[index];
+		return vals_[index]->clone();
 	}
 
 	// add String to end of this block, does not clone. Now owns s. if can't fit, return -1
