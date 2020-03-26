@@ -65,11 +65,11 @@ public:
         //pull message type from message
         const char *msgType = strtok(msg, " ");
         printf("Message type: %s\n", msgType);
-        assert(msgType != NULL);
+        assert(msgType != nullptr);
         if (strcmp(msgType, "REGISTER") == 0)
         {
             const char *ip = strtok(NULL, " ");
-            assert(ip != NULL);
+            assert(ip != nullptr);
             handleIp_(ip);
             sendUpdates_();
         }
@@ -118,7 +118,7 @@ public:
 
     String *genMsgForIdx_(size_t idx)
     {
-        ClientData *cdata = NULL;
+        ClientData *cdata = nullptr;
         StrBuff buff;
         buff.c("UPDATE ");
         char *tmp;
@@ -143,7 +143,7 @@ public:
 
     void sendUpdates_()
     {
-        char *msg = NULL;
+        char *msg = nullptr;
 
         for (size_t i = 0; i < clients_->length(); i++)
         {

@@ -105,7 +105,7 @@ public:
 
         int valread = read(fileDesc, buffer, 1024);
         assert(valread >= 0);
-        assert(buffer != NULL);
+        assert(buffer != nullptr);
         return buffer;
     }
 

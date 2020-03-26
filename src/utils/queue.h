@@ -2,8 +2,6 @@
 #pragma once
 #include "object.h"
 
-
-
 //This class will be used to represent an element on the queue.
 //It will contain the value of the element and a reference to the next index
 class Node : public Object
@@ -28,23 +26,23 @@ public:
             return false;
         }
 
-        if (otherNode->o != NULL && !otherNode->o->equals(o))
+        if (otherNode->o != nullptr && !otherNode->o->equals(o))
         {
             return false;
         }
 
-        if (o != NULL && !o->equals(otherNode->o))
+        if (o != nullptr && !o->equals(otherNode->o))
         {
             return false;
         }
 
         //Current element same and no other elements exist
-        if (next == NULL && otherNode->next == NULL)
+        if (next == nullptr && otherNode->next == nullptr)
         {
             return true;
         }
 
-        if ((next == NULL && otherNode->next != NULL) || (next != NULL && otherNode->next == NULL))
+        if ((next == nullptr && otherNode->next != nullptr) || (next != nullptr && otherNode->next == nullptr))
         {
             return false;
         }
@@ -53,11 +51,6 @@ public:
         return next->equals(otherNode->next);
     }
 };
-
-
-
-
-
 
 /**
 * A Queue object serving as a FIFO queue.
@@ -73,8 +66,8 @@ public:
     /** Default constructor ensure that everything is initialized */
     Queue()
     {
-        front_ = NULL;
-        back_ = NULL;
+        front_ = nullptr;
+        back_ = nullptr;
         len_ = 0;
     }
 
@@ -116,7 +109,7 @@ public:
         //first check if queue has elements in it
         if (is_empty())
         {
-            return NULL;
+            return nullptr;
         }
 
         //store removed node
@@ -128,9 +121,9 @@ public:
         len_ -= 1;
 
         //check if queue now empty; means both front and back need to be null
-        if (front_ == NULL)
+        if (front_ == nullptr)
         {
-            back_ = NULL;
+            back_ = nullptr;
         }
 
         return temp->o;
@@ -149,8 +142,8 @@ public:
         deleteQueue_();
 
         //reset values
-        front_ = NULL;
-        back_ = NULL;
+        front_ = nullptr;
+        back_ = nullptr;
         len_ = 0;
     }
 
@@ -176,12 +169,12 @@ public:
         }
 
         //Current element same and no other elements exist
-        if (front_ == NULL && other->front_ == NULL)
+        if (front_ == nullptr && other->front_ == nullptr)
         {
             return true;
         }
 
-        if ((front_ == NULL && other->front_ != NULL) || (front_ != NULL && other->front_ == NULL))
+        if ((front_ == nullptr && other->front_ != nullptr) || (front_ != nullptr && other->front_ == nullptr))
         {
             return false;
         }
@@ -200,7 +193,7 @@ public:
     {
         size_t hash = 0;
         Node *cur = front_;
-        while (cur != NULL)
+        while (cur != nullptr)
         {
             size_t nodeHash = reinterpret_cast<size_t>(cur);
             hash += nodeHash;
@@ -217,7 +210,7 @@ public:
     {
         Node *n = new Node();
         n->o = obj;
-        n->next = NULL;
+        n->next = nullptr;
 
         return n;
     }
@@ -228,7 +221,7 @@ public:
     void deleteQueue_()
     {
         Node *cur = front_;
-        while (cur != NULL)
+        while (cur != nullptr)
         {
             //set next element, delete existing, and swap
             Node *next = cur->next;
