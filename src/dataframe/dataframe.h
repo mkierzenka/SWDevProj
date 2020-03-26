@@ -66,7 +66,7 @@ public:
   /** Converts an array into a dataframe object.
    *  Returns the df result, caller is responsible for deleting it.
    */
-  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, float* elems) {
+  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, double* elems) {
     DataFrame* df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
 	addDFToStore_(df, kv, k);
@@ -113,9 +113,9 @@ public:
 	return df;
   }
 
-  /** Add array of floats to dataframe as a column. Add the data into chunks, and generate
+  /** Add array of doubles to dataframe as a column. Add the data into chunks, and generate
    * keys for them. Column needs to get dataframe's key and key-value store */
-  void add_array(size_t numElements, float *elements)
+  void add_array(size_t numElements, double *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
   }
@@ -202,9 +202,9 @@ public:
     return columns_->get_bool(col, row);
   }
 
-  float get_float(size_t col, size_t row)
+  double get_double(size_t col, size_t row)
   {
-    return columns_->get_float(col, row);
+    return columns_->get_double(col, row);
   }
 
   String *get_string(size_t col, size_t row)
@@ -385,8 +385,8 @@ public:
     case 'B':
       columns_->push_back(colIdx, row.get_bool(colIdx));
       break;
-    case 'F':
-      columns_->push_back(colIdx, row.get_float(colIdx));
+    case 'D':
+      columns_->push_back(colIdx, row.get_double(colIdx));
       break;
     case 'S':
       columns_->push_back(colIdx, row.get_string(colIdx));
@@ -455,8 +455,8 @@ public:
     case 'B':
       r.set(colIdx, columns_->get_bool(colIdx, rowIdx));
       break;
-    case 'F':
-      r.set(colIdx, columns_->get_float(colIdx, rowIdx));
+    case 'D':
+      r.set(colIdx, columns_->get_double(colIdx, rowIdx));
       break;
     case 'S':
       r.set(colIdx, columns_->get_string(colIdx, rowIdx));

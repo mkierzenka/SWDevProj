@@ -5,28 +5,28 @@
 
 
 /**
-* FloatBlock - to represent a block of floats.
+* DoubleBlock - to represent a block of doubles.
 *
 */
-class FloatBlock : public Block
+class DoubleBlock : public Block
 {
 public:
-	float* vals_; //list of floats, owned
+	double* vals_; //list of doubles, owned
 
-	FloatBlock()
+	DoubleBlock()
 	{
 		capacity_ = BLOCK_SIZE;
 		size_ = 0;
-		vals_ = new float[capacity_];
-		memset(vals_, 0, capacity_ * sizeof(float));
+		vals_ = new double[capacity_];
+		memset(vals_, 0, capacity_ * sizeof(double));
 	}
 
-	~FloatBlock()
+	~DoubleBlock()
 	{
 		delete[] vals_;
 	}
 	
-	/** Serialize this block of floats into s */
+	/** Serialize this block of doubles into s */
 	void serialize(Serializer* s) {
 		s->write(capacity_);
 		s->write(size_);
@@ -35,20 +35,20 @@ public:
 		}
 	}
 	
-	/** Deserialize a block of floats into this block (mutate) */
+	/** Deserialize a block of doubles into this block (mutate) */
 	void deserialize(Serializer* s) {
 		delete[] vals_;
 		capacity_ = s->readSizeT();
-		vals_ = new float[capacity_];
-		memset(vals_, 0, capacity_ * sizeof(float));
+		vals_ = new double[capacity_];
+		memset(vals_, 0, capacity_ * sizeof(double));
 		size_ = s->readSizeT();
 		for (size_t i = 0; i < size_; i++) {
-			vals_[i] = s->readFloat();
+			vals_[i] = s->readDouble();
 		}
 	}
 
-	/** Gets the float at the specified index of the array */
-	float get(size_t index)
+	/** Gets the double at the specified index of the array */
+	double get(size_t index)
 	{
 		// check for out-of-bounds
 		if (index >= size_)
@@ -59,8 +59,8 @@ public:
 		return vals_[index];
 	}
 
-	/** Adds the float to end of this block. If can't fit, return -1. */
-	int add(float s)
+	/** Adds the double to end of this block. If can't fit, return -1. */
+	int add(double s)
 	{
 		if (size_ >= capacity_)
 		{
@@ -70,8 +70,8 @@ public:
 		size_++;
 	}
 
-	/** Set the float at the given index */
-	void set(size_t index, float s)
+	/** Set the double at the given index */
+	void set(size_t index, double s)
 	{
 		// check for out-of-bounds
 		if (index >= size_)
@@ -90,7 +90,7 @@ public:
 			return true;
 		}
 
-		FloatBlock* b = dynamic_cast<FloatBlock*>(other);
+		DoubleBlock* b = dynamic_cast<DoubleBlock*>(other);
 		if (b == nullptr || size_ != b->size_ || capacity_ != b->capacity_)
 		{
 			return false;
@@ -99,7 +99,7 @@ public:
 		for (size_t i = 0; i < size_; i++)
 		{
 			//set a tolerance
-			float tolerance = 0.0001;
+			double tolerance = 0.0001;
 			if (abs(vals_[i] - b->vals_[i]) > tolerance)
 			{
 				return false;
@@ -109,7 +109,7 @@ public:
 		return true;
 	}
 	
-	/** Compute hash code of this bool block */
+	/** Compute hash code of this double block */
 	size_t hash_me_()
 	{
 		size_t hash_ = 0;
@@ -127,9 +127,9 @@ public:
 		return hash_;
 	}
 	
-	/** Clears the memory in this FloatBlock */
+	/** Clears the memory in this DoubleBlock */
 	void clear() {
-		memset(vals_, 0, capacity_ * sizeof(float));
+		memset(vals_, 0, capacity_ * sizeof(double));
 		size_ = 0;
 	}
 };

@@ -17,18 +17,16 @@ class Trivial : public Application {
  public:
   Trivial(size_t idx) : Application(idx) { }
   void run_() {
-	// This test will fail with floats at SZ > ~1000 because they don't have
-	//   enough precision to store the numbers completely
     size_t SZ = 1000;//1000 1000
-    float* vals = new float[SZ];
-    float sum = 0;
+    double* vals = new double[SZ];
+    double sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
     Key key(new String("triv"), 0);
     DataFrame* df = DataFrame::fromArray(&key, kv_, SZ, vals);
-    assert(df->get_float(0,1) == 1);
+    assert(df->get_double(0,1) == 1);
     DataFrame* df2 = kv_->get(&key);
-    for (size_t i = 0; i < SZ; ++i) sum -= df2->get_float(0,i);
-	fprintf(stderr, "Final float sum = %6.6f\n", sum);
+    for (size_t i = 0; i < SZ; ++i) sum -= df2->get_double(0,i);
+	fprintf(stderr, "Final double sum = %6.6lf\n", sum);
     assert(sum==0);
     delete df; delete df2;
   }

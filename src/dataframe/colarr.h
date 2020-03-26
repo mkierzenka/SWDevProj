@@ -8,7 +8,8 @@
 
 
 /**
- * todo
+ * This class represents a ColArray object, which manages an array of Column objects
+ * within a Distributed KV store.
  *
  * @author broder.c@husky.neu.edu & kierzenka.m@husky.neu.edu
  */
@@ -132,9 +133,6 @@ public:
    *  columns out of bounds, or request the wrong type is undefined.*/
   int get_int(size_t col, size_t row)
   {
-    //IntColumn *tmp = safeConvertIntCol_(col);
-    //return tmp->get(row);
-
 	Column* c = dynamic_cast<Column*>(colList_->get(col));
 	//can check the type in the row
 	return c->get_int(row);
@@ -142,30 +140,21 @@ public:
 
   bool get_bool(size_t col, size_t row)
   {
-    // BoolColumn *tmp = safeConvertBoolCol_(col);
-    // return tmp->get(row);
-
 	Column* c = dynamic_cast<Column*>(colList_->get(col));
 	//can check the type in the row
 	return c->get_bool(row);
   }
 
-  float get_float(size_t col, size_t row)
+  double get_double(size_t col, size_t row)
   {
-    // FloatColumn *tmp = safeConvertFloatCol_(col);
-    // return tmp->get(row);
-
 	Column* c = dynamic_cast<Column*>(colList_->get(col));
 	//can check the type in the row
-	return c->get_float(row);
+	return c->get_double(row);
   }
 
   // gets the actual String*, no copy
   String *get_string(size_t col, size_t row)
   {
-    // StringColumn *tmp = safeConvertStringCol_(col);
-    // return tmp->get(row);
-
 	Column* c = dynamic_cast<Column*>(colList_->get(col));
 	//can check the type in the row
 	return c->get_string(row);
@@ -186,9 +175,9 @@ public:
 //     tmp->set(row, val);
 //   }
 
-//   void set(size_t col, size_t row, float val)
+//   void set(size_t col, size_t row, double val)
 //   {
-// 	FloatColumn *tmp = safeConvertFloatCol_(col);
+// 	DoubleColumn *tmp = safeConvertDoubleCol_(col);
 //     tmp->set(row, val);
 //   }
 
@@ -202,100 +191,26 @@ public:
 	/** Type appropriate push_back methods. Appends the element to the end of the
 	* specified column. Calling the wrong method is undefined behavior. **/
     void push_back(size_t col, int val) {
-		//IntColumn *tmp = safeConvertIntCol_(col);
-		//tmp->push_back(val);
-
 		Column* c = dynamic_cast<Column*>(colList_->get(col));
 		//can check the type in the row
 		return c->push_back(val);
 	}
 
     void push_back(size_t col, bool val) {
-		//BoolColumn *tmp = safeConvertBoolCol_(col);
-		//tmp->push_back(val);
 		Column* c = dynamic_cast<Column*>(colList_->get(col));
 		//can check the type in the row
 		return c->push_back(val);
 	}
 
-    void push_back(size_t col, float val) {
-		//FloatColumn *tmp = safeConvertFloatCol_(col);
-		//tmp->push_back(val);
+    void push_back(size_t col, double val) {
 		Column* c = dynamic_cast<Column*>(colList_->get(col));
 		//can check the type in the row
 		return c->push_back(val);
 	}
 
     void push_back(size_t col, String *val) {
-		//StringColumn *tmp = safeConvertStringCol_(col);
-		//tmp->push_back(val);
 		Column* c = dynamic_cast<Column*>(colList_->get(col));
 		//can check the type in the row
 		return c->push_back(val);
 	}
-	
-	/*void errorIfOutOfBounds_(size_t colIdx) {
-		if (colIdx >= len_) {
-		  fprintf(stderr, "Out-Of-Bounds Error: cannot get column from index %zu", colIdx);
-		  exit(1);
-		}
-	}*/
-	
-	/** Return pointer to column at given index as IntColumn
-	* Errors and exits if no column at index or of improper type*/
-//   IntColumn *safeConvertIntCol_(size_t colIdx)
-//   {
-//     errorIfOutOfBounds_(colIdx);
-//     IntColumn *ic = colList_[colIdx]->as_int();
-//     if (ic == nullptr)
-//     {
-//       fprintf(stderr, "Illegal Column Conversion: column %zu is not an int column", colIdx);
-//       exit(1);
-//     }
-//     return ic;
-//   }
-
-//   /** Return pointer to column at given index as BoolColumn
-// 	* Errors and exits if no column at index or of improper type*/
-//   BoolColumn *safeConvertBoolCol_(size_t colIdx)
-//   {
-//     errorIfOutOfBounds_(colIdx);
-//     BoolColumn *ic = colList_[colIdx]->as_bool();
-//     if (ic == nullptr)
-//     {
-//       fprintf(stderr, "Illegal Column Conversion: column %zu is not an bool column", colIdx);
-//       exit(1);
-//     }
-//     return ic;
-//   }
-
-//   /** Return pointer to column at given index as FloatColumn
-// 	* Errors and exits if no column at index or of improper type*/
-//   FloatColumn *safeConvertFloatCol_(size_t colIdx)
-//   {
-//     errorIfOutOfBounds_(colIdx);
-//     FloatColumn *ic = colList_[colIdx]->as_float();
-//     if (ic == nullptr)
-//     {
-//       fprintf(stderr, "Illegal Column Conversion: column %zu is not a float column", colIdx);
-//       exit(1);
-//     }
-//     return ic;
-//   }
-
-//   /** Return pointer to column at given index as StringColumn
-// 	* Errors and exits if no column at index or of improper type*/
-//   StringColumn *safeConvertStringCol_(size_t colIdx)
-//   {
-//     errorIfOutOfBounds_(colIdx);
-//     StringColumn *ic = colList_[colIdx]->as_string();
-//     if (ic == nullptr)
-//     {
-//       fprintf(stderr, "Illegal Column Conversion: column %zu is not a string column", colIdx);
-//       exit(1);
-//     }
-//     return ic;
-//   }
-  
-  
 };

@@ -10,7 +10,7 @@
  */
 union RowValue {
     int iElem;
-    float fElem;
+    double dElem;
     bool bElem;
     String *sElem;
 };
@@ -46,9 +46,9 @@ public:
         set_ = true;
     }
 
-    void set(float val)
+    void set(double val)
     {
-        val_->fElem = val;
+        val_->dElem = val;
         set_ = true;
     }
 
@@ -75,9 +75,9 @@ public:
         return val_->bElem;
     }
 
-    float getFloat()
+    double getDouble()
     {
-        return val_->fElem;
+        return val_->dElem;
     }
 
     String* getString()

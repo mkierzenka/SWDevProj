@@ -51,9 +51,9 @@ public:
 		entries_[col]->set(val);
 	}
 
-	void set(size_t col, float val)
+	void set(size_t col, double val)
 	{
-		exitIfBadSet_(col, 'F');
+		exitIfBadSet_(col, 'D');
 		entries_[col]->set(val);
 	}
 
@@ -102,12 +102,12 @@ public:
 
 		exitIfNotSet_(col);
 	}
-	float get_float(size_t col)
+	double get_double(size_t col)
 	{
-		exitIfBadSet_(col, 'F');
+		exitIfBadSet_(col, 'D');
 		if (entries_[col]->isSet())
 		{
-			return entries_[col]->getFloat();
+			return entries_[col]->getDouble();
 		}
 
 		exitIfNotSet_(col);
@@ -161,8 +161,8 @@ public:
 			case 'B':
 				f.accept(curElem->getBool());
 				break;
-			case 'F':
-				f.accept(curElem->getFloat());
+			case 'D':
+				f.accept(curElem->getDouble());
 				break;
 			case 'S':
 				f.accept(curElem->getString());

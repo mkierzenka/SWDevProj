@@ -8,7 +8,7 @@
 #include "../src/store/kvstore.h"
 #include "../src/utils/string.h"
 #include "../src/dataframe/boolblock.h"
-#include "../src/dataframe/floatblock.h"
+#include "../src/dataframe/doubleblock.h"
 #include "../src/dataframe/intblock.h"
 #include "../src/dataframe/distributedarray.h"
 #include "../src/dataframe/columnarray.h"
@@ -61,11 +61,11 @@ void serializeBoolBlockTest()
     delete newB;
 }
 
-void serializeFloatBlockTest()
+void serializeDoubleBlockTest()
 {
-    printf("Serialize float block test started\n");
+    printf("Serialize double block test started\n");
 
-    FloatBlock* b = new FloatBlock();
+    DoubleBlock* b = new DoubleBlock();
     b->add(0);
     b->add(3.9);
     b->add(57.92);
@@ -73,12 +73,12 @@ void serializeFloatBlockTest()
     Serializer* s = new Serializer();
     b->serialize(s);
 
-    FloatBlock* newB = new FloatBlock();
+    DoubleBlock* newB = new DoubleBlock();
     newB->deserialize(s);
 
     assert(b->equals(newB));
 
-    printf("Serialize float block test passed!\n");
+    printf("Serialize double block test passed!\n");
 
     delete b;
     delete s;
@@ -178,12 +178,12 @@ void serializeColumnArrTest() {
 	
 	ColumnArray* ca = new ColumnArray(store, k);
 	size_t numElems = 7;
-	float* flts = new float[numElems];
+	double* dbls = new double[numElems];
 	for (size_t i = 0; i < numElems; i++) {
-		flts[i] = (i * 1.5f);
+		dbls[i] = (i * 1.5f);
 	}
 	
-	ca->add_column_fromarray(7, flts);
+	ca->add_column_fromarray(7, dbls);
 	
 	Serializer* s = new Serializer();
     ca->serialize(s);
@@ -204,7 +204,7 @@ int main()
 {
     serializeKeyTest();
     serializeBoolBlockTest();
-    serializeFloatBlockTest();
+    serializeDoubleBlockTest();
     serializeSchemaTest();
     serializeColumnTest();
 	serializeDistArrTest();

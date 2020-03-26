@@ -9,7 +9,7 @@
 #include "intblock.h"
 #include "boolblock.h"
 #include "stringblock.h"
-#include "floatblock.h"
+#include "doubleblock.h"
 
 #include <stddef.h>
 #include <math.h>
@@ -17,7 +17,7 @@
 
 enum ColType {
     Str = 0, 
-    Float = 1, 
+    Double = 1, 
     Boolean = 2, 
     Integer = 3
 };
@@ -35,7 +35,7 @@ public:
     size_t size_;     //how many elements are in the column, in theory
     DistributedArray* blocks_; //owned, arr of the keys for data in this column
     KVStore* store_;
-    ColType type_; //what time of column (bool, int, float, string)
+    ColType type_; //what time of column (bool, int, double, string)
     Key* baseKey_; //owned
 
     /** Default constructor: start column to fit two elements. Steals key ownership */
@@ -67,15 +67,6 @@ public:
         store_ = store;
     }
 
-    /** Constructor allows you to set the starting capacity of
-     * the column */
-     //maybe we need this?
-    /*Column(size_t capacity)
-    {
-        size_ = 0;
-        capacity_ = capacity;
-    }*/
-
 	/** 
      * Get character representation of column's type
      */
@@ -89,8 +80,8 @@ public:
                 return 'S';
             case ColType::Boolean:
                 return 'B';
-            case ColType::Float:
-                return 'F';
+            case ColType::Double:
+                return 'D';
             default:
                 fprintf(stderr, "Unknown enum data type");
                 exit(-1);
@@ -132,9 +123,9 @@ public:
         }
     }
 
-    void push_back(float val) {
-        if (type_ != ColType::Float) {
-            fprintf(stderr, "Cannot add float to column of type %c", getCharType());
+    void push_back(double val) {
+        if (type_ != ColType::Double) {
+            fprintf(stderr, "Cannot add double to column of type %c", getCharType());
             exit(1);
         }
     }
@@ -196,17 +187,17 @@ public:
 		delete block;
     }
     
-    /** Add an entire list of floats to this column*/
-    void add_all(size_t len, float* vals) {
-        if (type_ != ColType::Float) {
-            fprintf(stderr, "Cannot add float to column of type %c", getCharType());
+    /** Add an entire list of doubles to this column*/
+    void add_all(size_t len, double* vals) {
+        if (type_ != ColType::Double) {
+            fprintf(stderr, "Cannot add double to column of type %c", getCharType());
             exit(1);
         }
-		FloatBlock* block = new FloatBlock();
+		DoubleBlock* block = new DoubleBlock();
         size_t len_added = 0;
         while (len_added < len) {
 			size_t amount_to_add = std::min((len - len_added), BLOCK_SIZE);
-            //FloatBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
+            //DoubleBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
             for (size_t i = len_added; i < len_added + amount_to_add; i++) {
                 block->add(vals[i]);
             }
@@ -257,10 +248,10 @@ public:
     {
     }
     
-	float get_float(size_t idx) {
-        if (!properType(ColType::Float))
+	double get_double(size_t idx) {
+        if (!properType(ColType::Double))
         {
-            fprintf(stderr, "Cannot get float from non-float col");
+            fprintf(stderr, "Cannot get double from non-double col");
             return -1;
         }
 
@@ -269,7 +260,7 @@ public:
 
         //Key to look up data
         Key* k = genKey_(chunk);
-		float out = blocks_->getFloat(k, idxInChunk);
+		double out = blocks_->getDouble(k, idxInChunk);
 		delete k;
 		return out;
      }
@@ -357,7 +348,7 @@ public:
             case 'I': return ColType::Integer;
             case 'S': return ColType::Str;
             case 'B': return ColType::Boolean;
-            case 'F': return ColType::Float;
+            case 'D': return ColType::Double;
             default:
                 fprintf(stderr, "Unknown char data type: %c\n", c);
                 exit(-1);

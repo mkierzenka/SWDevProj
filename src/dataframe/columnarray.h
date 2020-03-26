@@ -18,35 +18,26 @@ class ColumnArray : public Object
 {
 public:
 	KVStore* store_; // NOT OWNED
-	//Column **colList_; //list of columns, owned
 	ColArray* colList_; //list of columns, owned
 	Key* dfKey_; //key of dataframe this column array belongs to
-	//DistributedArray* colList_; //owned
 
 	// constructor
 	ColumnArray(KVStore* store, Key* k)
 	{
 		store_ = store;
 		dfKey_ = k;
-		//capacity_ = 2;
-		//colList_ = new Column*[capacity_];
 		colList_ = new ColArray();
-		//colList_ = new DistributedArray(store_);
-		//len_ = 0;
 	}
 
 	// destructor
 	~ColumnArray()
 	{
-		//deleteColList_();
 		delete colList_;
 	}
 
 	/** Serialize a ColumnArray into char* representation */
 	void serialize(Serializer* s)
 	{
-		//will elements be serialized as objects or columns?
-		//colList_->serializeAsColumnArray(s);
 		colList_->serialize(s);
 		dfKey_->serialize(s);
 	}
@@ -107,36 +98,6 @@ public:
 		Object* colObj = colList_->get(index);
 		return dynamic_cast<Column*>(colObj);
 	}
-	
-	/**
-	 * Get the type of the specified column. Exits if invalid index
-	 */
-	/*char getType(size_t index) {
-		Column* col = get(index); // <-- will error if invalid index
-		return col->get_type();
-		/*IntColumn *ic = col->as_int();
-		FloatColumn *fc = col->as_float();
-		BoolColumn *bc = col->as_bool();
-		StringColumn *sc = col->as_string();
-		if (ic != nullptr)
-		{
-		  return ic->get_type();
-		}
-		else if (fc != nullptr)
-		{
-		  return fc->get_type();
-		}
-		else if (bc != nullptr)
-		{
-		  return bc->get_type();
-		}
-		else if (sc != nullptr)
-		{
-		  return sc->get_type();
-		}
-		//doesn't match any types, so delegate to Column
-		return col->get_type();*/
-	//}
 
 	/**
 	 * Appends column to this columnarray. Does not make copy
@@ -148,10 +109,10 @@ public:
 
 	/** Create a new column of the given types and add in the elements, chunks at a
 	 * time */
-	void add_column_fromarray(size_t numElements, float* elements)
+	void add_column_fromarray(size_t numElements, double* elements)
 	{	
 		//create column
-		Column* c = new Column(store_, dfKey_->addIndex(length()), ColType::Float); //column steals ownership
+		Column* c = new Column(store_, dfKey_->addIndex(length()), ColType::Double); //column steals ownership
 
 		//add all data to the column
 		c->add_all(numElements, elements);
@@ -209,18 +170,10 @@ public:
 		return colList_->index_of(c);
 	}
 
-	// remove all elements in the array
-/*	void clear()
-	{
-		deleteColList_();
-		capacity_ = 2;
-		colList_ = new Column *[capacity_];
-		len_ = 0;
-	}*/
 	// ========== METHODS WORKING WITH ELEMENTS IN COLUMNS ==========
 
 	
-	/** Return the value at the given column and row. Accessing rows or
+  /** Return the value at the given column and row. Accessing rows or
    *  columns out of bounds, or request the wrong type is undefined.*/
   int get_int(size_t col, size_t row)
   {
@@ -236,11 +189,11 @@ public:
 	return c->get_bool(row);
   }
 
-  float get_float(size_t col, size_t row)
+  double get_double(size_t col, size_t row)
   {
     Column* c = colList_->get(col);
 	//can check the type in the row
-	return c->get_float(row);
+	return c->get_double(row);
   }
 
   // gets the actual String*, no copy
@@ -250,75 +203,32 @@ public:
 	//can check the type in the row
 	return c->get_string(row);
   }
-	
-	/** Set the value at the given column and row to the given value.
-    * If the column is not  of the right type or the indices are out of
-    * bound, the result is undefined. */
-//   void set(size_t col, size_t row, int val)
-//   {
-//     IntColumn *tmp = safeConvertIntCol_(col);
-//     tmp->set(row, val);
-//   }
 
-//   void set(size_t col, size_t row, bool val)
-//   {
-//     BoolColumn *tmp = safeConvertBoolCol_(col);
-//     tmp->set(row, val);
-//   }
 
-//   void set(size_t col, size_t row, float val)
-//   {
-// 	FloatColumn *tmp = safeConvertFloatCol_(col);
-//     tmp->set(row, val);
-//   }
-
-//   void set(size_t col, size_t row, String *val)
-//   {
-// 	StringColumn *tmp = safeConvertStringCol_(col);
-//     tmp->set(row, val);
-//   }
-	
-	
 	/** Type appropriate push_back methods. Appends the element to the end of the
 	* specified column. Calling the wrong method is undefined behavior. **/
     void push_back(size_t col, int val) {
-		//IntColumn *tmp = safeConvertIntCol_(col);
-		//tmp->push_back(val);
-
 		Column* c = dynamic_cast<Column*>(colList_->get(col));
 		//can check the type in the row
 		return c->push_back(val);
 	}
 
     void push_back(size_t col, bool val) {
-		//BoolColumn *tmp = safeConvertBoolCol_(col);
-		//tmp->push_back(val);
 		Column* c = dynamic_cast<Column*>(colList_->get(col));
 		//can check the type in the row
 		return c->push_back(val);
 	}
 
-    void push_back(size_t col, float val) {
-		//FloatColumn *tmp = safeConvertFloatCol_(col);
-		//tmp->push_back(val);
+    void push_back(size_t col, double val) {
 		Column* c = dynamic_cast<Column*>(colList_->get(col));
 		//can check the type in the row
 		return c->push_back(val);
 	}
 
     void push_back(size_t col, String *val) {
-		//StringColumn *tmp = safeConvertStringCol_(col);
-		//tmp->push_back(val);
 		Column* c = dynamic_cast<Column*>(colList_->get(col));
 		//can check the type in the row
 		return c->push_back(val);
 	}
-	
-	/*void errorIfOutOfBounds_(size_t colIdx) {
-		if (colIdx >= len_) {
-		  fprintf(stderr, "Out-Of-Bounds Error: cannot get column from index %zu", colIdx);
-		  exit(1);
-		}
-	}*/
   
 };

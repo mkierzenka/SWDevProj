@@ -34,8 +34,8 @@ void addToRow(Row* row, const char* elemStr, const char type, size_t idx) {
 		case 'I':
 			row->set(idx, atoi(elemStr));
 			break;
-		case 'F':
-			row->set(idx, static_cast<float>(atof(elemStr))); // so it isn't interpretted as double
+		case 'D':
+			row->set(idx, atod(elemStr));
 			break;
 		case 'S':
 		{
@@ -133,9 +133,9 @@ void validateDF(DataFrame* df) {
   assert(df->get_int(0, 0) == -343033);
   assert(df->get_bool(1, 0) == false);
   assert(df->get_string(2, 0)->equals(new String("inflexive")));
-  assert(df->get_float(3, 0) == -8184.767578f);
+  assert(df->get_double(3, 0) == -8184.767578);
   assert(df->get_string(6, 675876)->equals(new String("Cynurus")));
-  assert(df->get_float(11, 961309) == 8329.041016f);
+  assert(df->get_double(11, 961309) == 8329.041016);
   assert(df->get_bool(5, 1099999) == true);
   
 }
@@ -146,10 +146,10 @@ void validateHaystack(DataFrame* df) {
 	assert(df->get_int(0, 0) == 1573390);
 	assert(df->get_string(1, 0)->equals(new String("crawl's")));
 	assert(df->get_bool(2, 0) == true);
-	assert(df->get_float(3, 0) == -5871.645508f);
+	assert(df->get_double(3, 0) == -5871.645508);
 	assert(df->get_string(5, 39)->equals(new String("Marist")));
 	assert(df->get_int(4, 85) == -905910);
-	assert(df->get_float(7, 92) == -3794.611572f);
+	assert(df->get_double(7, 92) == -3794.611572);
 }
 
 int main()

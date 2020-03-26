@@ -12,9 +12,7 @@
 #include "intblock.h"
 #include "boolblock.h"
 #include "stringblock.h"
-#include "floatblock.h"
-
-//class KVStore;
+#include "doubleblock.h"
 
 /**
  * This class represents a distributed array. It holds a list of keys
@@ -99,17 +97,17 @@ public:
     }
 	
 	/**
-	 * Get specific float from a value stored with key k
+	 * Get specific double from a value stored with key k
 	 */
-    float getFloat(Key *k, size_t itemIdx)
+    double getDouble(Key *k, size_t itemIdx)
     {
-		FloatBlock* floatData = getFloatBlock_(k);
-		if (floatData == nullptr) {
-			fprintf(stderr, "Unable to get float from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
+		DoubleBlock* doubleData = getDoubleBlock_(k);
+		if (doubleData == nullptr) {
+			fprintf(stderr, "Unable to get double from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
-		float out = floatData->get(itemIdx);
-		delete floatData;
+		double out = doubleData->get(itemIdx);
+		delete doubleData;
 		return out;
     }
 
@@ -204,13 +202,13 @@ public:
         return hash_;
     }
 	
-	/** Returns the Value mapped to this key, deserialized as a float block
+	/** Returns the Value mapped to this key, deserialized as a double block
 	 *  Caller is expected to delete the block
 	 */
-	FloatBlock* getFloatBlock_(Key* k) {
+	DoubleBlock* getDoubleBlock_(Key* k) {
 		Value* val = get(k);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
-		FloatBlock* out = new FloatBlock();
+		DoubleBlock* out = new DoubleBlock();
 		out->deserialize(s);
 		delete s;
 		return out;
