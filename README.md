@@ -4,12 +4,21 @@
 
 ### Notes for things to improve from before:
 
+* Does columnarray need push_back? ColArr has it too. Do we even use it?
 
 * Clean up client and server, try to get more than two clients to connect successfully
 
 * (Marcin) Rename float references to double
 
 * Do we need both ColumnArray and ColArr?
+
+* Fix generalTests to use Column and check all 4 types
+
+* Do we want DataFrame.add_row() and Column.push_back()? If not, delete memTest
+
+* Sorer code- make the arrays use our array instead of reimplementing functionality
+
+* Sorer code- merge Types enum and our col type enum
 
 * Fix old tests to compile/run/pass
 
