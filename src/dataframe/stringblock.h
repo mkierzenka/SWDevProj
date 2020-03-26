@@ -7,7 +7,7 @@
 
 
 /**
-* StringBlock - to represent a block of String*.
+* StringBlock - to represent a block of Strings.
 *
 */
 class StringBlock : public Block
@@ -17,7 +17,6 @@ public:
 	size_t size_;
 	size_t capacity_;
 
-	// constructor
 	StringBlock()
 	{
 		capacity_ = BLOCK_SIZE;
@@ -26,12 +25,9 @@ public:
 		memset(vals_, 0, capacity_ * sizeof(String*));
 	}
 
-	// deconstructor
 	~StringBlock()
 	{
-		for (size_t i = 0; i < size_; i++) {
-			delete vals_[i];
-		}
+		clear(); //expected that this calls delete on each String
 		delete[] vals_;
 	}
 	
@@ -62,7 +58,7 @@ public:
 		}
 	}
 
-	// get the String with the index in the array
+	/** Get a clone of the String with the index in the block */
 	String* get(size_t index)
 	{
 		// check for out-of-bounds
@@ -71,10 +67,12 @@ public:
 			fprintf(stderr, "Out-Of-Bounds Error: cannot get value from index %zu", index);
 			exit(1);
 		}
-		return vals_[index];
+		return vals_[index]->clone();
 	}
 
-	// add String to end of this block, does not clone. Now owns s. if can't fit, return -1
+	/** Adds the String to end of this block, does not clone. Now owns.
+	 * If can't fit, return -1
+	 */
 	int add(String* s)
 	{
 		if (size_ >= capacity_)
@@ -85,7 +83,7 @@ public:
 		size_++;
 	}
 
-	// set the element in the given index to a clone of the given String
+	/** Set the element in the given index to a clone of the given String */
 	void set(size_t index, String* s)
 	{
 		// check for out-of-bounds
@@ -138,5 +136,13 @@ public:
 
 		return hash_;
 	}
-
+	
+	/** Clears the memory in this StringBlock, deleting each String ptr */
+	void clear() {
+		for (size_t i = 0; i < size_; i++) {
+			delete vals_[i];
+		}
+		memset(vals_, 0, capacity_ * sizeof(int));
+		size_ = 0;
+	}
 };

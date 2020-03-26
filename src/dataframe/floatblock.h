@@ -5,17 +5,14 @@
 
 
 /**
-* FloatBlock - to represent a block of float.
+* FloatBlock - to represent a block of floats.
 *
 */
 class FloatBlock : public Block
 {
 public:
-	float* vals_; //list of float, owned
-	size_t size_;
-	size_t capacity_;
+	float* vals_; //list of floats, owned
 
-	// constructor
 	FloatBlock()
 	{
 		capacity_ = BLOCK_SIZE;
@@ -24,7 +21,6 @@ public:
 		memset(vals_, 0, capacity_ * sizeof(float));
 	}
 
-	// deconstructor
 	~FloatBlock()
 	{
 		delete[] vals_;
@@ -51,7 +47,7 @@ public:
 		}
 	}
 
-	// get the float with the index in the array
+	/** Gets the float at the specified index of the array */
 	float get(size_t index)
 	{
 		// check for out-of-bounds
@@ -63,7 +59,7 @@ public:
 		return vals_[index];
 	}
 
-	// add float to end of this block. if can't fit, return -1
+	/** Adds the float to end of this block. If can't fit, return -1. */
 	int add(float s)
 	{
 		if (size_ >= capacity_)
@@ -74,7 +70,7 @@ public:
 		size_++;
 	}
 
-	// set the element in the given index to the given float
+	/** Set the float at the given index */
 	void set(size_t index, float s)
 	{
 		// check for out-of-bounds
@@ -129,5 +125,11 @@ public:
 		}
 
 		return hash_;
+	}
+	
+	/** Clears the memory in this FloatBlock */
+	void clear() {
+		memset(vals_, 0, capacity_ * sizeof(float));
+		size_ = 0;
 	}
 };

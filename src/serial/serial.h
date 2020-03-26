@@ -11,7 +11,7 @@
 
 class Serializer {
 public:
-	const size_t BUFFER_SIZE_ = 1024;
+	const size_t BUFFER_SIZE_ = 8192;//1024;
 	char* buffer_;			// owned
 	char* curBuffPtrWrite_;	// just points to a place in buffer_
 	char* curBuffPtrRead_;	// just points to a place in buffer_

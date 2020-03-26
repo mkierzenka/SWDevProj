@@ -18,7 +18,7 @@
 class Cache : public Object
 {
 public:
-    size_t maxSize_ = 5; //maximum size of the cache; this value can be altered
+    size_t maxSize_ = 15; //maximum size of the cache; this value can be altered
     Map *data_;          //data being stored in cache
     Queue *keyOrder_;    //keeps track of order in which keys added to cache
 

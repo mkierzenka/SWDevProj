@@ -153,11 +153,53 @@ public:
 		//create column
 		Column* c = new Column(store_, dfKey_->addIndex(length()), ColType::Float); //column steals ownership
 
+		//add all data to the column
+		c->add_all(numElements, elements);
+
 		//add column to column array
 		add_column(c);
+	}
+
+	/** Create a new column of the given types and add in the elements, chunks at a
+	 * time */
+	void add_column_fromarray(size_t numElements, int* elements)
+	{	
+		//create column
+		Column* c = new Column(store_, dfKey_->addIndex(length()), ColType::Integer); //column steals ownership
 
 		//add all data to the column
 		c->add_all(numElements, elements);
+
+		//add column to column array
+		add_column(c);
+	}
+	
+	/** Create a new column of the given types and add in the elements, chunks at a
+	 * time */
+	void add_column_fromarray(size_t numElements, bool* elements)
+	{	
+		//create column
+		Column* c = new Column(store_, dfKey_->addIndex(length()), ColType::Boolean); //column steals ownership
+
+		//add all data to the column
+		c->add_all(numElements, elements);
+
+		//add column to column array
+		add_column(c);
+	}
+	
+	/** Create a new column of the given types and add in the elements, chunks at a
+	 * time */
+	void add_column_fromarray(size_t numElements, String** elements)
+	{	
+		//create column
+		Column* c = new Column(store_, dfKey_->addIndex(length()), ColType::Str); //column steals ownership
+
+		//add all data to the column
+		c->add_all(numElements, elements);
+
+		//add column to column array
+		add_column(c);
 	}
 
 	// get the index of the given Column

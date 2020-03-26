@@ -4,17 +4,14 @@
 #include "../serial/serial.h"
 
 /**
-* IntBlock - to represent a block of ints.
+* IntBlock - to represent a block of integers.
 *
 */
 class IntBlock : public Block
 {
 public:
 	int* vals_; //list of ints, owned
-	size_t size_;
-	size_t capacity_;
 
-	// constructor
 	IntBlock()
 	{
 		capacity_ = BLOCK_SIZE;
@@ -23,7 +20,6 @@ public:
 		memset(vals_, 0, capacity_ * sizeof(int));
 	}
 
-	// deconstructor
 	~IntBlock()
 	{
 		delete[] vals_;
@@ -50,7 +46,7 @@ public:
 		}
 	}
 
-	// get the int with the index in the array
+	/** Gets the int at the specified index of the array */
 	int get(size_t index)
 	{
 		// check for out-of-bounds
@@ -62,7 +58,7 @@ public:
 		return vals_[index];
 	}
 
-	// add int to end of this block. if can't fit, return -1
+	/** Adds the int to end of this block. If can't fit, return -1 */
 	int add(int n)
 	{
 		if (size_ >= capacity_)
@@ -73,7 +69,7 @@ public:
 		size_++;
 	}
 
-	// set the element in the given index to the given object
+	/** Sets the element at the given index */
 	void set(size_t index, int v)
 	{
 		// check for out-of-bounds
@@ -125,5 +121,11 @@ public:
 		}
 
 		return hash_;
+	}
+	
+	/** Clears the memory in this IntBlock */
+	void clear() {
+		memset(vals_, 0, capacity_ * sizeof(int));
+		size_ = 0;
 	}
 };

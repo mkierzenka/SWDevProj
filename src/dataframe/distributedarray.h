@@ -9,6 +9,10 @@
 #include "../store/kvstore.h"
 #include "../utils/object.h"
 #include "../serial/serial.h"
+#include "intblock.h"
+#include "boolblock.h"
+#include "stringblock.h"
+#include "floatblock.h"
 
 //class KVStore;
 
@@ -92,10 +96,71 @@ public:
 
         return val;
     }
+	
+	/**
+	 * Get specific float from a value stored with key k
+	 */
+    float getFloat(Key *k, size_t itemIdx)
+    {
+		FloatBlock* floatData = getFloatBlock_(k);
+		if (floatData == nullptr) {
+			fprintf(stderr, "Unable to get float from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
+			exit(1);
+		}
+		float out = floatData->get(itemIdx);
+		delete floatData;
+		return out;
+    }
+
+	/**
+	 * Get specific boolean from a value stored with key k
+	 */
+    bool getBool(Key *k, size_t itemIdx)
+    {
+		BoolBlock* boolData = getBoolBlock_(k);
+		if (boolData == nullptr) {
+			fprintf(stderr, "Unable to get boolean from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
+			exit(1);
+		}
+		bool out = boolData->get(itemIdx);
+		delete boolData;
+		return out;
+    }
+
+	/**
+	 * Get specific integer from a value stored with key k
+	 */
+    int getInt(Key *k, size_t itemIdx)
+    {
+		IntBlock* intData = getIntBlock_(k);
+		if (intData == nullptr) {
+			fprintf(stderr, "Unable to get integer from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
+			exit(1);
+		}
+		int out = intData->get(itemIdx);
+		delete intData;
+		return out;
+    }
+
+	/**
+	 * Get specific string from a value stored with key k.
+	 * Caller is responsible for deleting the String returned
+	 */
+    String* getString(Key *k, size_t itemIdx)
+    {
+		StringBlock* strData = getStrBlock_(k);
+		if (strData == nullptr) {
+			fprintf(stderr, "Unable to get string from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
+			exit(1);
+		}
+		String* out = strData->get(itemIdx); //get should have cloned it
+		delete strData;
+		return out;
+    }
 
     /**
-         * Gets key with specified index in array, then get data for that key
-         */
+     * Gets key with specified index in array, then get data for that key
+     */
     Value *get(size_t idx)
     {
         return get(getKeyAtIndex(idx));
@@ -137,4 +202,55 @@ public:
 
         return hash_;
     }
+	
+	/** Returns the Value mapped to this key, deserialized as a float block
+	 *  Caller is expected to delete the block
+	 */
+	FloatBlock* getFloatBlock_(Key* k) {
+		Value* val = get(k);
+		Serializer* s = new Serializer(val->getSize(), val->getData());
+		FloatBlock* out = new FloatBlock();
+		out->deserialize(s);
+		delete s;
+		return out;
+	}
+
+	/** Returns the Value mapped to this key, deserialized as a bool block.
+	 *  Caller is expected to delete the block
+	 */
+	BoolBlock* getBoolBlock_(Key* k) {
+		Value* val = get(k);
+		Serializer* s = new Serializer(val->getSize(), val->getData());
+		BoolBlock* out = new BoolBlock();
+		out->deserialize(s);
+		delete s;
+		return out;
+	}
+
+	/** Returns the Value mapped to this key, deserialized as a int block.
+	 *  Caller is expected to delete the block
+	 */
+	IntBlock* getIntBlock_(Key* k) {
+		Value* val = get(k);
+		Serializer* s = new Serializer(val->getSize(), val->getData());
+		IntBlock* out = new IntBlock();
+		out->deserialize(s);
+		delete s;
+		return out;
+	}
+
+
+	/** Returns the Value mapped to this key, deserialized as a string block.
+	 *  Caller is expected to delete the block
+	 */
+	StringBlock* getStrBlock_(Key* k) {
+		Value* val = get(k);
+		Serializer* s = new Serializer(val->getSize(), val->getData());
+		StringBlock* out = new StringBlock();
+		out->deserialize(s);
+		delete s;
+		return out;
+	}	
+
+	
 };
