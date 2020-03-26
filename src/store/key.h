@@ -82,7 +82,7 @@ public:
 
     size_t hash_me_()
     {
-        return reinterpret_cast<size_t>(kStr_) + homeNode_;
+        return kStr_->hash() + homeNode_;
     }
 	
 	/** Returns a new Key with cloned values */
