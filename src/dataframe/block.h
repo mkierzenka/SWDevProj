@@ -2,7 +2,7 @@
 
 #include "../utils/object.h"
 
-static const size_t BLOCK_SIZE = 2048;
+static const size_t BLOCK_SIZE = 1024;//2048;
 
 /**
 * Block - to represent a block of one type of data.

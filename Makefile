@@ -23,8 +23,8 @@ ourTests:
 	#./tests/testSorer data/datafile.sor
 	
 memory:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testSorer data/datafile.sor
-
+	#valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testSorer data/datafile.sor
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testTrivial
 
 .SILENT: clean
 clean:
