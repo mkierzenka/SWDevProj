@@ -9,4 +9,4 @@
  *
  * Author: cao.yuan1@husky.neu.edu & zhan.d@husky.neu.edu
  */
-enum Types{ FIELD=0, BOOL=1, INT=2, FLOAT=3, STRING=4 };
+enum Types{ FIELD=0, BOOL=1, INT=2, DOUBLE=3, STRING=4 };

@@ -6,7 +6,6 @@
 #include <string.h>
 #include <stdio.h>
 
-
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -41,7 +40,7 @@ int main(int argc, char **argv) {
     assert(d->get_int(0, 0) == -1437879);
     assert(d->get_bool(1, 0) == false);
     assert(d->get_bool(1, 1) == true);
-    assert(d->get_float(3, 0) - 1040.435425 < 0.00001);
+    assert(d->get_double(3, 0) - 1040.435425 < 0.00001);
     assert(strcmp(d->get_string(2, 0)->c_str(), "inflexive") == 0);
     assert(strcmp(d->get_string(2, 1)->c_str(), "abdominal's") == 0);
     assert(strcmp(d->get_string(2, 2)->c_str(), "discourtesy's") == 0);
@@ -51,19 +50,7 @@ int main(int argc, char **argv) {
     puts("Dataframe successfully transferred!");
 
     LengthRower* lr = new LengthRower(d);
-
-    //add extra column to store results of rower
-    IntColumn* lenResults = new IntColumn();
-    for (int i = 0; i < d->nrows(); i++)
-    {
-        lenResults->push_back(0);
-    }
-
-    d->add_column(lenResults, nullptr);
-
-    size_t lastColIdx = d->ncols() - 1;
     d->map(*lr);
-
 	assert(lr->getLen() == 60631); //check rower is correct
 
 	delete lr;

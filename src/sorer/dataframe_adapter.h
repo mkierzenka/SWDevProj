@@ -42,8 +42,8 @@ public:
                 case INT:
                     row->set(c, get_int_field(file, field_start, field_end));
                     break;
-                case FLOAT:
-                    row->set(c, get_float_field(file, field_start, field_end));
+                case DOUBLE:
+                    row->set(c, get_double_field(file, field_start, field_end));
                     break;
                 case STRING:
                 {
@@ -95,8 +95,8 @@ public:
             return 'B';
         case INT:
             return 'I';
-        case FLOAT:
-            return 'F';
+        case DOUBLE:
+            return 'D';
         case STRING:
             return 'S';
         default:
@@ -122,7 +122,7 @@ public:
         return (file[new_start] == '1') ? true : false;
     }
 
-    float get_float_field(char *file, int start, int end)
+    double get_double_field(char *file, int start, int end)
     {
         // remove empty spaces in front
         size_t new_start = triml(file, start, end);

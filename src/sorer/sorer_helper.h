@@ -100,7 +100,7 @@ inline Types parse_field_type(char* file, size_t start, size_t end) {
             }
             strtold(&file[start], &endptr);
             if ((size_t) (endptr - &file[start]) == end - start + 1) {
-                return Types::FLOAT;
+                return Types::DOUBLE;
             }
             for (size_t i = start; i <= end; ++i) {
                 if (isspace(file[i])) {
@@ -311,8 +311,8 @@ inline void print_type(Types t) {
         case Types::INT:
             std::cout << "INT" << "\n";
             break;
-        case Types::FLOAT:
-            std::cout << "FLOAT" << "\n";
+        case Types::DOUBLE:
+            std::cout << "DOUBLE" << "\n";
             break;
         case Types::STRING:
             std::cout << "STRING" << "\n";
@@ -348,7 +348,7 @@ inline void print_field(char *file, int start, int end, Types t) {
             case Types::INT:
                 std::cout << strtoll(&file[new_start], nullptr, 10) << "\n";
                 break;
-            case Types::FLOAT:
+            case Types::DOUBLE:
                 std::cout << strtold(&file[new_start], nullptr) << "\n";
                 break;
             case Types::STRING:
