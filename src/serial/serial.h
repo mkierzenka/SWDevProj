@@ -11,39 +11,34 @@
 
 class Serializer {
 public:
-	const size_t BUFFER_SIZE_ = 8192;//1024;
+	const size_t BUFFER_SIZE_ = 4096;//8192;//1024;
 	char* buffer_;			// owned
 	char* curBuffPtrWrite_;	// just points to a place in buffer_
 	char* curBuffPtrRead_;	// just points to a place in buffer_
 	size_t numBytesWritten_;
 	size_t numBytesRead_;
+	size_t capacity_;
 	
 	Serializer() {
-		buffer_ = new char[BUFFER_SIZE_];
-		memset(buffer_, 0, BUFFER_SIZE_);
+		capacity_ = BUFFER_SIZE_;
+		buffer_ = new char[capacity_];
+		memset(buffer_, 0, capacity_);
 		curBuffPtrWrite_ = buffer_;
 		curBuffPtrRead_ = buffer_;
 		numBytesWritten_ = 0;
 		numBytesRead_ = 0;
 	}
 	
-	Serializer(const char* inp) {
-		buffer_ = new char[strlen(inp)];
-		memset(buffer_, 0, strlen(inp));
-		memcpy(buffer_, inp, strlen(inp));
-		curBuffPtrWrite_ = buffer_;
-		curBuffPtrRead_ = buffer_;
-		numBytesWritten_ = strlen(inp);
-		numBytesRead_ = 0;
-	}
+	Serializer(const char* inp) : Serializer(strlen(inp), inp) { }
 
 	Serializer(size_t size, const char* inp) {
-		buffer_ = new char[size];
-		memset(buffer_, 0, size);
-		memcpy(buffer_, inp, size);
+		capacity_ = size;
+		buffer_ = new char[capacity_];
+		memset(buffer_, 0, capacity_);
+		memcpy(buffer_, inp, capacity_);
 		curBuffPtrWrite_ = buffer_;
 		curBuffPtrRead_ = buffer_;
-		numBytesWritten_ = size;
+		numBytesWritten_ = capacity_;
 		numBytesRead_ = 0;
 	}
 	
@@ -59,9 +54,8 @@ public:
 	}
 	
 	void write(double d) {
-		memcpy(curBuffPtrWrite_, &d, sizeof(double));
-		curBuffPtrWrite_ += sizeof(double);
-		numBytesWritten_ += sizeof(double);
+		add_(&d, sizeof(double));
+
 	}
 
 	void write(MsgKind mk) {
@@ -101,54 +95,54 @@ public:
 				out[0]=0;
 		}
 		out[1] = 0;
-		memcpy(curBuffPtrWrite_, &out, 2);
-		curBuffPtrWrite_ += 2;
-		numBytesWritten_ += 2;
+		add_(out, 2);
 	}
 	
 	void write(size_t s) {
-		memcpy(curBuffPtrWrite_, &s, sizeof(size_t));
-		curBuffPtrWrite_ += sizeof(size_t);
-		numBytesWritten_ += sizeof(size_t);
+		add_(&s, sizeof(size_t));
 	}
 	
 	void write(char c) {
-		memcpy(curBuffPtrWrite_, &c, sizeof(char));
-		curBuffPtrWrite_ += sizeof(char);
-		numBytesWritten_ += sizeof(char);
+		add_(&c, sizeof(char));
 	}
 
 	/** Calculates the length using strlen*/
 	void write(const char* str) {
-		//issue with strlen if null byte in middle of string?
-		size_t lenStr = strlen(str); //length of str
-		memcpy(curBuffPtrWrite_, str, lenStr + 1); //add 1 to also copy null terminator
-		curBuffPtrWrite_ += lenStr+1;
-		numBytesWritten_ += lenStr+1;
+		size_t lenStr = strlen(str); //length of str (up to first null byte)
+		add_(str, lenStr + 1); //add 1 to include null terminator
 	}
 
 	void write(short s) {
-		memcpy(curBuffPtrWrite_, &s, sizeof(s));
-		curBuffPtrWrite_ += sizeof(s);
-		numBytesWritten_ += sizeof(s);
+		add_(&s, sizeof(short));
 	}
 
 	void write(long l) {
-		memcpy(curBuffPtrWrite_, &l, sizeof(l));
-		curBuffPtrWrite_ += sizeof(l);
-		numBytesWritten_ += sizeof(l);
+		add_(&l, sizeof(long));
 	}
 
 	void write(int i) {
-		memcpy(curBuffPtrWrite_, &i, sizeof(i));
-		curBuffPtrWrite_ += sizeof(i);
-		numBytesWritten_ += sizeof(i);
+		add_(&i, sizeof(int));
 	}
 	
 	void write(bool b) {
-		memcpy(curBuffPtrWrite_, &b, sizeof(b));
-		curBuffPtrWrite_ += sizeof(b);
-		numBytesWritten_ += sizeof(b);
+		add_(&b, sizeof(bool));
+	}
+	
+	void add_(const void* d, size_t s) {
+		if ((numBytesWritten_ + s) > capacity_) {
+			grow_();
+		}
+		memcpy((buffer_ + numBytesWritten_), d, s);
+		curBuffPtrWrite_ += s;
+		numBytesWritten_ += s;
+	}
+	
+	void grow_() {
+		capacity_ *= 2;
+		char* newBuf = new char[capacity_];
+		memmove(newBuf, buffer_, numBytesWritten_);
+		delete[] buffer_;
+		buffer_ = newBuf;
 	}
 
 	char* readString() {
