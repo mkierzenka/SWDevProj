@@ -152,13 +152,12 @@ public:
             fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
             exit(1);
         }
-        size_t len_left = len;
         size_t len_added = 0;
-        while ((len_added + BLOCK_SIZE) <= len) {
-            //put BLOCK_SIZE data into store_
+        while (len_added < len) {
+			size_t amount_to_add = std::min((len - len_added), BLOCK_SIZE);
             IntBlock* block = new IntBlock();
-            //IntBlock gets ints from vals[len_added] : vals[len_added + BLOCK_SIZE]
-            for (size_t i = len_added; i < len_added + BLOCK_SIZE; i++) {
+            //IntBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
+            for (size_t i = len_added; i < len_added + amount_to_add; i++) {
                 block->add(vals[i]);
             }
 			Serializer* s = new Serializer();
@@ -166,24 +165,8 @@ public:
 			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            len_added += BLOCK_SIZE;
+            len_added += amount_to_add;
         }
-
-        if (len_added < len) {
-            //put rest of values into store
-            IntBlock* block = new IntBlock();
-            //IntBlock gets ints from vals[len_added] : vals[len_added + BLOCK_SIZE]
-            for (size_t i = len_added; i < len; i++) {
-                block->add(vals[i]);
-            }
-			Serializer* s = new Serializer();
-			block->serialize(s);
-			addBlockToStore_(s, len_added / BLOCK_SIZE);
-			delete s;
-			delete block;
-            len_added = len;
-        }
-		
 		size_ += len_added;
     }
 
@@ -193,13 +176,12 @@ public:
             fprintf(stderr, "Cannot add boolean to column of type %c", getCharType());
             exit(1);
         }
-        size_t len_left = len;
         size_t len_added = 0;
-        while ((len_added + BLOCK_SIZE) <= len) {
-            //put BLOCK_SIZE data into store_
+        while (len_added < len) {
+			size_t amount_to_add = std::min((len - len_added), BLOCK_SIZE);
             BoolBlock* block = new BoolBlock();
-            //IntBlock gets ints from vals[len_added] : vals[len_added + BLOCK_SIZE]
-            for (size_t i = len_added; i < len_added + BLOCK_SIZE; i++) {
+            //BoolBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
+            for (size_t i = len_added; i < len_added + amount_to_add; i++) {
                 block->add(vals[i]);
             }
 			Serializer* s = new Serializer();
@@ -207,22 +189,7 @@ public:
 			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            len_added += BLOCK_SIZE;
-        }
-
-        if (len_added < len) {
-            //put rest of values into store
-            BoolBlock* block = new BoolBlock();
-            //BoolBlock gets ints from vals[len_added] : vals[len_added + BLOCK_SIZE]
-            for (size_t i = len_added; i < len; i++) {
-                block->add(vals[i]);
-            }
-			Serializer* s = new Serializer();
-			block->serialize(s);
-			addBlockToStore_(s, len_added / BLOCK_SIZE);
-			delete s;
-			delete block;
-            len_added = len;
+            len_added += amount_to_add;
         }
 		size_ += len_added;
     }
@@ -233,13 +200,12 @@ public:
             fprintf(stderr, "Cannot add float to column of type %c", getCharType());
             exit(1);
         }
-        size_t len_left = len;
         size_t len_added = 0;
-        while ((len_added + BLOCK_SIZE) <= len) {
-            //put BLOCK_SIZE data into store_
+        while (len_added < len) {
+			size_t amount_to_add = std::min((len - len_added), BLOCK_SIZE);
             FloatBlock* block = new FloatBlock();
-            //IntBlock gets ints from vals[len_added] : vals[len_added + BLOCK_SIZE]
-            for (size_t i = len_added; i < len_added + BLOCK_SIZE; i++) {
+            //FloatBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
+            for (size_t i = len_added; i < len_added + amount_to_add; i++) {
                 block->add(vals[i]);
             }
 			Serializer* s = new Serializer();
@@ -247,22 +213,7 @@ public:
 			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            len_added += BLOCK_SIZE;
-        }
-
-        if (len_added < len) {
-            //put rest of values into store
-            FloatBlock* block = new FloatBlock();
-            //FloatBlock gets ints from vals[len_added] : vals[len_added + BLOCK_SIZE]
-            for (size_t i = len_added; i < len; i++) {
-                block->add(vals[i]);
-            }
-			Serializer* s = new Serializer();
-			block->serialize(s);
-			addBlockToStore_(s, len_added / BLOCK_SIZE);
-			delete s;
-			delete block;
-            len_added = len;
+            len_added += amount_to_add;
         }
 		size_ += len_added;
     }
@@ -273,38 +224,21 @@ public:
             fprintf(stderr, "Cannot add String to column of type %c", getCharType());
             exit(1);
         }
-        size_t len_left = len;
         size_t len_added = 0;
-        while ((len_added + BLOCK_SIZE) <= len) {
-            //put BLOCK_SIZE data into store_
+        while (len_added < len) {
+			size_t amount_to_add = std::min((len - len_added), BLOCK_SIZE);
             StringBlock* block = new StringBlock();
-            //StringBlock gets ints from vals[len_added] : vals[len_added + BLOCK_SIZE]
-            for (size_t i = len_added; i < len_added + BLOCK_SIZE; i++) {
-                block->add(vals[i]->clone());
+            //StringBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
+            for (size_t i = len_added; i < len_added + amount_to_add; i++) {
+                block->add(vals[i]);
             }
 			Serializer* s = new Serializer();
 			block->serialize(s);
 			addBlockToStore_(s, len_added / BLOCK_SIZE);
 			delete s;
 			delete block;
-            len_added += BLOCK_SIZE;
+            len_added += amount_to_add;
         }
-
-        if (len_added < len) {
-            //put rest of values into store
-            StringBlock* block = new StringBlock();
-            //StringBlock gets Strings from vals[len_added] : vals[len_added + BLOCK_SIZE]
-            for (size_t i = len_added; i < len; i++) {
-                block->add(vals[i]->clone());
-            }
-			Serializer* s = new Serializer();
-			block->serialize(s);
-			addBlockToStore_(s, len_added / BLOCK_SIZE);
-			delete s;
-			delete block;
-            len_added = len;
-        }
-		
 		size_ += len_added;
     }
 	
