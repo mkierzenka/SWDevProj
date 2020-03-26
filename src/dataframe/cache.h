@@ -18,12 +18,24 @@
 class Cache : public Object
 {
 public:
-    size_t maxSize_ = 15; //maximum size of the cache; this value can be altered
+    size_t maxSize_;     //maximum size of the cache
     Map *data_;          //data being stored in cache
     Queue *keyOrder_;    //keeps track of order in which keys added to cache
 
-    Cache()
+    Cache() : Cache(15) {}
+
+    /**
+     * Constructor to specify max size of cache
+     */
+    Cache(size_t max) : Object()
     {
+        if (max == 0)
+        {
+            fprintf(stderr, "Can't have cache with max size 0\n");
+            exit(-1);
+        }
+
+        maxSize_ = max;
         data_ = new Map();
         keyOrder_ = new Queue();
     }
@@ -63,8 +75,9 @@ public:
             removeFirstAddedElement_();
         }
 
-        data_->put(k, val);
-        keyOrder_->push(k);
+        data_->put(k->clone(), val->clone());
+        keyOrder_->push(k->clone());
+        assert(data_->size() == keyOrder_->size());
     }
 
     /**
@@ -125,6 +138,7 @@ public:
         }
 
         data_->remove(k);
+        assert(data_->size() == keyOrder_->size());
         return k;
     }
 };
