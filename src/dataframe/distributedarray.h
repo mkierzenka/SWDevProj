@@ -101,27 +101,21 @@ public:
     double getDouble(Key *k, size_t itemIdx)
     {
 		DoubleBlock* doubleData = nullptr;
-		if (cache_->containsKey(k))
+		if (!(cache_->containsKey(k)))
         {
-            doubleData = dynamic_cast<DoubleBlock*>(cache_->getBlock(k));
-        }
-		if (doubleData == nullptr) {
-			//get data from store and cache
+            //get data from store and cache
 			DoubleBlock* val = getDoubleBlockFromStore_(k);
 			if (val != nullptr) {
 				cache_->put(k, val);
-				doubleData = val;
+				delete val;
 			}
-		}
-		//DoubleBlock* doubleData = dynamic_cast<DoubleBlock*>(get(k));//getDoubleBlock_(k);
-		
+        }
+		doubleData = dynamic_cast<DoubleBlock*>(cache_->getBlock(k));
 		if (doubleData == nullptr) {
 			fprintf(stderr, "Unable to get double from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
-		double out = doubleData->get(itemIdx);
-		//delete doubleData;
-		return out;
+		return doubleData->get(itemIdx);
     }
 
 	/**
@@ -129,15 +123,22 @@ public:
 	 */
     bool getBool(Key *k, size_t itemIdx)
     {
-		//BoolBlock* boolData = getBoolBlock_(k);
-		BoolBlock* boolData = dynamic_cast<BoolBlock*>(cache_->getBlock(k));
+		BoolBlock* boolData = nullptr;
+		if (!(cache_->containsKey(k)))
+        {
+            //get data from store and cache
+			BoolBlock* val = getBoolBlockFromStore_(k);
+			if (val != nullptr) {
+				cache_->put(k, val);
+				delete val;
+			}
+        }
+		boolData = dynamic_cast<BoolBlock*>(cache_->getBlock(k));
 		if (boolData == nullptr) {
 			fprintf(stderr, "Unable to get boolean from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
-		bool out = boolData->get(itemIdx);
-		//delete boolData;
-		return out;
+		return boolData->get(itemIdx);
     }
 
 	/**
@@ -145,40 +146,22 @@ public:
 	 */
     int getInt(Key *k, size_t itemIdx)
     {
-		IntBlock* doubleData = nullptr;
+		IntBlock* intData = nullptr;
 		if (!(cache_->containsKey(k)))
         {
             //get data from store and cache
 			IntBlock* val = getIntBlockFromStore_(k);
 			if (val != nullptr) {
 				cache_->put(k, val);
+				delete val;
 			}
-			delete val;
         }
-		doubleData = dynamic_cast<IntBlock*>(cache_->getBlock(k));
-		//DoubleBlock* doubleData = dynamic_cast<DoubleBlock*>(get(k));//getDoubleBlock_(k);
-		
-		if (doubleData == nullptr) {
-			fprintf(stderr, "Unable to get int from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
-			exit(1);
-		}
-		int out = doubleData->get(itemIdx);
-		//delete doubleData;
-		return out;
-		
-		
-		/*
-		//IntBlock* intData = getIntBlock_(k);
-		Block* tmp = cache_->getBlock(k);
-		//assert(tmp != nullptr);
-		IntBlock* intData = dynamic_cast<IntBlock*>(tmp);
+		intData = dynamic_cast<IntBlock*>(cache_->getBlock(k));
 		if (intData == nullptr) {
 			fprintf(stderr, "Unable to get integer from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
-		int out = intData->get(itemIdx);
-		//delete intData;
-		return out;*/
+		return intData->get(itemIdx);
     }
 
 	/**
@@ -187,15 +170,22 @@ public:
 	 */
     String* getString(Key *k, size_t itemIdx)
     {
-		//StringBlock* strData = getStrBlock_(k);
-		StringBlock* strData = dynamic_cast<StringBlock*>(cache_->getBlock(k));
+		StringBlock* strData = nullptr;
+		if (!(cache_->containsKey(k)))
+        {
+            //get data from store and cache
+			StringBlock* val = getStrBlockFromStore_(k);
+			if (val != nullptr) {
+				cache_->put(k, val);
+				delete val;
+			}
+        }
+		strData = dynamic_cast<StringBlock*>(cache_->getBlock(k));
 		if (strData == nullptr) {
 			fprintf(stderr, "Unable to get string from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
-		String* out = strData->get(itemIdx); //get should have cloned it
-		//delete strData;
-		return out;
+		return strData->get(itemIdx); //get should have cloned it
     }
 
     /**
@@ -207,8 +197,8 @@ public:
     }*/
 
     /**
-         * Get key at specified index, return error if out-of-bounds
-         */
+     * Get key at specified index, return error if out-of-bounds
+     */
     Key *getKeyAtIndex(size_t idx)
     {
         return keyList_->get(idx);
