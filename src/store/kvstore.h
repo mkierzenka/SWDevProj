@@ -4,6 +4,7 @@
 #include "../network/client.h"
 #include "../serial/serial.h"
 #include "../serial/message.h"
+#include "../serial/getdatamsg.h"
 #include "../utils/map.h"
 #include "key.h"
 #include "value.h"
@@ -47,10 +48,25 @@ public:
     DataFrame *get(Key *k);
 
     /** Send request to specified store to get data. Return nullptr if cannot find */
-    // DataFrame* waitAndGet(Key *k)
-    // {
-    //     //will need to create a Message
-    // }
+    DataFrame* waitAndGet(Key *k)
+    {
+        // if k has our node num, just get it
+        if (k->getNode() == storeId)
+        {
+            return get(k);
+        }
+         // else
+        GetDataMsg* dm = new GetDataMsg(k);
+        client_->sendmsg(dm);
+        ReplyData* dataMsg = dynamic_cast<ReplyData*>(client_->receivemsg()); //blocks until received
+        Value* val = dataMsg->getValue();
+        Serializer* s = new Serializer(val->getSize(), val->getdata());
+        DataFrame* df = new DataFrame();
+        df->deserialize(s);
+        delete val;
+        delete s;
+        return df;
+    }
 
     /** Get the actual Value that the given key maps to */
     Value *getValue(Key *k)
