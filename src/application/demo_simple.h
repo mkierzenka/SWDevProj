@@ -1,3 +1,4 @@
+#pragma once
 #include "application.h"
 #include "../dataframe/dataframe.h"
 #include "../store/key.h"
@@ -8,27 +9,30 @@
  */
 class Demo : public Application {
 public:
-  Key main("main",0);
+  //had to initialize new key to prevent errors
+  Key* main = new Key("main", 0);
 
   Demo(size_t idx): Application(idx) {}
- 
+
   void run_() override {
     switch(this_node()) {
     case 0:   producer();     break;
-    case 1:   verifier();
+    case 1:   verifier();     break;
     default: puts("bad thread number");
    }
   }
  
   void producer() {
+    puts("producer started");
     size_t SZ = 100;
     int* vals = new int[SZ];
-    for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
-    DataFrame::fromArray(&main, &kv, SZ, vals);
+    for (size_t i = 0; i < SZ; ++i) vals[i] = i;
+    DataFrame::fromArray(main, kv_, SZ, vals);
   }
  
   void verifier() {
-    DataFrame* result = kv.waitAndGet(main);
+    puts("verifier started");
+    DataFrame* result = kv_->waitAndGet(main);
     pln(result->get_int(0,5) == 5 ? "SUCCESS":"FAILURE");
   }
 };

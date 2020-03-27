@@ -1,5 +1,6 @@
 //lang:Cpp
 //#include "../src/application/demo.h"
+#include "../src/application/demothread.h"
 #include "../src/application/demo_simple.h"
 
 int main()
@@ -15,8 +16,8 @@ int main()
 
     for (size_t j = 0; j < nodeNum; j++)
     {
-        demos[i]->join();
-        delete demos[i];
+        demos[j]->join();
+        delete demos[j];
     }
 
     delete[] demos;
