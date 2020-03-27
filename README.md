@@ -32,3 +32,5 @@
 * fromScalar
 
 * Delete code for printing throughout
+
+* Fix map tests 
