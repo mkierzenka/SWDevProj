@@ -20,8 +20,6 @@
 
 * Fix old tests to compile/run/pass
 
-* Serializer needs to have adjustable memory size
-
 * DataFrame needs equals and hash (probably other classes do too...)
 
 * Add basic sanity tests for Key, Value
@@ -33,8 +31,6 @@
 	so we aren't repeatedly deserializing the things in the cache.
 
 * ??Should Column.add_all live more in Distributed Array? Do we need the block imports in Column?
-
-* Test Cache, especially what happens when we try to add to it when full
 
 * fromScalar
 
