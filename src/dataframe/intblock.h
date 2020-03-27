@@ -128,4 +128,12 @@ public:
 		memset(vals_, 0, capacity_ * sizeof(int));
 		size_ = 0;
 	}
+	
+	IntBlock* clone() {
+		IntBlock* out = new IntBlock();
+		for (size_t i = 0; i < size_; i++) {
+			out->add(get(i));
+		}
+		return out;
+	}
 };

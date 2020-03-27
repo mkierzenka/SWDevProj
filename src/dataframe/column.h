@@ -277,11 +277,15 @@ public:
 
         //Key to look up data
         Key* k = genKey_(chunk);
-        Value* v = blocks_->get(k);
+		bool out = blocks_->getBool(k, idxInChunk);
+        /*Value* v = blocks_->get(k);
 		Serializer* s = new Serializer(v->getSize(), v->getData());
         BoolBlock* boolData = new BoolBlock();
 		boolData->deserialize(s);
-        return boolData->get(idxInChunk);
+        bool out = boolData->get(idxInChunk);
+		delete boolData;*/
+		delete k;
+		return out;
      }
 	
 	String* get_string(size_t idx) {
@@ -296,11 +300,14 @@ public:
 
         //Key to look up data
         Key* k = genKey_(chunk);
-        Value* v = blocks_->get(k);
+        /*Value* v = blocks_->get(k);
 		Serializer* s = new Serializer(v->getSize(), v->getData());
         StringBlock* strData = new StringBlock();
-		strData->deserialize(s);
-        return strData->get(idxInChunk);
+		strData->deserialize(s);*/
+        String* out = blocks_->getString(k, idxInChunk);
+		//delete strData;
+		delete k;
+		return out;
     }
 	
     /** Get int from the column at specified index */
@@ -317,11 +324,14 @@ public:
 
         //Key to look up data
         Key* k = genKey_(chunk);
-        Value* v = blocks_->get(k);
+        /*Value* v = blocks_->get(k);
 		Serializer* s = new Serializer(v->getSize(), v->getData());
         IntBlock* intData = new IntBlock();
-		intData->deserialize(s);
-        return intData->get(idxInChunk);
+		intData->deserialize(s);*/
+        int out = blocks_->getInt(k, idxInChunk);
+		//delete intData;
+		delete k;
+		return out;
     }
 
     /** Check if the type of this column matches the given type */

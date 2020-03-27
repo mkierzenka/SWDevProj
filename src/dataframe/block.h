@@ -16,6 +16,8 @@ public:
 	size_t size_;
 	size_t capacity_;
 
+	virtual ~Block() {}
+
 	/** Get the number of elements in this block */
 	virtual size_t size()
 	{

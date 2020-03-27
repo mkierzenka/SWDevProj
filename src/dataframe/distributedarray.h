@@ -77,36 +77,50 @@ public:
     * Get the data for the specified key. Adds nullptr if value
     * cannot be found.
     */
-    Value *get(Key *k)
+    /*Block *get(Key *k)
     {
         //check the cache first: return if exists
         if (cache_->containsKey(k))
         {
-            return cache_->getValue(k);
+            return cache_->getBlock(k);
         }
 
         //get data from store, and cache and return it
-        Value *val = store_->getValue(k);
+        Block *val = store_->getBlock(k);
         if (val != nullptr)
         {
             cache_->put(k->clone(), val->clone());
         }
 
         return val;
-    }
+    }*/
 	
 	/**
 	 * Get specific double from a value stored with key k
 	 */
     double getDouble(Key *k, size_t itemIdx)
     {
-		DoubleBlock* doubleData = getDoubleBlock_(k);
+		DoubleBlock* doubleData = nullptr;
+		if (cache_->containsKey(k))
+        {
+            doubleData = dynamic_cast<DoubleBlock*>(cache_->getBlock(k));
+        }
+		if (doubleData == nullptr) {
+			//get data from store and cache
+			DoubleBlock* val = getDoubleBlockFromStore_(k);
+			if (val != nullptr) {
+				cache_->put(k, val);
+				doubleData = val;
+			}
+		}
+		//DoubleBlock* doubleData = dynamic_cast<DoubleBlock*>(get(k));//getDoubleBlock_(k);
+		
 		if (doubleData == nullptr) {
 			fprintf(stderr, "Unable to get double from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
 		double out = doubleData->get(itemIdx);
-		delete doubleData;
+		//delete doubleData;
 		return out;
     }
 
@@ -115,13 +129,14 @@ public:
 	 */
     bool getBool(Key *k, size_t itemIdx)
     {
-		BoolBlock* boolData = getBoolBlock_(k);
+		//BoolBlock* boolData = getBoolBlock_(k);
+		BoolBlock* boolData = dynamic_cast<BoolBlock*>(cache_->getBlock(k));
 		if (boolData == nullptr) {
 			fprintf(stderr, "Unable to get boolean from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
 		bool out = boolData->get(itemIdx);
-		delete boolData;
+		//delete boolData;
 		return out;
     }
 
@@ -130,14 +145,40 @@ public:
 	 */
     int getInt(Key *k, size_t itemIdx)
     {
-		IntBlock* intData = getIntBlock_(k);
+		IntBlock* doubleData = nullptr;
+		if (!(cache_->containsKey(k)))
+        {
+            //get data from store and cache
+			IntBlock* val = getIntBlockFromStore_(k);
+			if (val != nullptr) {
+				cache_->put(k, val);
+			}
+			delete val;
+        }
+		doubleData = dynamic_cast<IntBlock*>(cache_->getBlock(k));
+		//DoubleBlock* doubleData = dynamic_cast<DoubleBlock*>(get(k));//getDoubleBlock_(k);
+		
+		if (doubleData == nullptr) {
+			fprintf(stderr, "Unable to get int from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
+			exit(1);
+		}
+		int out = doubleData->get(itemIdx);
+		//delete doubleData;
+		return out;
+		
+		
+		/*
+		//IntBlock* intData = getIntBlock_(k);
+		Block* tmp = cache_->getBlock(k);
+		//assert(tmp != nullptr);
+		IntBlock* intData = dynamic_cast<IntBlock*>(tmp);
 		if (intData == nullptr) {
 			fprintf(stderr, "Unable to get integer from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
 		int out = intData->get(itemIdx);
-		delete intData;
-		return out;
+		//delete intData;
+		return out;*/
     }
 
 	/**
@@ -146,23 +187,24 @@ public:
 	 */
     String* getString(Key *k, size_t itemIdx)
     {
-		StringBlock* strData = getStrBlock_(k);
+		//StringBlock* strData = getStrBlock_(k);
+		StringBlock* strData = dynamic_cast<StringBlock*>(cache_->getBlock(k));
 		if (strData == nullptr) {
 			fprintf(stderr, "Unable to get string from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
 		String* out = strData->get(itemIdx); //get should have cloned it
-		delete strData;
+		//delete strData;
 		return out;
     }
 
     /**
      * Gets key with specified index in array, then get data for that key
      */
-    Value *get(size_t idx)
+    /*Block *get(size_t idx)
     {
         return get(getKeyAtIndex(idx));
-    }
+    }*/
 
     /**
          * Get key at specified index, return error if out-of-bounds
@@ -204,8 +246,8 @@ public:
 	/** Returns the Value mapped to this key, deserialized as a double block
 	 *  Caller is expected to delete the block
 	 */
-	DoubleBlock* getDoubleBlock_(Key* k) {
-		Value* val = get(k);
+	DoubleBlock* getDoubleBlockFromStore_(Key* k) {
+		Value* val = store_->getValue(k);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		DoubleBlock* out = new DoubleBlock();
 		out->deserialize(s);
@@ -216,8 +258,8 @@ public:
 	/** Returns the Value mapped to this key, deserialized as a bool block.
 	 *  Caller is expected to delete the block
 	 */
-	BoolBlock* getBoolBlock_(Key* k) {
-		Value* val = get(k);
+	BoolBlock* getBoolBlockFromStore_(Key* k) {
+		Value* val = store_->getValue(k);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		BoolBlock* out = new BoolBlock();
 		out->deserialize(s);
@@ -228,8 +270,8 @@ public:
 	/** Returns the Value mapped to this key, deserialized as a int block.
 	 *  Caller is expected to delete the block
 	 */
-	IntBlock* getIntBlock_(Key* k) {
-		Value* val = get(k);
+	IntBlock* getIntBlockFromStore_(Key* k) {
+		Value* val = store_->getValue(k);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		IntBlock* out = new IntBlock();
 		out->deserialize(s);
@@ -241,14 +283,12 @@ public:
 	/** Returns the Value mapped to this key, deserialized as a string block.
 	 *  Caller is expected to delete the block
 	 */
-	StringBlock* getStrBlock_(Key* k) {
-		Value* val = get(k);
+	StringBlock* getStrBlockFromStore_(Key* k) {
+		Value* val = store_->getValue(k);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		StringBlock* out = new StringBlock();
 		out->deserialize(s);
 		delete s;
 		return out;
-	}	
-
-	
+	}
 };

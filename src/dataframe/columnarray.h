@@ -177,31 +177,23 @@ public:
    *  columns out of bounds, or request the wrong type is undefined.*/
   int get_int(size_t col, size_t row)
   {
-    Column* c = dynamic_cast<Column*>(colList_->get(col));
-	//can check the type in the row
-	return c->get_int(row);
+    return colList_->get_int(col, row);
   }
 
   bool get_bool(size_t col, size_t row)
   {
-    Column* c = dynamic_cast<Column*>(colList_->get(col));
-	//can check the type in the row
-	return c->get_bool(row);
+    return colList_->get_bool(col, row);
   }
 
   double get_double(size_t col, size_t row)
   {
-    Column* c = colList_->get(col);
-	//can check the type in the row
-	return c->get_double(row);
+    return colList_->get_double(col, row);
   }
 
   // gets the actual String*, no copy
   String *get_string(size_t col, size_t row)
   {
-    Column* c = dynamic_cast<Column*>(colList_->get(col));
-	//can check the type in the row
-	return c->get_string(row);
+    return colList_->get_string(col, row);
   }
 
 
