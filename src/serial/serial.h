@@ -11,20 +11,16 @@
 
 class Serializer {
 public:
-	const size_t BUFFER_SIZE_ = 4096;//8192;//1024;
+	const size_t INIT_BUFFER_SIZE_ = 1024;
 	char* buffer_;			// owned
-	char* curBuffPtrWrite_;	// just points to a place in buffer_
-	char* curBuffPtrRead_;	// just points to a place in buffer_
 	size_t numBytesWritten_;
 	size_t numBytesRead_;
 	size_t capacity_;
 	
 	Serializer() {
-		capacity_ = BUFFER_SIZE_;
+		capacity_ = INIT_BUFFER_SIZE_;
 		buffer_ = new char[capacity_];
 		memset(buffer_, 0, capacity_);
-		curBuffPtrWrite_ = buffer_;
-		curBuffPtrRead_ = buffer_;
 		numBytesWritten_ = 0;
 		numBytesRead_ = 0;
 	}
@@ -36,20 +32,11 @@ public:
 		buffer_ = new char[capacity_];
 		memset(buffer_, 0, capacity_);
 		memcpy(buffer_, inp, capacity_);
-		curBuffPtrWrite_ = buffer_;
-		curBuffPtrRead_ = buffer_;
 		numBytesWritten_ = capacity_;
 		numBytesRead_ = 0;
 	}
 	
 	~Serializer() {
-		// if (numBytesWritten_ != numBytesRead_)
-		// {
-		// 	printf("Num bytes written does not equal num bytes read\n");
-		// 	printf("Num bytes written: %zu\n", numBytesWritten_);
-		// 	printf("Num bytes read: %zu\n", numBytesRead_);
-		// }
-
 		delete[] buffer_;
 	}
 	
@@ -133,7 +120,6 @@ public:
 			grow_();
 		}
 		memcpy((buffer_ + numBytesWritten_), d, s);
-		curBuffPtrWrite_ += s;
 		numBytesWritten_ += s;
 	}
 	
@@ -146,67 +132,60 @@ public:
 	}
 
 	char* readString() {
-		size_t lenNextStr = strlen(curBuffPtrRead_); // get the next string (up to first \0)
+		char* startPtr = buffer_ + numBytesRead_;
+		size_t lenNextStr = strlen(startPtr); // get the next string (up to first \0)
 		size_t bytesNeeded = lenNextStr + 1; //extra for null terminator
 		char* out = new char[bytesNeeded];
-		memcpy(out, curBuffPtrRead_, bytesNeeded);
-		curBuffPtrRead_ += bytesNeeded; //skip null terminator
+		memcpy(out, startPtr, bytesNeeded);
 		numBytesRead_ += bytesNeeded;
 		return out;
 	}
 	
 	double readDouble() {
 		double out;
-		memcpy(&out, curBuffPtrRead_, sizeof(double));
-		curBuffPtrRead_ += sizeof(double);
+		memcpy(&out, buffer_ + numBytesRead_, sizeof(double));
 		numBytesRead_ += sizeof(double);
 		return out;
 	}
 
 	short readShort() {
 		short out;
-		memcpy(&out, curBuffPtrRead_, sizeof(short));
-		curBuffPtrRead_ += sizeof(short);
+		memcpy(&out, buffer_ + numBytesRead_, sizeof(short));
 		numBytesRead_ += sizeof(short);
 		return out;
 	}
 
 	long readLong() {
 		long out;
-		memcpy(&out, curBuffPtrRead_, sizeof(long));
-		curBuffPtrRead_ += sizeof(long);
+		memcpy(&out, buffer_ + numBytesRead_, sizeof(long));
 		numBytesRead_ += sizeof(long);
 		return out;
 	}
 
 	int readInt() {
 		int out;
-		memcpy(&out, curBuffPtrRead_, sizeof(int));
-		curBuffPtrRead_ += sizeof(int);
+		memcpy(&out, buffer_ + numBytesRead_, sizeof(int));
 		numBytesRead_ += sizeof(int);
 		return out;
 	}
 
 	bool readBool() {
 		bool out;
-		memcpy(&out, curBuffPtrRead_, sizeof(bool));
-		curBuffPtrRead_ += sizeof(bool);
+		memcpy(&out, buffer_ + numBytesRead_, sizeof(bool));
 		numBytesRead_ += sizeof(bool);
 		return out;
 	}
 
 	char readChar() {
 		char out;
-		memcpy(&out, curBuffPtrRead_, sizeof(char));
-		curBuffPtrRead_ += sizeof(char);
+		memcpy(&out, buffer_ + numBytesRead_, sizeof(char));
 		numBytesRead_ += sizeof(char);
 		return out;
 	}
 	
 	MsgKind readMsgKind() {
 		char sMsgKind[2];
-		memcpy(sMsgKind, curBuffPtrRead_, 2);
-		curBuffPtrRead_ += 2;
+		memcpy(sMsgKind, buffer_ + numBytesRead_, 2);
 		numBytesRead_ += 2;
 		if (strcmp(sMsgKind, "0") == 0) {
 			return Ack;
@@ -235,8 +214,7 @@ public:
 	
 	size_t readSizeT() {
 		size_t out;
-		memcpy(&out, curBuffPtrRead_, sizeof(size_t));
-		curBuffPtrRead_ += sizeof(size_t);
+		memcpy(&out, buffer_ + numBytesRead_, sizeof(size_t));
 		numBytesRead_ += sizeof(size_t);
 		return out;
 	}
@@ -255,10 +233,10 @@ public:
 	
 	char* clear() {
 		delete[] buffer_;
-		buffer_ = new char[BUFFER_SIZE_];
-		memset(buffer_, 0, BUFFER_SIZE_);
-		curBuffPtrWrite_ = buffer_;
-		curBuffPtrRead_ = buffer_;
+		buffer_ = new char[capacity_];
+		memset(buffer_, 0, capacity_);
+		numBytesRead_ = 0;
+		numBytesWritten_ = 0;
 	}
 
 };

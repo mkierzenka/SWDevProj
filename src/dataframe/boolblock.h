@@ -132,5 +132,13 @@ public:
 		memset(vals_, 0, capacity_ * sizeof(bool));
 		size_ = 0;
 	}
-
+	
+	/** Returns a new BoolBlock with duplicate elements */
+	BoolBlock* clone() {
+		BoolBlock* out = new BoolBlock();
+		for (size_t i = 0; i < size_; i++) {
+			out->add(get(i));
+		}
+		return out;
+	}
 };

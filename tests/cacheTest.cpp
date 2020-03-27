@@ -39,7 +39,7 @@ int main()
     c->put(key4, val4);
     assert(!c->containsKey(key1));
     assert(c->containsKey(key4));
-    puts("second put");
+
     c->put(key5, val5);
     assert(!c->containsKey(key1));
     assert(c->containsKey(key4));

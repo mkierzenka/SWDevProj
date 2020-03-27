@@ -145,4 +145,13 @@ public:
 		memset(vals_, 0, capacity_ * sizeof(int));
 		size_ = 0;
 	}
+	
+	/** Returns a new StringBlock with all the elements cloned from this one */
+	StringBlock* clone() {
+		StringBlock* out = new StringBlock();
+		for (size_t i = 0; i < size_; i++) {
+			out->add(get(i)->clone());
+		}
+		return out;
+	}
 };

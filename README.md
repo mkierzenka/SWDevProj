@@ -8,13 +8,13 @@
 
 * Clean up client and server, try to get more than two clients to connect successfully
 
-* Do we need both ColumnArray and ColArr?
+* Attempt to merge ColArray into ColumnArray
 
 * Fix generalTests to use Column and check all 4 types
 
 * Do we want DataFrame.add_row() and Column.push_back()? If not, delete memTest
 
-* Sorer code- make the arrays use our array instead of reimplementing functionality
+* Sorer code- make the arrays use our array instead of re-implementing functionality
 
 * Sorer code- merge Types enum and our col type enum
 
@@ -30,7 +30,8 @@
 * ??Maybe cache should store deserialized data. Might as well deserialize it first,
 	so we aren't repeatedly deserializing the things in the cache.
 
-* ??Should Column.add_all live more in Distributed Array? Do we need the block imports in Column?
+* Move most of logic (like loop) from Column.add_all into Distributed Array. Remove block imports from Column
 
 * fromScalar
 
+* ??Delete code for printing throughout

@@ -209,4 +209,5 @@ int main()
     serializeColumnTest();
 	serializeDistArrTest();
 	serializeColumnArrTest();
+	printf("All Serialization Tests Passed!\n");
 }

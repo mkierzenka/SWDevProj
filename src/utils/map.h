@@ -293,9 +293,7 @@ class Map : public Object {
 			Entry* prevEntry = nullptr;
 			Entry* curEntry = bucket;
 			while (curEntry && curEntry != nullptr) {
-				fprintf(stderr, "in loop\n");
 				if (curEntry->getKey()->equals(key)) {
-					fprintf(stderr, "seen this key before\n");
 					// already seen this key, replace the value
 					Object* oldVal = curEntry->getValue();
 					curEntry->setValue(val);
@@ -304,7 +302,6 @@ class Map : public Object {
 				prevEntry = curEntry;
 				curEntry = curEntry->getNext();
 			}
-			fprintf(stderr, "out of loop\n");
 			Entry* newEntry = new Entry(key, val);
 			prevEntry->setNext(newEntry);
 			this->size_++;
@@ -373,11 +370,9 @@ class Map : public Object {
 				return nullptr;
 			}
 			
-			puts("called");
 			Entry* prevEntry = nullptr;
 			Entry* curEntry = bucket;
 			while (curEntry) {
-				fprintf(stderr, "comparing\n");
 				if (curEntry->getKey()->equals(key)) {
 					if (!prevEntry || prevEntry == nullptr) {
 						// deleting curEntry, the first item of the bucket

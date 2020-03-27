@@ -7,10 +7,11 @@
 #include "../utils/queue.h"
 #include "../store/key.h"
 #include "../store/value.h"
+#include "../dataframe/block.h"
 
 /**
  * This class represents a cache in our distributed array. It contains
- * a maximum amount of values at a time and will update the map on a FIFO
+ * a maximum amount of blocks at a time and will update the map on a FIFO
  * basis (key-value that was added first will be overwritten by new value)
  * 
  * Authors: Marcin Kierzenka and Chase Broder
@@ -20,7 +21,7 @@ class Cache : public Object
 public:
     size_t maxSize_;     //maximum size of the cache
     Map *data_;          //data being stored in cache
-    Queue *keyOrder_;    //keeps track of order in which keys added to cache
+    Queue *keyOrder_;    //keeps track of order in which keys were added to cache
 
     Cache() : Cache(15) {}
 
@@ -58,16 +59,16 @@ public:
     /**
      * Get mapped data for given key or nullptr if it doesn't exist
      */
-    Value *getValue(Key *k)
+    Block *getBlock(Key *k)
     {
-        return dynamic_cast<Value *>(data_->get(k));
+        return dynamic_cast<Block *>(data_->get(k));
     }
 
     /**
-     * Put key-value pair into cache; if cache full, remove key that was
+     * Put key-block pair into cache; if cache full, remove key that was
      * added longest ago
      */
-    void put(Key *k, Value *val)
+    void put(Key *k, Block *val)
     {
         //remove element from queue if it's full
         if (isFull_())
@@ -75,7 +76,7 @@ public:
             removeFirstAddedElement_();
         }
 
-        data_->put(k->clone(), val->clone());
+        data_->put(k->clone(), val); //TODO should this clone?
         keyOrder_->push(k->clone());
         assert(data_->size() == keyOrder_->size());
     }
@@ -137,7 +138,7 @@ public:
             return k;
         }
 
-        data_->remove(k);
+		data_->remove(k);
         assert(data_->size() == keyOrder_->size());
         return k;
     }

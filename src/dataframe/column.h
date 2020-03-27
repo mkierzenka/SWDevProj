@@ -258,8 +258,7 @@ public:
         size_t chunk = idx / BLOCK_SIZE;
         size_t idxInChunk = idx % BLOCK_SIZE;
 
-        //Key to look up data
-        Key* k = genKey_(chunk);
+        Key* k = genKey_(chunk); //Key to look up data
 		double out = blocks_->getDouble(k, idxInChunk);
 		delete k;
 		return out;
@@ -275,13 +274,10 @@ public:
         size_t chunk = idx / BLOCK_SIZE;
         size_t idxInChunk = idx % BLOCK_SIZE;
 
-        //Key to look up data
-        Key* k = genKey_(chunk);
-        Value* v = blocks_->get(k);
-		Serializer* s = new Serializer(v->getSize(), v->getData());
-        BoolBlock* boolData = new BoolBlock();
-		boolData->deserialize(s);
-        return boolData->get(idxInChunk);
+        Key* k = genKey_(chunk); //Key to look up data
+		bool out = blocks_->getBool(k, idxInChunk);
+        delete k;
+		return out;
      }
 	
 	String* get_string(size_t idx) {
@@ -294,13 +290,10 @@ public:
         size_t chunk = idx / BLOCK_SIZE;
         size_t idxInChunk = idx % BLOCK_SIZE;
 
-        //Key to look up data
-        Key* k = genKey_(chunk);
-        Value* v = blocks_->get(k);
-		Serializer* s = new Serializer(v->getSize(), v->getData());
-        StringBlock* strData = new StringBlock();
-		strData->deserialize(s);
-        return strData->get(idxInChunk);
+        Key* k = genKey_(chunk); //Key to look up data
+        String* out = blocks_->getString(k, idxInChunk);
+        delete k;
+		return out;
     }
 	
     /** Get int from the column at specified index */
@@ -315,13 +308,10 @@ public:
         size_t chunk = idx / BLOCK_SIZE;
         size_t idxInChunk = idx % BLOCK_SIZE;
 
-        //Key to look up data
-        Key* k = genKey_(chunk);
-        Value* v = blocks_->get(k);
-		Serializer* s = new Serializer(v->getSize(), v->getData());
-        IntBlock* intData = new IntBlock();
-		intData->deserialize(s);
-        return intData->get(idxInChunk);
+        Key* k = genKey_(chunk); //Key to look up data
+        int out = blocks_->getInt(k, idxInChunk);
+        delete k;
+		return out;
     }
 
     /** Check if the type of this column matches the given type */
