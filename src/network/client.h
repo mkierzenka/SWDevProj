@@ -20,8 +20,6 @@ public:
     const char *serverIp_;
     Network *network_;   //network to connect to server
     Network *listening_; //network to listen for client connections
-    bool shouldSend_;    //for demo purposes, so one client knows to send to other
-
     Array *clients_; //connection info of neighboring clients
     Array *fdArr;
 
@@ -37,7 +35,6 @@ public:
         listening_->listenForClient(listening_->getServerFd());
         clients_ = new Array();
         fdArr = new Array();
-        shouldSend_ = false;
     }
 
     ~Client()
@@ -96,6 +93,7 @@ public:
 
     struct pollfd *getFDs()
     {
+        //printf("FDARR length: %zu\n", fdArr->length());
         struct pollfd *ret = new struct pollfd[2 + fdArr->length()];
         // First fd is the server connection
         ret[0].fd = network_->getServerFd();
@@ -173,7 +171,7 @@ public:
         printf("Attempting to connect to client %s\n", ip);
         Network *n = new Network(ip);
         n->connectToServer();
-        printf("Conneted to %s\n", ip);
+        printf("Connected to %s\n", ip);
         n->sendMessage("HIIII", n->getServerFd());
     }
 
