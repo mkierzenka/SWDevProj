@@ -132,4 +132,13 @@ public:
 		memset(vals_, 0, capacity_ * sizeof(double));
 		size_ = 0;
 	}
+	
+	/** Returns a new DoubleBlock with duplicate elements */
+	DoubleBlock* clone() {
+		DoubleBlock* out = new DoubleBlock();
+		for (size_t i = 0; i < size_; i++) {
+			out->add(get(i));
+		}
+		return out;
+	}
 };

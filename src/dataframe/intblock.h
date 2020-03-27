@@ -129,6 +129,7 @@ public:
 		size_ = 0;
 	}
 	
+	/** Returns a new IntBlock with duplicate elements */
 	IntBlock* clone() {
 		IntBlock* out = new IntBlock();
 		for (size_t i = 0; i < size_; i++) {
