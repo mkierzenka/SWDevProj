@@ -3,6 +3,7 @@
 #include "../utils/object.h"
 #include "../utils/string.h"
 #include "../utils/helper.h"
+#include "../utils/thread.h"
 #include "../store/kvstore.h"
 #include "../store/key.h"
 #include "../serial/serial.h"
@@ -12,7 +13,6 @@
 #include "schema.h"
 #include "rower.h"
 #include "row.h"
-#include "thread.h"
 
 /****************************************************************************
  * DataFrame::
