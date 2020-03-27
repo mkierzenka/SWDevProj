@@ -27,11 +27,8 @@
 * See if there are other places where Blocks can be cleared instead of repeatedly
 	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
 
-* ??Maybe cache should store deserialized data. Might as well deserialize it first,
-	so we aren't repeatedly deserializing the things in the cache.
-
 * Move most of logic (like loop) from Column.add_all into Distributed Array. Remove block imports from Column
 
 * fromScalar
 
-* ??Delete code for printing throughout
+* Delete code for printing throughout
