@@ -8,8 +8,6 @@
 
 * Clean up client and server, try to get more than two clients to connect successfully
 
-* Attempt to merge ColArray into ColumnArray
-
 * Fix generalTests to use Column and check all 4 types
 
 * Do we want DataFrame.add_row() and Column.push_back()? If not, delete memTest
@@ -33,4 +31,4 @@
 
 * Delete code for printing throughout
 
-* Fix map tests 
+* Df constructor that takes in schema and key: we never initialize store, pass in null store at places

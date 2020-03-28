@@ -66,51 +66,56 @@ public:
   /** Converts an array into a dataframe object.
    *  Returns the df result, caller is responsible for deleting it.
    */
-  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, double* elems) {
-    DataFrame* df = new DataFrame(k->clone(), kv);
+  static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, double *elems)
+  {
+    DataFrame *df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
-	addDFToStore_(df, kv, k);
+    addDFToStore_(df, kv, k);
     return df;
   }
-  
+
   /** Converts an array of ints into a dataframe object.
    *  Returns the df result, caller is responsible for deleting it.
    */
-  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, int* elems) {
-    DataFrame* df = new DataFrame(k->clone(), kv);
+  static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, int *elems)
+  {
+    DataFrame *df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
-	return addDFToStore_(df, kv, k);
+    return addDFToStore_(df, kv, k);
   }
-  
+
   /** Converts an array of booleans into a dataframe object.
    *  Returns the df result, caller is responsible for deleting it.
    */
-  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, bool* elems) {
-    DataFrame* df = new DataFrame(k->clone(), kv);
+  static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, bool *elems)
+  {
+    DataFrame *df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
-	return addDFToStore_(df, kv, k);
+    return addDFToStore_(df, kv, k);
   }
-  
+
   /** Converts an array of Strings into a dataframe object.
    *  Returns the df result, caller is responsible for deleting it.
    */
-  static DataFrame* fromArray(Key* k, KVStore* kv, size_t numElems, String** elems) {
-    DataFrame* df = new DataFrame(k->clone(), kv);
+  static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, String **elems)
+  {
+    DataFrame *df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
-	addDFToStore_(df, kv, k);
+    addDFToStore_(df, kv, k);
     return df;
   }
-  
+
   /** Adds the DataFrame to the given KVStore with the given key.
    *  Returns the DataFrame just added (df).
    */
-  static DataFrame* addDFToStore_(DataFrame* df, KVStore* kv, Key* k) {
-	Serializer* s = new Serializer();
+  static DataFrame *addDFToStore_(DataFrame *df, KVStore *kv, Key *k)
+  {
+    Serializer *s = new Serializer();
     df->serialize(s);
     Value *v = new Value(s->getBuffer(), s->getNumBytesWritten());
     kv->put(k->clone(), v);
     delete s;
-	return df;
+    return df;
   }
 
   /** Add array of doubles to dataframe as a column. Add the data into chunks, and generate
@@ -122,21 +127,21 @@ public:
 
   /** Add array of ints to dataframe as a column. Add the data into chunks, and generate
    * keys for them. Column needs to get dataframe's key and key-value store */
-  void add_array(size_t numElements, int* elements)
+  void add_array(size_t numElements, int *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
   }
-  
+
   /** Add array of booleans to dataframe as a column. Add the data into chunks, and generate
    * keys for them. Column needs to get dataframe's key and key-value store */
-  void add_array(size_t numElements, bool* elements)
+  void add_array(size_t numElements, bool *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
   }
-  
+
   /** Add array of Strings to dataframe as a column. Add the data into chunks, and generate
    * keys for them. Column needs to get dataframe's key and key-value store */
-  void add_array(size_t numElements, String** elements)
+  void add_array(size_t numElements, String **elements)
   {
     columns_->add_column_fromarray(numElements, elements);
   }
@@ -213,7 +218,7 @@ public:
   }
 
   /** Add a row at the end of this dataframe. The row is expected to have
-   *  the right schema and be filled with values, otherwise undedined.  */
+   *  the right schema and be filled with values, otherwise undefined.  */
   void add_row(Row &row)
   {
     size_t rowWidth = row.width();

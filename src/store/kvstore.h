@@ -42,7 +42,7 @@ public:
             fprintf(stderr, "Attempting to put Key with node %zu into store for node %zu", k->getNode(), storeId);
         }
 
-        kvMap->put(k->getKeyStr()->clone(), data); //todo should this go back to cloning?
+        kvMap->put(k->getKeyStr()->clone(), data->clone());
     }
 
     DataFrame *get(Key *k);

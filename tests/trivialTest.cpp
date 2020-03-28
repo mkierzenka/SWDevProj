@@ -23,6 +23,9 @@ void testTrivialCase() {
   printf("Trivial case started\n");
   Trivial* tv = new Trivial(0);
   tv->run_();
+  tv->run_2();
+  tv->run_3();
+  tv->run_4();
 
   printf("Trivial case passed!\n");
   delete tv;
