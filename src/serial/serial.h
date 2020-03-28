@@ -51,13 +51,13 @@ public:
 			case Ack:
 				out[0]='0';
 				break;
-			case Nack:
+			case GetData:
 				out[0]='1';
 				break;
 			case Put:
 				out[0]='2';
 				break;
-			case Reply:
+			case ReplyData:
 				out[0]='3';
 				break;
 			case Get:
@@ -97,6 +97,11 @@ public:
 	void write(const char* str) {
 		size_t lenStr = strlen(str); //length of str (up to first null byte)
 		add_(str, lenStr + 1); //add 1 to include null terminator
+	}
+
+	/** sz should include null terminator, if applicable */
+	void write(size_t sz, const char* str) {
+		add_(str, sz);
 	}
 
 	void write(short s) {
@@ -190,11 +195,11 @@ public:
 		if (strcmp(sMsgKind, "0") == 0) {
 			return Ack;
 		} else if (strcmp(sMsgKind, "1") == 0) {
-			return Nack;
+			return GetData;
 		} else if (strcmp(sMsgKind, "2") == 0) {
 			return Put;
 		} else if (strcmp(sMsgKind, "3") == 0) {
-			return Reply;
+			return ReplyData;
 		} else if (strcmp(sMsgKind, "4") == 0) {
 			return Get;
 		} else if (strcmp(sMsgKind, "5") == 0) {
@@ -208,7 +213,7 @@ public:
 		} else if (strcmp(sMsgKind, "9") == 0) {
 			return Directory;
 		} else {
-			return Nack;
+			return GetData;
 		}
 	}
 	
