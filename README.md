@@ -33,6 +33,4 @@
 
 * Delete code for printing throughout
 
-* Fix map tests 
-
 * Df constructor that takes in schema and key: we never initialize store, pass in null store at places
