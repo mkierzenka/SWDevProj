@@ -46,4 +46,9 @@ public:
 		target_ = s->readSizeT();
 		id_ = s->readSizeT();
 	}
+
+	size_t getTarget()
+	{
+		return target_;
+	}
 };
