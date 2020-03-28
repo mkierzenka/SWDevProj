@@ -218,7 +218,7 @@ public:
   }
 
   /** Add a row at the end of this dataframe. The row is expected to have
-   *  the right schema and be filled with values, otherwise undedined.  */
+   *  the right schema and be filled with values, otherwise undefined.  */
   void add_row(Row &row)
   {
     size_t rowWidth = row.width();
