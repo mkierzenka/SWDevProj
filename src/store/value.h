@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../utils/object.h"
+#include "../serial/serial.h"
 
 /** This class represents the serialized data that's stored in our key-value store. 
  * It can be used to store either a dataframe or a chunk of data. Values are immutable,
@@ -36,6 +37,23 @@ public:
     {
         return capacity_;
     }
+
+    /** Serializes this Value into s */
+    void serialize(Serializer* s) {
+        s->write(capacity_);
+        s->write(capacity_, val_);
+    }
+
+    /** Deserializes s into this Value */
+    void deserialize(Serializer* s) {
+        if (val_ && val_ != nullptr) {
+            free(val_);
+        }
+        capacity_ = s->readSizeT();
+        val_ = (char*)malloc(capacity_);
+        memcpy(val_, s->readString(), capacity_);
+    }
+
 
     /** Check if this Value object equals the given one */
     bool equals(Object *other)
