@@ -3,9 +3,9 @@
 #pragma once
 
 #include "../utils/object.h"
+#include "../utils/array.h"
 #include "../store/kvstore.h"
 #include "../serial/serial.h"
-#include "colarr.h"
 #include "column.h"
 #include <assert.h>
 
@@ -18,7 +18,7 @@ class ColumnArray : public Object
 {
 public:
 	KVStore* store_; // NOT OWNED
-	ColArray* colList_; //list of columns, owned
+	Array* colList_;
 	Key* dfKey_; //key of dataframe this column array belongs to
 
 	// constructor
@@ -26,7 +26,7 @@ public:
 	{
 		store_ = store;
 		dfKey_ = k;
-		colList_ = new ColArray();
+		colList_ = new Array();
 	}
 
 	// destructor
@@ -38,7 +38,14 @@ public:
 	/** Serialize a ColumnArray into char* representation */
 	void serialize(Serializer* s)
 	{
-		colList_->serialize(s);
+		//since using standard array, need to cast to column and serialize
+		//each of those
+		size_t len = colList_->length();
+		s->write(len);
+		for (size_t i = 0; i < len; i++) {
+			(dynamic_cast<Column*>(colList_->get(i)))->serialize(s);
+		}
+
 		dfKey_->serialize(s);
 	}
 
@@ -47,8 +54,14 @@ public:
 	{
 		//need to pass on KVStore to columns: assuming KVStore here is already set
 		assert(store_ != nullptr);
-		colList_->setStore(store_);
-		colList_->deserialize(s);
+		size_t len = s->readSizeT();
+		for (size_t i = 0; i < len; i++) {
+			Column* c = new Column();
+			c->setStore(store_);
+			c->deserialize(s);
+			colList_->add(c);
+		}
+
 		dfKey_->deserialize(s);
 	}
 	
@@ -104,7 +117,7 @@ public:
 	 */
 	void add_column(Column *c)
 	{
-		colList_->add_column(c);
+		colList_->add(c);
 	}
 
 	/** Create a new column of the given types and add in the elements, chunks at a
@@ -177,23 +190,34 @@ public:
    *  columns out of bounds, or request the wrong type is undefined.*/
   int get_int(size_t col, size_t row)
   {
-    return colList_->get_int(col, row);
+    //return colList_->get_int(col, row);
+	Column* c = dynamic_cast<Column*>(colList_->get(col));
+	//can check the type in the row
+	return c->get_int(row);
   }
 
   bool get_bool(size_t col, size_t row)
   {
-    return colList_->get_bool(col, row);
+    //return colList_->get_bool(col, row);
+	Column* c = dynamic_cast<Column*>(colList_->get(col));
+	//can check the type in the row
+	return c->get_bool(row);
   }
 
   double get_double(size_t col, size_t row)
   {
-    return colList_->get_double(col, row);
+    Column* c = dynamic_cast<Column*>(colList_->get(col));
+	//can check the type in the row
+	return c->get_double(row);
   }
 
   // gets the actual String*, no copy
   String *get_string(size_t col, size_t row)
   {
-    return colList_->get_string(col, row);
+    //return colList_->get_string(col, row);
+	Column* c = dynamic_cast<Column*>(colList_->get(col));
+	//can check the type in the row
+	return c->get_string(row);
   }
 
 
