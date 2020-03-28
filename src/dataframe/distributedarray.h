@@ -107,7 +107,6 @@ public:
 			DoubleBlock* val = getDoubleBlockFromStore_(k);
 			if (val != nullptr) {
 				cache_->put(k, val);
-				delete val;
 			}
         }
 		doubleData = dynamic_cast<DoubleBlock*>(cache_->getBlock(k));
@@ -130,7 +129,6 @@ public:
 			BoolBlock* val = getBoolBlockFromStore_(k);
 			if (val != nullptr) {
 				cache_->put(k, val);
-				delete val;
 			}
         }
 		boolData = dynamic_cast<BoolBlock*>(cache_->getBlock(k));
@@ -153,7 +151,6 @@ public:
 			IntBlock* val = getIntBlockFromStore_(k);
 			if (val != nullptr) {
 				cache_->put(k, val);
-				delete val;
 			}
         }
 		intData = dynamic_cast<IntBlock*>(cache_->getBlock(k));
@@ -177,7 +174,6 @@ public:
 			StringBlock* val = getStrBlockFromStore_(k);
 			if (val != nullptr) {
 				cache_->put(k, val);
-				delete val;
 			}
         }
 		strData = dynamic_cast<StringBlock*>(cache_->getBlock(k));

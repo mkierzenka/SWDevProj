@@ -324,7 +324,7 @@ class Map : public Object {
 			}
 			size_t hash = key->hash();
 			size_t index = hash % capacity_;
-			return this->insertIntoBucket_(index, key->clone(), val->clone());
+			return this->insertIntoBucket_(index, key, val);
 		}
 
 		// Returns the Object* corresponding to the specified key in the specified (by index) bucket

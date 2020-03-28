@@ -58,6 +58,9 @@ public:
 
     /** Deserialize as a String into this String*/
     void deserialize(Serializer* s) {
+        if (cstr_ != nullptr) {
+            delete[] cstr_;
+        }
         size_ = s->readSizeT();
         cstr_ = s->readString();
     }
