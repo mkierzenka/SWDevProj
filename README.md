@@ -32,3 +32,11 @@
 * Delete code for printing throughout
 
 * Df constructor that takes in schema and key: we never initialize store, pass in null store at places
+
+* Put all messages in same file
+
+* Delete unused message types
+
+* Things to ask Jan
+	* BoolBlock: reduce code duplication using unions (we think we have an idea)
+	* ColumnArray: reducing code size
