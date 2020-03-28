@@ -28,7 +28,7 @@ class Trivial : public Application {
     assert(df->get_double(0,1) == 1);
     DataFrame* df2 = kv_->get(&key);
     for (size_t i = 0; i < SZ; ++i) sum -= df2->get_double(0,i);
-	fprintf(stderr, "Final double sum = %3.6lf\n", sum);
+  	fprintf(stdout, "Final double sum = %3.6lf\n", sum);
     assert(sum==0);
     delete df; delete df2; delete[] vals;
   }
@@ -43,8 +43,8 @@ class Trivial : public Application {
     assert(df->get_int(0,1) == 1);
     DataFrame* df2 = kv_->get(&key);
     for (size_t i = 0; i < SZ; ++i) sum -= df2->get_int(0,i);
-    fprintf(stderr, "Final int sum = %d\n", sum);
-	assert(sum==0);
+    fprintf(stdout, "Final int sum = %d\n", sum);
+	  assert(sum==0);
     delete df; delete df2; delete[] vals;
   }
 
@@ -86,6 +86,7 @@ class Trivial : public Application {
     assert(actual->equals(expected));
     delete actual; delete expected;
     delete df; delete df2;
+    fprintf(stdout, "String DataFrame OK\n");
   }
 
   void run_4() {
@@ -104,5 +105,6 @@ class Trivial : public Application {
         assert(df2->get_bool(0,i) == ((i % 2) == 0 || (i > (SZ - 5))));
     }
     delete df; delete df2; delete[] vals;
+    fprintf(stdout, "Bool DataFrame OK\n");
   }
 };
