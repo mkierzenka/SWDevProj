@@ -2,9 +2,11 @@
 
 #include "../utils/object.h"
 #include "../network/client.h"
+#include "../network/pseudo/pseudonetwork.h"
 #include "../serial/serial.h"
 #include "../serial/message.h"
 #include "../serial/getdatamsg.h"
+#include "../serial/replydatamsg.h"
 #include "../utils/map.h"
 #include "key.h"
 #include "value.h"
@@ -18,13 +20,15 @@ class KVStore : public Object
 {
 public:
     MapStrObj *kvMap; //holds all key-value pairings
-    //Client *client;     //networking class used to talk to other stores
+    //Client *client_;     //networking class used to talk to other stores
+    PseudoNetwork* client_; //fake network for demo
     size_t storeId; //node id that this store belongs to
 
-    KVStore(size_t id)
+    KVStore(size_t id, PseudoNetwork* client)
     {
         kvMap = new MapStrObj();
         storeId = id;
+        client_ = client; //for demo, all need same object
     }
 
     ~KVStore()
@@ -47,26 +51,28 @@ public:
 
     DataFrame *get(Key *k);
 
+    DataFrame* waitAndGet(Key* k);
     /** Send request to specified store to get data. Return nullptr if cannot find */
-    DataFrame* waitAndGet(Key *k)
-    {
-        // if k has our node num, just get it
-        if (k->getNode() == storeId)
-        {
-            return get(k);
-        }
-         // else
-        GetDataMsg* dm = new GetDataMsg(k);
-        client_->sendmsg(dm);
-        ReplyData* dataMsg = dynamic_cast<ReplyData*>(client_->receivemsg()); //blocks until received
-        Value* val = dataMsg->getValue();
-        Serializer* s = new Serializer(val->getSize(), val->getdata());
-        DataFrame* df = new DataFrame();
-        df->deserialize(s);
-        delete val;
-        delete s;
-        return df;
-    }
+    // DataFrame* waitAndGet(Key *k)
+    // {
+    //     // if k has our node num, just get it
+    //     if (k->getNode() == storeId)
+    //     {
+    //         return get(k);
+    //     }
+    //      // else
+    //     GetDataMsg* dm = new GetDataMsg(k, storeId, k->getNode());
+    //     client_->sendMsg(dm);
+    //     ReplyDataMsg* dataMsg = dynamic_cast<ReplyDataMsg*>(client_->receiveMsg(storeId)); //blocks until received
+    //     Value* val = dataMsg->getValue();
+    //     Serializer* s = new Serializer(val->getSize(), val->getData());
+    //     DataFrame* df = new DataFrame(k, this);
+    //     df->deserialize(s);
+    //     delete val;
+    //     delete dataMsg;
+    //     delete s;
+    //     return df;
+    // }
 
     /** Get the actual Value that the given key maps to */
     Value *getValue(Key *k)
