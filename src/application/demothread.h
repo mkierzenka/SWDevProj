@@ -1,6 +1,7 @@
 //lang:Cpp
 
 #include "../utils/thread.h"
+#include "../network/pseudo/pseudonetwork.h"
 #include "demo_simple.h"
 
  /** An inner class of DataFrame representing a Thread for doing work on a contiguous
@@ -11,15 +12,20 @@ class DemoThread : public Thread
   {
   public:
     size_t nodeNum_;
+    //Demo* dem_;  //owned
+    PseudoNetwork* network_;
 
-    DemoThread(size_t node) {
+    DemoThread(size_t node, PseudoNetwork* net) : Thread() {
         nodeNum_ = node;
+        network_ = net;
     }
+
+    ~DemoThread() {}
 
     void run()
     {
-        Demo* dem = new Demo(nodeNum_);
-        dem->run_();
-        delete dem;
+        Demo* dem_ = new Demo(nodeNum_, network_);
+        dem_->run_();
+        delete dem_;
     }
   };
