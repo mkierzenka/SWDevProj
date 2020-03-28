@@ -20,8 +20,6 @@
 
 * DataFrame needs equals and hash (probably other classes do too...)
 
-* Add basic sanity tests for Key, Value
-
 * See if there are other places where Blocks can be cleared instead of repeatedly
 	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
 
@@ -31,7 +29,9 @@
 
 * Delete code for printing throughout
 
-* Df constructor that takes in schema and key: we never initialize store, pass in null store at places
+* Add KVstore to DF constructor with schema and key, remove one that takes in dataframe
+
+* Create application for sorer
 
 * Put all messages in same file
 
