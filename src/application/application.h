@@ -32,5 +32,5 @@ public:
         return idx_;
     }
 
-    void run_() {}
+    virtual void run_() {}
 };
