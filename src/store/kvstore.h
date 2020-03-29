@@ -15,7 +15,10 @@ class DataFrame;
 
 /** This class represents our key-value store. It will utilize a Map object to hold the
  * key-value pairings. It will also have networking capabilities to interact with other 
- * stores. */
+ * stores. 
+ * 
+ * @authors: broder.c@husky.neu.edu and kierzenka.m@husky.neu.edu 
+ */
 class KVStore : public Object
 {
 public:
