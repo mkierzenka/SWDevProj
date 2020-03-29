@@ -105,6 +105,23 @@ public:
     return df;
   }
 
+  /** Converts double into a dataframe object. Returns df result, which will be owned
+   * by caller
+   */
+  static DataFrame* fromScalar(Key* k, KVStore* kv, double elem)
+  {
+    //create array of size 1 and set passed element
+    double* elements = new double[1];
+    elements[0] = elem;
+
+    //delegate to from array
+    DataFrame* df = fromArray(k, kv, 1, elements);
+
+    //delete double array and return frame
+    delete elements;
+    return df;
+  }
+
   /** Adds the DataFrame to the given KVStore with the given key.
    *  Returns the DataFrame just added (df).
    */
