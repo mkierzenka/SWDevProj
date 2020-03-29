@@ -1,6 +1,7 @@
 //lang:Cpp
 //#include "../src/application/demo.h"
 #include "../src/application/demothread.h"
+#include "../src/application/nodethread.h"
 #include "../src/application/demo_simple.h"
 #include "../src/network/pseudo/pseudonetwork.h"
 
@@ -45,19 +46,37 @@ int main()
 {
     //Testing on this many nodes
     size_t nodeNum = 2;
-    DemoThread **demos = new DemoThread *[nodeNum];
+    NodeThread** nodes = new NodeThread*[nodeNum];
     PseudoNetwork *client = new PseudoNetwork(nodeNum);
     for (size_t i = 0; i < nodeNum; i++)
     {
-        demos[i] = new DemoThread(i, client);
-        demos[i]->start();
+        Demo* d = new Demo(i, client);
+        nodes[i] = new NodeThread(d);
+        nodes[i]->start();
     }
 
     for (size_t j = 0; j < nodeNum; j++)
     {
-        demos[j]->join();
-        delete demos[j];
+        nodes[j]->join();
+        delete nodes[j];
     }
 
-    delete[] demos;
+    delete[] nodes;
+    exit(1);
+
+    // DemoThread **demos = new DemoThread *[nodeNum];
+    // PseudoNetwork *client = new PseudoNetwork(nodeNum);
+    // for (size_t i = 0; i < nodeNum; i++)
+    // {
+    //     demos[i] = new DemoThread(i, client);
+    //     demos[i]->start();
+    // }
+
+    // for (size_t j = 0; j < nodeNum; j++)
+    // {
+    //     demos[j]->join();
+    //     delete demos[j];
+    // }
+
+    //delete[] demos;
 }
