@@ -25,7 +25,11 @@
 
 * Move most of logic (like loop) from Column.add_all into Distributed Array. Remove block imports from Column
 
-* fromScalar
+* Changing Sorer/reading in file to go bottom up instead of top down (create the blocks then add those to arrays)
+
+* fromScalar for int, float, string
+
+* Condense block subclasses into one class -> Block (union type and blocktype)
 
 * Delete code for printing throughout
 
@@ -36,16 +40,3 @@
 * Put all messages in same file
 
 * Delete unused message types
-
-* Things to ask Jan
-	* Pseudonetwork: flow of sending messages
-	* Actual network 
-		* Can't get more than two clients to connect
-		* How does polling work without a cpp file for clients and servers?
-		* Critique of overall design
-	* get and getAndWait: where should we put these?
-	* BoolBlock: reduce code duplication using unions (we think we have an idea)
-	* ColumnArray: reducing code size
-	* Passing KVStore into application (feedback from M2)
-	* How to handle KVStore: pass it around?
-	* fromScalar: types to handle?
