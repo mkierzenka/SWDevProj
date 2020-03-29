@@ -43,6 +43,9 @@
 		* Can't get more than two clients to connect
 		* How does polling work without a cpp file for clients and servers?
 		* Critique of overall design
+	* get and getAndWait: where should we put these?
 	* BoolBlock: reduce code duplication using unions (we think we have an idea)
 	* ColumnArray: reducing code size
 	* Passing KVStore into application (feedback from M2)
+	* How to handle KVStore: pass it around?
+	* fromScalar: types to handle?
