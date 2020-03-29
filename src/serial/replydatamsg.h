@@ -1,4 +1,6 @@
 //lang:Cpp
+#pragma once
+
 #include "message.h"
 #include "../store/key.h"
 #include "../store/value.h"

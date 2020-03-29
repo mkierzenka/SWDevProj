@@ -27,4 +27,11 @@ class GetDataMsg : public Message {
             Message::deserialize(s);
             key_->deserialize(s);
         }
+
+        /** Return key from this message */
+        Key* getKey()
+        {
+            return key_;
+        }
 };
+

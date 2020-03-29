@@ -51,4 +51,8 @@ public:
 	{
 		return target_;
 	}
+
+	MsgKind getKind() {
+		return kind_;
+	}
 };
