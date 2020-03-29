@@ -38,5 +38,11 @@
 * Delete unused message types
 
 * Things to ask Jan
+	* Pseudonetwork: flow of sending messages
+	* Actual network 
+		* Can't get more than two clients to connect
+		* How does polling work without a cpp file for clients and servers?
+		* Critique of overall design
 	* BoolBlock: reduce code duplication using unions (we think we have an idea)
 	* ColumnArray: reducing code size
+	* Passing KVStore into application (feedback from M2)
