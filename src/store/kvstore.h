@@ -63,11 +63,22 @@ public:
     /** Get the actual Value that the given key maps to */
     Value *getValue(Key *k)
     {
-        Value* val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
-        // if (val == nullptr) {
-        //     // don't have the value locally
-        //     val = getFromNetwork_(k);
-        // }
+        Value* val = nullptr;
+        if (k->getNode() == storeId) {
+            printf("Getting data locally\n");
+            val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
+            while (val == nullptr) {
+                val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
+            }
+
+            printf("Data received locally\n");
+        } else {
+            printf("Getting data from network\n");
+            // don't have the value locally
+            val = getFromNetwork_(k);
+            printf("Data received from network\n");
+        }
+
         return val;
     }
 
@@ -99,7 +110,7 @@ public:
     //     return hash_;
     // }
 
-    Value* getValueFromNetwork(Key* k) {
+    Value* getFromNetwork_(Key* k) {
         GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
         client_->sendMsg(dm);
         while (receivedMsgs_->size() == 0) {
