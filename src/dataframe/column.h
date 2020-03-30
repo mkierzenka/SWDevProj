@@ -327,7 +327,7 @@ public:
         buff->c(blockNum);
         String* keyStr = buff->get();
         delete buff;
-        Key* k = new Key(keyStr, 0); //clones String; figure out node value later
+        Key* k = new Key(keyStr, baseKey_->getNode()); //clones String; figure out node value later
         delete keyStr;
         return k;
     }
