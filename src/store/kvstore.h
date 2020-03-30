@@ -64,10 +64,10 @@ public:
     Value *getValue(Key *k)
     {
         Value* val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
-        if (val == nullptr) {
-            // don't have the value locally
-            val = getFromNetwork_(k);
-        }
+        // if (val == nullptr) {
+        //     // don't have the value locally
+        //     val = getFromNetwork_(k);
+        // }
         return val;
     }
 
@@ -99,7 +99,7 @@ public:
     //     return hash_;
     // }
 
-    Value* getFromNetwork_(Key* k) {
+    Value* getValueFromNetwork(Key* k) {
         GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
         client_->sendMsg(dm);
         while (receivedMsgs_->size() == 0) {
