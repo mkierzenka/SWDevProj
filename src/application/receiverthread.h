@@ -44,17 +44,16 @@ public:
                 // respond with data
                 GetDataMsg *gdMsg = dynamic_cast<GetDataMsg *>(m);
                 size_t sender = gdMsg->getSender();  // who sent me the msg
-                printf("Sending from %zu to %zu\n", nodeNum_, sender);
                 Value* val = kv_->getValue(gdMsg->getKey());
-                //assert(val != nullptr);
-                while (val == nullptr)
-                {
-                    val = kv_->getValue(gdMsg->getKey());
-                }
+                assert(val != nullptr);
+                // while (val == nullptr)
+                // {
+                //     val = kv_->getValue(gdMsg->getKey());
+                // }
 
                 ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
-                printf("ABOUT TO SEND REPLY WITH TARGET %zu\n", reply->getTarget());
                 network_->sendMsg(reply);
+                printf("Sending ReplyData from %zu to %zu\n", nodeNum_, sender);
                 break;
             }
             case (MsgKind::ReplyData):
