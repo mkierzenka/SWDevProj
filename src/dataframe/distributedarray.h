@@ -233,13 +233,9 @@ public:
 	 *  Caller is expected to delete the block
 	 */
 	DoubleBlock* getDoubleBlockFromStore_(Key* k) {
+        printf("Getting block with key %s\n", k->kStr_->c_str());
 		Value* val = store_->getValue(k);
-        // assert(val != nullptr);
-        if (val == nullptr)
-        {
-            printf("Getting block from network\n");
-            val = store_->getValueFromNetwork(k);
-        }
+        assert(val != nullptr);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		DoubleBlock* out = new DoubleBlock();
 		out->deserialize(s);
