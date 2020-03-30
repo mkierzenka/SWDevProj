@@ -2,7 +2,8 @@
 
 #include "../utils/thread.h"
 #include "../network/pseudo/pseudonetwork.h"
-#include "demo_simple.h"
+//#include "demo_simple.h"
+#include "demo.h"
 
  /** An inner class of DataFrame representing a Thread for doing work on a contiguous
 	 *    subset of rows of a DataFrame.

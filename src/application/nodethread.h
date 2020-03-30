@@ -4,7 +4,8 @@
 #include "../utils/thread.h"
 #include "../network/pseudo/pseudonetwork.h"
 #include "application.h"
-#include "demo_simple.h"
+//#include "demo_simple.h"
+#include "demo.h"
 #include "receiverthread.h"
 
 

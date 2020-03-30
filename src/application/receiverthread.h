@@ -6,6 +6,8 @@
 #include "../serial/replydatamsg.h"
 #include "../serial/msgkind.h"
 
+#include <assert.h>
+
 /**
  * This class represents the receiver thread. It will listen for messages continuously
  * and handle them accordingly 
@@ -42,7 +44,16 @@ public:
                 // respond with data
                 GetDataMsg *gdMsg = dynamic_cast<GetDataMsg *>(m);
                 size_t sender = gdMsg->getSender();  // who sent me the msg
-                ReplyDataMsg *reply = new ReplyDataMsg(kv_->getValue(gdMsg->getKey()), nodeNum_, sender);
+                printf("Sending from %zu to %zu\n", nodeNum_, sender);
+                Value* val = kv_->getValue(gdMsg->getKey());
+                //assert(val != nullptr);
+                while (val == nullptr)
+                {
+                    val = kv_->getValue(gdMsg->getKey());
+                }
+
+                ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
+                printf("ABOUT TO SEND REPLY WITH TARGET %zu\n", reply->getTarget());
                 network_->sendMsg(reply);
                 break;
             }
@@ -56,5 +67,7 @@ public:
                 puts("Weird msg type...");
             }
         }
+        
+        printf("End of receive thread run\n");
     }
 };
