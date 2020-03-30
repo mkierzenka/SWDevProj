@@ -15,15 +15,20 @@ DataFrame *KVStore ::waitAndGet(Key *k)
     // else
     GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
     client_->sendMsg(dm);
-    ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(client_->receiveMsg(storeId)); //blocks until received
-    printf("Node %zu got reply data message: handle\n", storeId);
+    while (receivedMsgs_->size() == 0) {
+		//do nothing, waiting until there is a message received
+	}
+    //ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(client_->receiveMsg(storeId)); //blocks until received
+	ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(receivedMsgs_->pop());
+	assert(dataMsg != nullptr);
     Value *val = dataMsg->getValue();
+	assert(val != nullptr);
     Serializer *s = new Serializer(val->getSize(), val->getData());
     DataFrame *df = new DataFrame(k, this);
     df->deserialize(s);
-    delete val;
-    delete dataMsg;
-    delete s;
+    //delete val;
+    //delete dataMsg;
+    //delete s;
     return df;
 }
 
@@ -63,21 +68,5 @@ int main()
     }
 
     delete[] nodes;
-    exit(1);
-
-    // DemoThread **demos = new DemoThread *[nodeNum];
-    // PseudoNetwork *client = new PseudoNetwork(nodeNum);
-    // for (size_t i = 0; i < nodeNum; i++)
-    // {
-    //     demos[i] = new DemoThread(i, client);
-    //     demos[i]->start();
-    // }
-
-    // for (size_t j = 0; j < nodeNum; j++)
-    // {
-    //     demos[j]->join();
-    //     delete demos[j];
-    // }
-
-    //delete[] demos;
+    exit(0);
 }

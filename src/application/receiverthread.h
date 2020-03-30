@@ -33,28 +33,23 @@ public:
         while (true)
         {
             Message *m = network_->receiveMsg(nodeNum_); // blocks until new message arrives
-            //printf("Node %zu Received message!\n", nodeNum_);
             MsgKind kind = m->getKind();
             switch (kind)
             {
             case MsgKind::GetData:
             {
+                printf("Node %zu received getdata\n", nodeNum_);
                 // respond with data
                 GetDataMsg *gdMsg = dynamic_cast<GetDataMsg *>(m);
-                //size_t target = gdMsg->getTarget();
-                size_t target = gdMsg->getSender();
-                //printf("Node %zu target: %zu\n", nodeNum_, target);
-                ReplyDataMsg *reply = new ReplyDataMsg(kv_->getValue(gdMsg->getKey()), nodeNum_, target);
+                size_t sender = gdMsg->getSender();  // who sent me the msg
+                ReplyDataMsg *reply = new ReplyDataMsg(kv_->getValue(gdMsg->getKey()), nodeNum_, sender);
                 network_->sendMsg(reply);
-                printf("Node %zu got get data message\n", nodeNum_);
                 break;
             }
-            case MsgKind::ReplyData:
+            case (MsgKind::ReplyData):
             {
-                printf("Node %zu got reply data message: reflect\n", nodeNum_);
-                //let other receive message call handle
-                MessageQueue* msg = dynamic_cast<MessageQueue*>(network_->mqa_->arr_->get(nodeNum_));
-                msg->push(m);
+                printf("Node %zu received replydata\n", nodeNum_);
+                kv_->receivedMsgs_->push(m);
                 break;
             }
             default:
