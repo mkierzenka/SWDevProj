@@ -36,10 +36,10 @@ public:
     void sendMsg(Message *m)
     {
         size_t target = m->getTarget();
-        printf("SENDER: %zu\n", m->getSender());
-        printf("TARGET: %zu\n", target);
+        //printf("SENDER: %zu\n", m->getSender());
+        //printf("TARGET: %zu\n", target);
         mqa_->get(target)->push(m);
-        printf("Message sent to %zu\n", target);
+        printf("Message sent from %zu to %zu\n", m->getSender(), target);
         printf("Length of message queue %zu's message array: %zu\n", target, mqa_->get(target)->size());
     }
 
