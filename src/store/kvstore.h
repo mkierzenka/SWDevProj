@@ -59,27 +59,6 @@ public:
     DataFrame *get(Key *k);
 
     DataFrame* waitAndGet(Key* k);
-    /** Send request to specified store to get data. Return nullptr if cannot find */
-    // DataFrame* waitAndGet(Key *k)
-    // {
-    //     // if k has our node num, just get it
-    //     if (k->getNode() == storeId)
-    //     {
-    //         return get(k);
-    //     }
-    //      // else
-    //     GetDataMsg* dm = new GetDataMsg(k, storeId, k->getNode());
-    //     client_->sendMsg(dm);
-    //     ReplyDataMsg* dataMsg = dynamic_cast<ReplyDataMsg*>(client_->receiveMsg(storeId)); //blocks until received
-    //     Value* val = dataMsg->getValue();
-    //     Serializer* s = new Serializer(val->getSize(), val->getData());
-    //     DataFrame* df = new DataFrame(k, this);
-    //     df->deserialize(s);
-    //     delete val;
-    //     delete dataMsg;
-    //     delete s;
-    //     return df;
-    // }
 
     /** Get the actual Value that the given key maps to */
     Value *getValue(Key *k)
