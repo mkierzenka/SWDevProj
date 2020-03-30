@@ -24,11 +24,11 @@ DataFrame *KVStore ::waitAndGet(Key *k)
     Value *val = dataMsg->getValue();
 	assert(val != nullptr);
     Serializer *s = new Serializer(val->getSize(), val->getData());
-    printf("Serializer created\n");
+    //printf("Serializer created\n");
     DataFrame *df = new DataFrame(k, this);
-    printf("Dataframe created\n");
+    //printf("Dataframe created\n");
     df->deserialize(s);
-    printf("Dataframe deserialized\n");
+    //printf("Dataframe deserialized\n");
     //delete val;
     //delete dataMsg;
     //delete s;
@@ -64,14 +64,14 @@ int main()
         nodes[i]->start();
     }
 
-    //for (size_t j = 0; j < nodeNum; j++)
-    for (size_t j = nodeNum - 1; j >= 0; j--)
-    {
-        nodes[j]->join();
-        printf("Thread %zu ended\n", j);
-        delete nodes[j];
-    }
+     for (size_t j = 0; j < nodeNum; j++)
+     //for (size_t j = nodeNum - 1; j >= 0; j--)
+     {
+         nodes[j]->join();
+         printf("Thread %zu ended\n", j);
+         delete nodes[j];
+     }
 
-    delete[] nodes;
+    //delete[] nodes;
     exit(0);
 }
