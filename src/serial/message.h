@@ -47,11 +47,6 @@ public:
 		id_ = s->readSizeT();
 	}
 
-	size_t getSender()
-	{
-		return sender_;
-	}
-
 	size_t getTarget()
 	{
 		return target_;
