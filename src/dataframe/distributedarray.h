@@ -234,6 +234,12 @@ public:
 	 */
 	DoubleBlock* getDoubleBlockFromStore_(Key* k) {
 		Value* val = store_->getValue(k);
+        // assert(val != nullptr);
+        if (val == nullptr)
+        {
+            printf("Getting block from network\n");
+            val = store_->getValueFromNetwork(k);
+        }
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		DoubleBlock* out = new DoubleBlock();
 		out->deserialize(s);

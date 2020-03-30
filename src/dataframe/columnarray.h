@@ -208,6 +208,11 @@ public:
 	double get_double(size_t col, size_t row)
 	{
 		Column *c = dynamic_cast<Column *>(colList_->get(col));
+		if (c == nullptr)
+		{
+			fprintf(stderr, "Cannot get double from null column\n");
+		}
+		
 		//can check the type in the row
 		return c->get_double(row);
 	}
