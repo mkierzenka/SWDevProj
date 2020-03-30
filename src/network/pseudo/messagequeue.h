@@ -46,5 +46,10 @@ class MessageQueue : public Object {
             lock_.unlock();
             return res;
         }
+
+        /** Returns the number of entries in this MessageQueue */
+        size_t size() {
+            return messages_->size();
+        }
         
 };

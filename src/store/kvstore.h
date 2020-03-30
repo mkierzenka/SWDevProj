@@ -10,6 +10,7 @@
 #include "../utils/map.h"
 #include "key.h"
 #include "value.h"
+#include "../network/pseudo/messagequeue.h"
 
 class DataFrame;
 
@@ -26,12 +27,15 @@ public:
     //Client *client_;     //networking class used to talk to other stores
     PseudoNetwork* client_; //fake network for demo
     size_t storeId; //node id that this store belongs to
+    MessageQueue* receivedMsgs_;
+
 
     KVStore(size_t id, PseudoNetwork* client)
     {
         kvMap = new MapStrObj();
         storeId = id;
         client_ = client; //for demo, all need same object
+        receivedMsgs_ = new MessageQueue();
     }
 
     ~KVStore()
@@ -80,8 +84,12 @@ public:
     /** Get the actual Value that the given key maps to */
     Value *getValue(Key *k)
     {
-        Object *o = kvMap->get(k->getKeyStr());
-        return dynamic_cast<Value *>(o);
+        Value* val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
+        if (val == nullptr) {
+            // don't have the value locally
+            val = getFromNetwork_(k);
+        }
+        return val;
     }
 
     /** Check if two distributed arrats equal */
@@ -111,4 +119,17 @@ public:
 
     //     return hash_;
     // }
+
+    Value* getFromNetwork_(Key* k) {
+        GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
+        client_->sendMsg(dm);
+        while (receivedMsgs_->size() == 0) {
+            //wait until ReceiverThread has something for me
+        }
+        //ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(client_->receiveMsg(storeId)); //blocks until received
+        ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(receivedMsgs_->pop());
+        assert(dataMsg != nullptr);
+        Value *val = dataMsg->getValue();
+        return val;
+    }
 };

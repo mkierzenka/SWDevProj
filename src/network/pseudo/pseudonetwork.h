@@ -42,7 +42,6 @@ public:
 
     Message *receiveMsg(size_t recNode)
     {
-        printf("Node %zu attempting to receive message\n", recNode);
         return mqa_->get(recNode)->pop();
     }
 };

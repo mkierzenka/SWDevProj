@@ -52,6 +52,10 @@ public:
 		return target_;
 	}
 
+	size_t getSender() {
+		return sender_;
+	}
+
 	MsgKind getKind() {
 		return kind_;
 	}

@@ -1,8 +1,16 @@
 # SWDevProj
 
-
+demoTest.cpp has latest waitAndGet
 
 ### Notes for things to improve from before:
+
+* waitAndGet has an empty while loop. This should probably be replaced with a lock or other means
+	to notify (instead of burning CPU cycles)
+
+* getFromNetwork_ has a while loop. This should probably be replaced with a lock or other means
+	to notify (instead of burning CPU cycles)
+
+* demoTest.cpp does not delete anything, memory leaks here
 
 * Does columnarray need push_back? ColArr has it too. Do we even use it?
 
