@@ -16,6 +16,7 @@ DataFrame *KVStore ::waitAndGet(Key *k)
     GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
     client_->sendMsg(dm);
     ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(client_->receiveMsg(storeId)); //blocks until received
+    printf("Node %zu got reply data message: handle\n", storeId);
     Value *val = dataMsg->getValue();
     Serializer *s = new Serializer(val->getSize(), val->getData());
     DataFrame *df = new DataFrame(k, this);
