@@ -24,11 +24,8 @@ DataFrame *KVStore ::waitAndGet(Key *k)
     Value *val = dataMsg->getValue();
 	assert(val != nullptr);
     Serializer *s = new Serializer(val->getSize(), val->getData());
-    //printf("Serializer created\n");
     DataFrame *df = new DataFrame(k, this);
-    //printf("Dataframe created\n");
     df->deserialize(s);
-    //printf("Dataframe deserialized\n");
     //delete val;
     //delete dataMsg;
     //delete s;
