@@ -40,7 +40,7 @@ public:
         //printf("TARGET: %zu\n", target);
         mqa_->get(target)->push(m);
         printf("Message sent from %zu to %zu\n", m->getSender(), target);
-        printf("Length of message queue %zu's message array: %zu\n", target, mqa_->get(target)->size());
+        //printf("Length of message queue %zu's message array: %zu\n", target, mqa_->get(target)->size());
     }
 
     Message *receiveMsg(size_t recNode)
