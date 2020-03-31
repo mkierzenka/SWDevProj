@@ -11,6 +11,7 @@
 #include "key.h"
 #include "value.h"
 #include "../network/pseudo/messagequeue.h"
+#include "../serial/putmsg.h"
 
 class DataFrame;
 
@@ -50,7 +51,9 @@ public:
         //make sure adding key to right node
         if (k->getNode() != storeId)
         {
-            fprintf(stderr, "Attempting to put Key with node %zu into store for node %zu", k->getNode(), storeId);
+            PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
+			client_->sendMsg(msg);
+			//fprintf(stderr, "Attempting to put Key with node %zu into store for node %zu", k->getNode(), storeId);
         }
 
         kvMap->put(k->getKeyStr()->clone(), data->clone());
@@ -65,18 +68,18 @@ public:
     {
         Value* val = nullptr;
         if (k->getNode() == storeId) {
-            printf("Getting data locally\n");
+            printf("Getting data [%s] locally\n", k->getKeyStr()->cstr_);
             val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
-            while (val == nullptr) {
+            /*while (val == nullptr) {
                 val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
-            }
+            }*/
 
-            printf("Data received locally\n");
+            //printf("Data [%s] received locally\n", k->getKeyStr()->cstr_);
         } else {
-            printf("Getting data from network\n");
+            printf("Getting data [%s] from network\n", k->getKeyStr()->cstr_);
             // don't have the value locally
             val = getFromNetwork_(k);
-            printf("Data received from network\n");
+            printf("Data received [%s] from network\n", k->getKeyStr()->cstr_);
         }
 
         return val;
