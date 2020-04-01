@@ -62,13 +62,12 @@ int main()
     }
 
      for (size_t j = 0; j < nodeNum; j++)
-     //for (size_t j = nodeNum - 1; j >= 0; j--)
      {
          nodes[j]->join();
          printf("Thread %zu ended\n", j);
          delete nodes[j];
      }
 
-    //delete[] nodes;
+    delete[] nodes;
     exit(0);
 }

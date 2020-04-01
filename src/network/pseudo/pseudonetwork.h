@@ -16,7 +16,7 @@ class PseudoNetwork : public Object
 public:
     MsgQueueArr *mqa_; //holds message arrays for each node
 
-    /**
+   /**
    * Pass in number of nodes
    */
     PseudoNetwork(size_t numNodes)
@@ -36,11 +36,8 @@ public:
     void sendMsg(Message *m)
     {
         size_t target = m->getTarget();
-        //printf("SENDER: %zu\n", m->getSender());
-        //printf("TARGET: %zu\n", target);
         mqa_->get(target)->push(m);
         printf("Message sent from %zu to %zu\n", m->getSender(), target);
-        //printf("Length of message queue %zu's message array: %zu\n", target, mqa_->get(target)->size());
     }
 
     Message *receiveMsg(size_t recNode)

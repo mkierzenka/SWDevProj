@@ -53,7 +53,6 @@ public:
         {
             PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
 			client_->sendMsg(msg);
-			//fprintf(stderr, "Attempting to put Key with node %zu into store for node %zu", k->getNode(), storeId);
         }
 
         kvMap->put(k->getKeyStr()->clone(), data->clone());
@@ -73,8 +72,6 @@ public:
             /*while (val == nullptr) {
                 val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
             }*/
-
-            //printf("Data [%s] received locally\n", k->getKeyStr()->cstr_);
         } else {
             printf("Getting data [%s] from network\n", k->getKeyStr()->cstr_);
             // don't have the value locally
