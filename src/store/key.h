@@ -97,7 +97,7 @@ public:
         //format of string should be "{kStr_->c_}-{idx}""
         StrBuff* sb = new StrBuff();
         sb->c(*kStr_);
-        sb->c('-');
+        sb->c("-");
         sb->c(idx);
         String* newStrRes = sb->get();
 
