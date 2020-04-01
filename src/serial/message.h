@@ -29,6 +29,16 @@ public:
 		sender_ = sender;
 		target_ = target;
 		id_ = id;
+
+		/*p("#Message ").p(sender).p(" ").p(target).p(" ");
+		switch (kind) {
+			case MsgKind::Ack: pln("Ack"); break;
+			case MsgKind::GetData: pln("GetData"); break;
+			case MsgKind::Put: pln("Put"); break;
+			case MsgKind::ReplyData: pln("ReplyData"); break;
+			case MsgKind::WaitAndGet: pln("WaitAndGet"); break;
+		}*/
+		
 	}
 	
 	virtual ~Message() {}

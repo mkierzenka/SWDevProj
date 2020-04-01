@@ -5,7 +5,7 @@
 #include "../serial/message.h"
 #include "../serial/replydatamsg.h"
 #include "../serial/msgkind.h"
-
+#include "../serial/waitandgetmsg.h"
 #include <assert.h>
 
 /**
@@ -42,60 +42,65 @@ public:
             {
             case MsgKind::GetData:
             {
-                // respond with data
                 GetDataMsg *gdMsg = dynamic_cast<GetDataMsg *>(m);
-                size_t sender = gdMsg->getSender();  // who sent me the msg
-				printf("Node %zu received getdata[%s] from node %zu\n", nodeNum_, gdMsg->getKey()->getKeyStr()->cstr_, sender);
-				
+                size_t sender = gdMsg->getSender();
+				// Respond with data, nullptr if we don't have it right now
 				Value* val = kv_->getValue(gdMsg->getKey());
-				if (val != nullptr) {
+				ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
+				network_->sendMsg(reply);
+                break;
+            }
+			case MsgKind::WaitAndGet:
+            {
+                // respond with data
+                WaitAndGetMsg *gdMsg = dynamic_cast<WaitAndGetMsg *>(m);
+                size_t sender = gdMsg->getSender();
+				// Respond with data, add it to the queue if we don't have it right now
+				Value* val = kv_->getValue(gdMsg->getKey());
+				if (val) {
 					ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
-					printf("Sending ReplyData[%s] from %zu to %zu\n", gdMsg->getKey()->getKeyStr()->cstr_, nodeNum_, sender);
 					network_->sendMsg(reply);
 				} else {
-					//msgsInProg_->push(gdMsg);
-					network_->sendMsg(gdMsg);
+					msgsInProg_->push(gdMsg);
 				}
                 break;
             }
             case (MsgKind::ReplyData):
             {
-				printf("Node %zu received replydata\n", nodeNum_);
                 kv_->receivedMsgs_->push(m);
                 break;
             }
 			case (MsgKind::Put):
 			{
-				printf("Node %zu received put\n", nodeNum_);
 				PutMsg *msg = dynamic_cast<PutMsg *>(m);
 				Key* k = msg->getKey();
                 if (k->getNode() == nodeNum_) {
-					kv_->put(k, msg->getValue());
+					kv_->putLocal(k, msg->getValue());
 				}
+				
+				// Handle messages in the Queue
+				MessageQueue* tmp = new MessageQueue();
+				while (msgsInProg_->size() > 0) {
+					WaitAndGetMsg* m = dynamic_cast<WaitAndGetMsg *>(msgsInProg_->pop());
+					size_t sender = m->getSender();
+					Value* val = kv_->getValue(m->getKey());
+					if(val != nullptr) {
+						ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
+						network_->sendMsg(reply);
+					} else {
+						tmp->push(m);
+					}
+				}
+				while(tmp->size() > 0) {
+					msgsInProg_->push(tmp->pop());
+				}
+				delete tmp;
 				break;
 			}
             default:
-                puts("Weird msg type...");
+                pln("Weird msg type...");
             }
-
-			// Handle messages in the Queue
-			/*MessageQueue* tmp = new MessageQueue();
-			while (msgsInProg_->size() > 0) {
-				GetDataMsg* m = dynamic_cast<GetDataMsg *>(msgsInProg_->pop());
-				size_t sender = m->getSender();  // who sent me the msg
-				Value* val = kv_->getValue(m->getKey());
-				if(val != nullptr) {
-					ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
-					printf("Sending ReplyData[%s] from %zu to %zu\n", m->getKey()->getKeyStr()->cstr_, nodeNum_, sender);
-					network_->sendMsg(reply);
-				} else {
-					tmp->push(m);
-				}
-			}
-			while(tmp->size() > 0) {
-				msgsInProg_->push(tmp->pop());
-			}
-			delete tmp;*/
+			
         }
         
         printf("End of receive thread run\n");

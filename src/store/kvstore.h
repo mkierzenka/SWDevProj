@@ -24,18 +24,18 @@ class DataFrame;
 class KVStore : public Object
 {
 public:
-    MapStrObj *kvMap; //holds all key-value pairings
-    //Client *client_;     //networking class used to talk to other stores
-    PseudoNetwork* client_; //fake network for demo
-    size_t storeId; //node id that this store belongs to
-    MessageQueue* receivedMsgs_;
+    MapStrObj *kvMap;              //holds all key-value pairings
+    //Client *client_;             //networking class used to talk to other stores
+    PseudoNetwork* client_;        //fake network for demo
+    size_t storeId;                //node id that this store belongs to
+    MessageQueue* receivedMsgs_;   //for our ReceiverThread to pass msgs to this store
 
 
     KVStore(size_t id, PseudoNetwork* client)
     {
         kvMap = new MapStrObj();
         storeId = id;
-        client_ = client; //for demo, all need same object
+        client_ = client;
         receivedMsgs_ = new MessageQueue();
     }
 
@@ -44,18 +44,20 @@ public:
         delete kvMap;
     }
 
-    /** Puts key-value pair into map. Since it is stored locally, don't need to include store id.
-     * Will clone the data */
+    /** Puts key-value pair into distributed KV store */
     void put(Key *k, Value *data)
     {
-        //make sure adding key to right node
-        if (k->getNode() != storeId)
-        {
-            PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
-			client_->sendMsg(msg);
-        }
-
+		PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
+		client_->sendMsg(msg);
+    }
+	
+	/** Puts key-value pair into local map. Will clone the data */
+    void putLocal(Key *k, Value *data)
+    {
+        assert(k->getNode() == storeId);
+		size_t tmp = kvMap->size();
         kvMap->put(k->getKeyStr()->clone(), data->clone());
+		assert(kvMap->size() == tmp + 1);
     }
 
     DataFrame *get(Key *k);
@@ -67,16 +69,9 @@ public:
     {
         Value* val = nullptr;
         if (k->getNode() == storeId) {
-            printf("Getting data [%s] locally\n", k->getKeyStr()->cstr_);
             val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
-            /*while (val == nullptr) {
-                val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
-            }*/
         } else {
-            printf("Getting data [%s] from network\n", k->getKeyStr()->cstr_);
-            // don't have the value locally
             val = getFromNetwork_(k);
-            printf("Data received [%s] from network\n", k->getKeyStr()->cstr_);
         }
 
         return val;
@@ -113,11 +108,8 @@ public:
     Value* getFromNetwork_(Key* k) {
         GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
         client_->sendMsg(dm);
-        while (receivedMsgs_->size() == 0) {
-            //wait until ReceiverThread has something for me
-        }
-        //ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(client_->receiveMsg(storeId)); //blocks until received
         ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(receivedMsgs_->pop());
+		// ^^ Blocks until the message is ready for this store
         assert(dataMsg != nullptr);
         Value *val = dataMsg->getValue();
         return val;

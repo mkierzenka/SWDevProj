@@ -37,7 +37,6 @@ public:
     {
         size_t target = m->getTarget();
         mqa_->get(target)->push(m);
-        printf("Message sent from %zu to %zu\n", m->getSender(), target);
     }
 
     Message *receiveMsg(size_t recNode)

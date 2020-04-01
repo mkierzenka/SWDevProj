@@ -4,6 +4,7 @@
 //#include "../src/application/demo_simple.h"
 #include "../src/application/demo.h"
 #include "../src/network/pseudo/pseudonetwork.h"
+#include "../src/serial/waitandgetmsg.h"
 
 DataFrame *KVStore ::waitAndGet(Key *k)
 {
@@ -12,33 +13,25 @@ DataFrame *KVStore ::waitAndGet(Key *k)
     {
         return get(k);
     }
-    // else
-    GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
+    WaitAndGetMsg *dm = new WaitAndGetMsg(k, storeId, k->getNode());
     client_->sendMsg(dm);
-    while (receivedMsgs_->size() == 0) {
-		//do nothing, waiting until there is a message received
-	}
-    //ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(client_->receiveMsg(storeId)); //blocks until received
 	ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(receivedMsgs_->pop());
-	assert(dataMsg != nullptr);
+	assert(dataMsg);
     Value *val = dataMsg->getValue();
-	assert(val != nullptr);
+	assert(val);
     Serializer *s = new Serializer(val->getSize(), val->getData());
     DataFrame *df = new DataFrame(k, this);
     df->deserialize(s);
-    //delete val;
-    //delete dataMsg;
-    //delete s;
+    delete val;
+    delete dataMsg;
+    delete s;
     return df;
 }
 
 DataFrame *KVStore::get(Key *k)
 {
     Value *val = getValue(k);
-    //set up new serializer to deserialize returned data into a dataframe
     Serializer *s = new Serializer(val->getSize(), val->getData());
-
-    //create new dataframe and mutate by deserializing
     DataFrame *d = new DataFrame(k, this);
     d->deserialize(s);
 
