@@ -2,13 +2,33 @@
 
 demoTest.cpp has latest waitAndGet
 
+
+Current ReceiverThread idea:
+WaitAndGet messages it can't currently respond to go on MessageQueue msgsInProg_
+Think of this queue as "linking" to KVStore's receivedMsgs_ (they are the same object for a KVStore-ReceiverThread pair)
+The field receivedMsgs_ is how ReceiverThread sends info to KVStore
+When a ReceiverThread receives a PutData message, it adds it to kvstore (addLocal)
+And then checks the msgsInProg_ Queue to see if anyone else was looking for the data that just came in
+It sends the responses if available
+
+
+
+Room for improvement:
+KVStore.put sends a Put message (from itself to itself), even if we are trying to put data locally.
+This causes the ReceiverThread to receive that message, add it to the local store,
+and then (this is the key) run through the msgsInProg_ Queue to see if anyone is looking for that new data
+There should be a way to accomplish this without have to send a message to yourself - perhaps using the shared queue in reverse
+The KVStore could maybe check the queue when it wants to add a new key locally, and send back new responses if possible
+But when I tried I did not get it to work consistently (Demo would hang, though possibly from an issue elsewhere)
+
+
+
 ### Notes for things to improve from before:
 
-* waitAndGet has an empty while loop. This should probably be replaced with a lock or other means
-	to notify (instead of burning CPU cycles)
 
-* getFromNetwork_ has a while loop. This should probably be replaced with a lock or other means
-	to notify (instead of burning CPU cycles)
+* waitandgetmsg.h could use comments and maybe cleanup, parallel to getdatamsg
+
+* Put pragma once everywhere
 
 * demoTest.cpp does not delete anything, memory leaks here
 
