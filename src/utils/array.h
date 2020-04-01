@@ -21,7 +21,7 @@ public:
 	// constructor
 	Array()
 	{
-		listSize_ = 1;
+		listSize_ = 2;
 		objList_ = new Object *[listSize_];
 		len_ = 0;
 	}
@@ -41,25 +41,17 @@ public:
 	// check if this array equals to other array
 	bool equals(Object *other)
 	{
-		//same memory address: must be equal
 		if (this == other)
 		{
 			return true;
 		}
 
 		Array *o = dynamic_cast<Array *>(other);
-		if (!o)
+		if (o == nullptr || this->length() != o->length())
 		{
 			return false;
 		}
 
-		//arrays cannot be equal if not the same length
-		if (len_ != o->len_)
-		{
-			return false;
-		}
-
-		//return false if any of elements not same
 		for (size_t i = 0; i < len_; i += 1)
 		{
 			if (!get(i)->equals(o->get(i)))
@@ -68,7 +60,6 @@ public:
 			}
 		}
 
-		//arrays equal
 		return true;
 	}
 
@@ -108,7 +99,7 @@ public:
 	Object *get(size_t index)
 	{
 		// check for out-of-bounds
-		if (index >= len_)
+		if (index >= length())
 		{
 			printf("Out-Of-Bounds Error: cannot get value from index %zu", index);
 			exit(1);
@@ -138,6 +129,7 @@ public:
 		if (index > len_)
 		{
 			printf("Out-Of-Bounds Error: cannot get value from index %zu", index);
+			exit(1);
 		}
 
 		//if index to insert at is the length, treat as if you're adding to end of array
@@ -152,16 +144,13 @@ public:
 	// remove the element with the given index
 	Object *remove(size_t index)
 	{
-		// check for out-of-bounds
 		if (index >= len_)
 		{
 			printf("Out-Of-Bounds Error: cannot get value from index %zu", index);
+			exit(1);
 		}
 
-		//get value to be removed
 		Object *val = get(index);
-
-		//decrement length
 		len_ -= 1;
 
 		//move elements over
@@ -176,7 +165,7 @@ public:
 	// get the index of the given object
 	int index_of(Object *o)
 	{
-		for (size_t i = 0; i < len_; i += 1)
+		for (size_t i = 0; i < length(); i += 1)
 		{
 			if (get(i)->equals(o))
 			{
@@ -191,13 +180,8 @@ public:
 	// remove all elements in the array
 	void clear()
 	{
-		for (int i = 0; i < len_; i++) {
-            //delete individual elements
-            delete objList_[i];
-        }
-
-		delete[] objList_;
-		listSize_ = 1;
+		deleteObjList_();
+		listSize_ = 2;
 		objList_ = new Object *[listSize_];
 		len_ = 0;
 	}
@@ -219,7 +203,6 @@ public:
 			tmp[i] = objList_[i];
 		}
 
-		//delete old reference and set updated pointer
 		delete[] objList_;
 		objList_ = tmp;
 	}
@@ -230,7 +213,6 @@ public:
 	void deleteObjList_()
 	{
 		for (int i = 0; i < len_; i++) {
-            //delete individual elements
             delete objList_[i];
         }
 		delete[] objList_;
