@@ -16,7 +16,7 @@
 
 class Trivial : public Application {
  public:
-  Trivial(size_t idx) : Application(idx) { }
+  Trivial(size_t idx) : Application(idx, nullptr) { }
 
   void run_() {
     size_t SZ = 1000 * 1000;

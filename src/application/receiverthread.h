@@ -49,12 +49,12 @@ public:
 				
 				Value* val = kv_->getValue(gdMsg->getKey());
 				if (val != nullptr) {
-					//assert(val != nullptr);
 					ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
 					printf("Sending ReplyData[%s] from %zu to %zu\n", gdMsg->getKey()->getKeyStr()->cstr_, nodeNum_, sender);
 					network_->sendMsg(reply);
 				} else {
-					msgsInProg_->push(gdMsg);
+					//msgsInProg_->push(gdMsg);
+					network_->sendMsg(gdMsg);
 				}
                 break;
             }
@@ -79,13 +79,12 @@ public:
             }
 
 			// Handle messages in the Queue
-			MessageQueue* tmp = new MessageQueue();
+			/*MessageQueue* tmp = new MessageQueue();
 			while (msgsInProg_->size() > 0) {
 				GetDataMsg* m = dynamic_cast<GetDataMsg *>(msgsInProg_->pop());
 				size_t sender = m->getSender();  // who sent me the msg
-				if(kv_->getValue(m->getKey()) != nullptr) {
-					Value* val = kv_->getValue(m->getKey());
-					assert(val != nullptr);
+				Value* val = kv_->getValue(m->getKey());
+				if(val != nullptr) {
 					ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
 					printf("Sending ReplyData[%s] from %zu to %zu\n", m->getKey()->getKeyStr()->cstr_, nodeNum_, sender);
 					network_->sendMsg(reply);
@@ -96,7 +95,7 @@ public:
 			while(tmp->size() > 0) {
 				msgsInProg_->push(tmp->pop());
 			}
-			delete tmp;
+			delete tmp;*/
         }
         
         printf("End of receive thread run\n");
