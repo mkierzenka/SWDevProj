@@ -127,18 +127,13 @@ class Map : public Object {
 		 * @brief Construct a new Map object
 		 * 
 		 */
-		Map() {
-			capacity_ = 4;
-			size_ = 0;
-			buckets_ = new Entry*[capacity_];
-			memset(buckets_, 0, capacity_ * sizeof(buckets_));
-		}
+		Map() : Map(4) {}
 		
 		/**
 		 * Constructor to optimize performance of map.
 		 * @param capacity number of buckets available to store different values.
 		 */
-		Map(size_t capacity) {
+		Map(size_t capacity) : Object() {
 			capacity_ = capacity;
 			size_ = 0;
 			buckets_ = new Entry*[capacity_];
@@ -628,155 +623,6 @@ class MapStrObj : public Map {
 		bool equals(Object* other) {
 			if (this == other) return true;
 			MapStrObj* otherMap = dynamic_cast<MapStrObj*>(other);
-			if (!otherMap) {
-				return false;
-			}
-			if (this->size_ != otherMap->size_) return false;
-			// different values for capacity_ (the number of buckets) is okay
-			
-			return this->helper_->equals(otherMap->helper_);
-		}
-		
-		/**
-		 * @brief Calculates the hash of the map. The hash will only be dependent on the key value pairs
-		 * of the map, and NOT the location of them in the buckets.
-		 * Example:
-		 * Map* map1 = new Map(10000);
-		 * Map* map2 = new Map();
-		 * Object* key = new Object();
-		 * Object* value = new Object();
-		 * map1->put(key, value);
-		 * map2->put(key, value);
-		 * // This should return true even though the key value pairs are in different bucket locations
-		 * map1->hash() == map2->hash(); 
-		 * 
-		 * @return hash representation of each key value pair in the map
-		 */
-		 // Overrides Map.hash
-		size_t hash() {
-			return this->helper_->hash();
-		}
-};
-
-/** 
- * Represents a map where the key is a string and the value is a string. Inherits from map.
- * 
- * These functions are restricted to only allowing String->String pairs, meaning that a MapStrStr
- * will only allow String->String pairs.
- */
-class MapStrStr : public Map {
-    public:
-		Map* helper_;
-    
-		/**
-		 * Constructor
-		 */
-		MapStrStr() : Map() {
-			helper_ = new Map();
-		}
-		
-		/**
-		 * Constructor to optimize performance of map.
-		 * @param capacity number of buckets available to store different values.
-		 */
-		MapStrStr(size_t capacity) : Map() {
-			helper_ = new Map(capacity);
-		}
-
-		/**
-		 * Deconstructor
-		 */
-		~MapStrStr() {
-			delete this->helper_;
-		}
-
-		/**
-		 * Adds a mapping from key to val to the map. A key must be unique, if there is already a key
-		 * of the same value in the map, the value will be overwritten by the new value.
-		 * 
-		 * NOTE: This function will mutate the Map
-		 * 
-		 * @param key String key
-		 * @param val String value
-		 * @return the old value from the given key, a nullptr is returned if no old value exists
-		 */
-		String* put(String* key, String* val) {
-			String* prev = dynamic_cast<String*>(this->helper_->put(key, val)); // safe because all values are String*
-			this->size_ = this->helper_->size();
-			return prev;
-		}
-		
-		/**
-		 * Returns the String that the key maps to.
-		 * 
-		 * @param key String unique key
-		 * @return String value for the key, a nullptr is returned if no value exists
-		 */
-		String* get(String* key) {
-			Object* value = this->helper_->get(key);
-			return dynamic_cast<String*>(value); //safe because all values inserted as Strings
-		}
-
-		/**
-		 * Removes the key value mapping from the map.
-		 * 
-		 * @param key String key of mapping to remove
-		 * @return String value that was removed, a nullptr is returned if no value exists
-		 */
-		String* remove(String* key) {
-			Object* value = this->helper_->remove(key);
-			this->size_ = this->helper_->size();
-			return dynamic_cast<String*>(value); //safe because all values inserted as Strings
-		}
-		
-		/**
-		 * Determines if the map contains the given key.
-		 * @param key String key
-		 * @return if the key is in the map
-		 */
-		bool contains_key(String* key) {
-			return this->helper_->contains_key(key);
-		}
-
-		/**
-		* Returns a new Object array of keys. This array will need to be freed in memory after use.
-		* NOTE: If a map has no keys, it will return an empty Object**
-		* @return new Object array of keys
-		*/
-		Object** get_keys() {
-			return this->helper_->get_keys();
-		}
-
-		/**
-		* Returns a new Object array of values. This array will need to be freed in memory after use.
-		* NOTE: If a map has no values, it will return an empty Object**
-		* @return new Object array of values
-		*/
-		Object** get_values() {
-			return this->helper_->get_values();
-		}
-		
-		/**
-		 * @brief Determines the number of mappings in this map.
-		 * @return size of map
-		 */
-		 // Overrides Map.size()
-		size_t size() {
-			return this->helper_->size();
-		}
-		
-		/**
-		 * @brief Determines if this map equals the given object. For two maps to be equal, they must
-		 * contain the exact same key-value pairs, BUT do not need to share the same locations inside
-		 * of the buckets.
-		 * 
-		 * @param other object to compare to
-		 * @return equals or not
-		 */
-		// Overrides Map.equals
-		bool equals(Object* other) {
-			if (this == other) return true;
-			MapStrStr* otherMap = dynamic_cast<MapStrStr*>(other);
 			if (!otherMap) {
 				return false;
 			}
