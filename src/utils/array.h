@@ -15,18 +15,19 @@ class Array : public Object
 {
 public:
 	Object **objList_; //list of objects, owned
-	size_t listSize_;  //how many elements allocated to size
+	size_t capacity_;  //how many elements allocated to size
 	size_t len_;	   //length of array
 
-	// constructor
-	Array()
+	
+	Array(size_t initialCapacity)
 	{
-		listSize_ = 2;
-		objList_ = new Object *[listSize_];
+		capacity_ = initialCapacity;
+		objList_ = new Object *[capacity_];
 		len_ = 0;
 	}
+	
+	Array() : Array(2) {}
 
-	// deconstructor
 	~Array()
 	{
         deleteObjList_();
@@ -181,23 +182,22 @@ public:
 	void clear()
 	{
 		deleteObjList_();
-		listSize_ = 2;
-		objList_ = new Object *[listSize_];
+		capacity_ = 2;
+		objList_ = new Object *[capacity_];
 		len_ = 0;
 	}
 
 	// determine if we have enough space allocated to fit the specified number of additional elements
 	bool hasRoomForMoreElems_(int numElements)
 	{
-		return listSize_ >= (len_ + numElements);
+		return capacity_ >= (len_ + numElements);
 	}
 
 	//double size of allocated array memory
 	void expandArray_()
 	{
-		//double list size
-		listSize_ *= 2;
-		Object **tmp = new Object *[listSize_];
+		capacity_ *= 2;
+		Object **tmp = new Object *[capacity_];
 		for (size_t i = 0; i < len_; i += 1)
 		{
 			tmp[i] = objList_[i];

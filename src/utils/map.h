@@ -127,18 +127,13 @@ class Map : public Object {
 		 * @brief Construct a new Map object
 		 * 
 		 */
-		Map() {
-			capacity_ = 4;
-			size_ = 0;
-			buckets_ = new Entry*[capacity_];
-			memset(buckets_, 0, capacity_ * sizeof(buckets_));
-		}
+		Map() : Map(4) {}
 		
 		/**
 		 * Constructor to optimize performance of map.
 		 * @param capacity number of buckets available to store different values.
 		 */
-		Map(size_t capacity) {
+		Map(size_t capacity) : Object() {
 			capacity_ = capacity;
 			size_ = 0;
 			buckets_ = new Entry*[capacity_];
