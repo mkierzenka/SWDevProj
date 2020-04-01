@@ -109,7 +109,7 @@ void serializeColumnTest()
 {
     printf("Column serialization test started\n");
 
-    KVStore* store = new KVStore(0);
+    KVStore* store = new KVStore(0, nullptr);
     String* keyStr = new String("0-0");
     Key* k = new Key(keyStr, 0);
 
@@ -138,7 +138,7 @@ void serializeColumnTest()
 void serializeDistArrTest() {
 	printf("Distributed Array serialization test started\n");
 	
-	KVStore* store = new KVStore(0);
+	KVStore* store = new KVStore(0, nullptr);
     String* keyStr = new String("data-0-0");
     Key* k = new Key(keyStr, 0);
 	
@@ -172,7 +172,7 @@ void serializeDistArrTest() {
 void serializeColumnArrTest() {
 	printf("Column Array serialization test started\n");
 	
-	KVStore* store = new KVStore(0);
+	KVStore* store = new KVStore(0, nullptr);
     String* keyStr = new String("data-0");
     Key* k = new Key(keyStr, 0);
 	
