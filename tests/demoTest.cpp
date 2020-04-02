@@ -1,6 +1,5 @@
 //lang:Cpp
 #include "../src/application/nodethread.h"
-//#include "../src/application/demo_simple.h"
 #include "../src/application/demo.h"
 #include "../src/network/pseudo/pseudonetwork.h"
 #include "../src/network/message.h"
