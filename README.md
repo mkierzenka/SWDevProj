@@ -68,3 +68,5 @@ But when I tried I did not get it to work consistently (Demo would hang, though 
 * Put all messages in same file
 
 * Delete unused message types
+
+* Create doc to keep track of ownership of objects
