@@ -2,7 +2,7 @@
 
 #include "../utils/thread.h"
 #include "../network/pseudo/pseudonetwork.h"
-#include "../serial/message.h"
+#include "../network/message.h"
 #include <assert.h>
 
 /**

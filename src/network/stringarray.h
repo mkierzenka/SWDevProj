@@ -4,7 +4,7 @@
 
 #include "../utils/object.h"
 #include "../utils/string.h"
-#include "serial.h"
+#include "../serial/serial.h"
 
 /**
 * StringArray - to represent a list of string.

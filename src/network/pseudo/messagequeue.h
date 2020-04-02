@@ -5,7 +5,7 @@
 #include "../../utils/queue.h"
 #include "../../utils/thread.h"
 #include "../../utils/object.h"
-#include "../../serial/message.h"
+#include "../message.h"
 
 /**
  * A queue of messages. Wraps a queue object and makes proper cast when necessary.

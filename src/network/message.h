@@ -3,7 +3,7 @@
 
 #include "../utils/object.h"
 #include "../utils/string.h"
-#include "serial.h"
+#include "../serial/serial.h"
 #include "stringarray.h"
 #include "../store/key.h"
 #include "../store/value.h"

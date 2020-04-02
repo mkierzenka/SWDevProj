@@ -4,7 +4,7 @@
 #include "../network/client.h"
 #include "../network/pseudo/pseudonetwork.h"
 #include "../serial/serial.h"
-#include "../serial/message.h"
+#include "../network/message.h"
 #include "../utils/map.h"
 #include "key.h"
 #include "value.h"

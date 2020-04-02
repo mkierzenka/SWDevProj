@@ -2,7 +2,7 @@
 #pragma once 
 
 #include "messagequeuearray.h"
-#include "../../serial/message.h"
+#include "../message.h"
 
 /**
  * This class represents a fake network. It will be used to send messages between
