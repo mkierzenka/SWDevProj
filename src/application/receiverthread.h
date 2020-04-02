@@ -25,6 +25,7 @@ public:
         network_ = net;
         kv_ = kv;
 		msgsInProg_ = new MessageQueue();
+		kv_->setBackChannel(msgsInProg_);
     }
 
     ~ReceiverThread() {}
@@ -45,21 +46,25 @@ public:
 				Value* val = kv_->getValue(gdMsg->getKey());
 				ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
 				network_->sendMsg(reply);
+				delete gdMsg;
                 break;
             }
 			case MsgKind::WaitAndGet:
             {
                 // respond with data
-                WaitAndGetMsg *gdMsg = dynamic_cast<WaitAndGetMsg *>(m);
-                size_t sender = gdMsg->getSender();
-				// Respond with data, add it to the queue if we don't have it right now
-				Value* val = kv_->getValue(gdMsg->getKey());
-				if (val) {
-					ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
-					network_->sendMsg(reply);
-				} else {
-					msgsInProg_->push(gdMsg);
-				}
+                WaitAndGetMsg *wagMsg = dynamic_cast<WaitAndGetMsg *>(m);
+                size_t sender = wagMsg->getSender();
+                // Respond with data, add it to the queue if we don't have it right now
+                Value* val = kv_->getValue(wagMsg->getKey());
+                if (val) {
+                    ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
+                    network_->sendMsg(reply);
+                    delete wagMsg;
+                } else {
+                    size_t t = msgsInProg_->size();
+                    msgsInProg_->push(wagMsg);
+                    assert(msgsInProg_->size() == (t + 1));
+                }
                 break;
             }
             case (MsgKind::ReplyData):
@@ -71,28 +76,8 @@ public:
 			{
 				PutMsg *msg = dynamic_cast<PutMsg *>(m);
 				Key* k = msg->getKey();
-                if (k->getNode() == nodeNum_) {
-					kv_->putLocal(k, msg->getValue());
-				}
-				
-				// Handle messages in the Queue
-				MessageQueue* tmp = new MessageQueue();
-				while (msgsInProg_->size() > 0) {
-					WaitAndGetMsg* m = dynamic_cast<WaitAndGetMsg *>(msgsInProg_->pop());
-					size_t sender = m->getSender();
-					Value* val = kv_->getValue(m->getKey());
-					if(val != nullptr) {
-						ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
-						network_->sendMsg(reply);
-					} else {
-						tmp->push(m);
-					}
-				}
-				while(tmp->size() > 0) {
-					msgsInProg_->push(tmp->pop());
-				}
-				delete tmp;
-				break;
+				assert(k->getNode() == nodeNum_);
+				kv_->put(k, msg->getValue());
 			}
             default:
                 pln("Weird msg type...");
