@@ -68,30 +68,6 @@ public:
     OK("test_put_1");
   }
 
-  void test_put_2() {
-	String* s = new String("Hello");
-	String* t = new String("World");
-    String * a = new String("a");
-    String * b = new String("b");
-    MapStrStr * mss = new MapStrStr();
-    mss->put(s, t);
-    String * e = mss->put(a, b);
-    t_true(mss->size() == 2);
-    t_true(mss->contains_key(s));
-    t_true(mss->contains_key(a));
-    t_true(mss->get(a)->equals(b));
-    t_true(e == nullptr);
-
-    String * c = new String("c");
-    String * d = mss->put(a, c);
-    t_true(mss->get(a)->equals(c));
-    t_true(d->equals(b));
-
-    delete mss;
-
-    OK("test_put_2");
-  }
-
   void test_remove_0() {
     String* s = new String("Hello");
     String* t = new String("World");
@@ -130,26 +106,6 @@ public:
     OK("test_remove_1");
   }
 
-  void test_remove_2() {
-    String* s = new String("Hello");
-    String* t = new String("World");
-    String * u = new String("HelloWorld");
-    String * w = new String("w");
-    MapStrStr * mss = new MapStrStr();
-    mss->put(s, t);
-    mss->put(w, u);
-    t_true(mss->size() == 2);
-    t_true(mss->contains_key(s));
-    t_true(mss->contains_key(w));
-    t_false(mss->contains_key(t));
-    String * q = mss->remove(s);
-    t_true(t->equals(q));
-    t_false(mss->contains_key(s));
-    t_true(mss->size() == 1);
-    delete mss;
-    OK("test_remove_2");
-  }
-
   void test_get_0() {
     String* s = new String("Hello");
     String* t = new String("World");
@@ -171,28 +127,6 @@ public:
     delete values;
 
     OK("test_get_0");
-  }
-
-  void test_get_1() {
-    String* s = new String("Hello");
-    String* t = new String("World");
-    MapStrStr * mss = new MapStrStr();
-    mss->put(s, t);
-
-    Object** keys = mss->get_keys();
-    Object** values = mss->get_values();
-    t_true(keys != nullptr);
-    t_true(values != nullptr);
-    t_true(keys[0]->equals(s));
-    t_false(keys[0]->equals(t));
-    t_true(values[0]->equals(t));
-    t_false(values[0]->equals(s));
-
-    delete mss;
-    delete keys;
-    delete values;
-
-    OK("test_get_1");
   }
 
   void test_get_2() {
@@ -265,7 +199,6 @@ public:
 	String * a = new String("AB");
 	String * b = new String("CD");
     Map* map = new Map();
-    MapStrStr* str_map = new MapStrStr();
     MapStrObj* str_obj_map = new MapStrObj();
     map->put(s, t);
     t_true(map->contains_key(s));
@@ -273,40 +206,16 @@ public:
     map->put(u, w);
     t_true(map->contains_key(u));
 
-    t_false(str_map->contains_key(x));
-    str_map->put(x, y);
-    t_true(str_map->contains_key(x));
-
     t_false(str_obj_map->contains_key(b));
     str_obj_map->put(b, a);
     t_true(str_obj_map->contains_key(b));
 
     delete map;
-    delete str_map;
     delete str_obj_map;
     OK("test_contains_keys_0");
   }
 
-/*  void test_hash_0() { same issue as below
-    String* s = new String("Hello");
-    String* t = new String("World");
-	String* s1 = new String("Hello");
-    String* t1 = new String("World");
-	String* a = new String("A");
-	String* b = new String("B");
-    Map* map = new Map();
-    MapStrStr* string_map = new MapStrStr();
-    map->put(s, t);
-    string_map->put(s1, t1);
-    t_true(map->hash() == string_map->hash());
-    map->put(a, b);
-    t_true(map->hash() != string_map->hash());
-    delete map;
-    delete string_map;
-    OK("test_hash_0");
-  }*/
-
-/*  void test_hash_1() { adding same object twice will break on delete
+  /*void test_hash_1() { adding same object twice will break on 
     MapStrObj* m1 = new MapStrObj();
     MapStrObj* m2 = new MapStrObj();
     Object * a = new Object();
@@ -368,16 +277,12 @@ int main(int argc, char** argv) {
   Test* test = new Test();
   test->test_put_0();
   test->test_put_1();
-  test->test_put_2();
   test->test_remove_0();
   test->test_remove_1();
-  test->test_remove_2();
   test->test_get_0();
-  test->test_get_1();
   test->test_get_2();
   test->test_equals_0();
   test->test_contain_keys_0();
-  //test->test_hash_0();
   //test->test_hash_1();
   test->test_big();
   test->OK("All map tests passed!");

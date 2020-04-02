@@ -9,12 +9,13 @@
 
 Sys *SYSTEM = new Sys();
 
-
-/*void basicTest2()
+/*
+void basicTest2()
 {
   SYSTEM->pln("Basic test2 started...");
   Schema s("III");
-  DataFrame df(s);
+  Key k("main", 0);
+  DataFrame df(s, &k);
   Row r(df.get_schema());
   int numRows = 100 * 1000;
   int expectedSum = 0;
@@ -34,25 +35,8 @@ Sys *SYSTEM = new Sys();
 
   assert(sr.getSum() == expectedSum);
   SYSTEM->pln("Basic test2 passed!");
-}
+}*/
 
-void basicTest()
-{
-  SYSTEM->pln("Basic test started...");
-  Schema s("II");
-  DataFrame df(s);
-  Row r(df.get_schema());
-  int numRows = 100 * 1000 * 1000;
-  for (int i = 0; i < numRows; i++)
-  {
-    r.set(0, i);
-    r.set(1, i + 1);
-    df.add_row(r);
-  }
-  assert(df.get_int(0, 10) == 10);
-  SYSTEM->pln("Basic test passed!");
-}
-/*
 void testSchema2()
 {
   SYSTEM->pln("Schema2 test started...");
@@ -66,13 +50,12 @@ void testSchema2()
   Schema *scm = new Schema("II");
   assert(scm->width() == 2);
   assert(scm->length() == 0);
-
   assert(scm->col_type(0) == 'I');
   assert(scm->col_type(1) == 'I');
 
   for (int i = 0; i < 1000; i++)
   {
-    scm->add_row(nullptr);
+    scm->add_row();
   }
 
   delete s0;
@@ -83,244 +66,137 @@ void testSchema2()
   delete s5;
   delete scm;
   SYSTEM->pln("Schema2 test passed!");
-}*/
-/*
+}
+
 void testSchema()
 {
   SYSTEM->pln("Schema test started...");
-  String *s0 = new String("a");
-  String *s1 = new String("a1");
-  String *s2 = new String("a2");
-  String *s3 = new String("a3");
-  String *s4 = new String("a4");
-  String *s5 = new String("a5");
 
   Schema *scm = new Schema();
-  scm->add_column('I', s0);
-  scm->add_column('F', s1);
-  scm->add_column('F', s2);
+  scm->add_column('I');
+  scm->add_column('F');
+  scm->add_column('F');
   assert(scm->width() == 3);
   assert(scm->length() == 0);
-
-  assert(scm->col_name(0)->equals(s0));
-  assert(scm->col_name(1)->equals(s1));
-  assert(scm->col_name(2)->equals(s2));
 
   assert(scm->col_type(0) == 'I');
   assert(scm->col_type(2) == 'F');
 
-  scm->add_column('S', s3);
-  scm->add_column('B', s4);
-  assert(scm->col_name(3)->equals(s3));
+  scm->add_column('S');
+  scm->add_column('B');
   assert(scm->col_type(3) == 'S');
   assert(scm->col_type(4) == 'B');
 
-  delete s0;
-  delete s1;
-  delete s2;
-  delete s3;
-  delete s4;
-  delete s5;
   delete scm;
   SYSTEM->pln("Schema test passed!");
-}*/
-/*
+}
+
 void columnTests()
 {
   SYSTEM->pln("Columns test started...");
+  KVStore* store = new KVStore(0);
 
-  int intA = 1;
-  int intB = 2;
-  int intC = 3;
-  IntColumn *ic = new IntColumn(4, intA, intB, intC, intB);
+  Key* baseKeyI = new Key("baseInts", 0);
+  int numsI[] = {1, 2, 3, 4};
+  Column* ic = new Column(store, baseKeyI, ColType::Integer);
+  ic->add_all(4, numsI);
 
-  ic->set(2, intB);
-
-  assert(ic->get(0) == intA);
-  assert(ic->get(2) == intB);
   assert(ic->size() == 4);
+  assert(ic->get_int(0) == numsI[0]);
+  assert(ic->get_int(1) == numsI[1]);
+  assert(ic->get_int(2) == numsI[2]);
+  assert(ic->get_int(3) == numsI[3]);
+  delete ic;
 
-  bool boolA = true;
-  bool boolB = true;
-  bool boolC = false;
-  BoolColumn *bc = new BoolColumn(4, boolA, boolB, boolC, boolB);
+  //
+  Key* baseKeyD = new Key("baseDbls", 0);
+  double numsD[] = {4.5, 2.1, 0.0, 0.004};
+  Column* dc = new Column(store, baseKeyD, ColType::Double);
+  dc->add_all(4, numsD);
 
-  bc->set(3, boolC);
+  assert(dc->size() == 4);
+  assert(dc->get_double(0) == numsD[0]);
+  assert(dc->get_double(1) == numsD[1]);
+  assert(dc->get_double(2) == numsD[2]);
+  assert(dc->get_double(3) == numsD[3]);
+  delete dc;
 
-  assert(bc->get(1) == boolB);
-  assert(bc->get(3) == boolC);
+  //
+  Key* baseKeyB = new Key("baseBools", 0);
+  bool valsB[] = {true, false, false, true};
+  Column* bc = new Column(store, baseKeyB, ColType::Boolean);
+  bc->add_all(4, valsB);
+
   assert(bc->size() == 4);
+  assert(bc->get_bool(0) == valsB[0]);
+  assert(bc->get_bool(1) == valsB[1]);
+  assert(bc->get_bool(2) == valsB[2]);
+  assert(bc->get_bool(3) == valsB[3]);
+  delete bc;
 
-  float floatA = 14.9;
-  float floatB = -.26;
-  float floatC = 3;
-  FloatColumn *fc = new FloatColumn(4, floatB, floatB, floatC, floatA);
-
-  fc->set(1, floatA);
-
-  assert(fc->get(0) == floatB);
-  assert(fc->get(1) == floatA);
-  assert(fc->get(2) == floatC);
-  assert(fc->size() == 4);
-
+  //
+  Key* baseKeyS = new Key("baseStrs", 0);
   String *stringA = new String("Good");
   String *stringB = new String("Morning");
   String *stringC = new String("Graduation");
-  String *nptr = nullptr;
-  StringColumn *sc = new StringColumn(5, stringA, stringC, stringA, stringB, nptr);
-
-  assert(sc->get(1)->equals(stringC));
-  assert(sc->get(2)->equals(stringA));
-  assert(sc->get(4) == nullptr);
-
-  sc->set(4, stringB);
-
-  assert(sc->get(4)->equals(stringB));
-  assert(sc->size() == 5);
+  String* valsS[] = {stringA, stringC, stringA, stringB};
+  Column* sc = new Column(store, baseKeyS, ColType::Str);
+  sc->add_all(4, valsS);
+ 
+  assert(sc->size() == 4);
+  assert(sc->get_string(0)->equals(valsS[0]));
+  assert(sc->get_string(1)->equals(valsS[1]));
+  assert(sc->get_string(2)->equals(valsS[2]));
+  assert(sc->get_string(3)->equals(valsS[3]));
+  delete sc;
+  
+  delete store;
 
   SYSTEM->pln("Columns test passed!");
-}*/
+}
 
-/*void dataFrameTest()
+/* Adding multiple columns to DF via add_array
+void dataFrameTest()
 {
   SYSTEM->pln("Data frame test started...");
 
-  Schema s;
-  s.add_column('I', new String("counts"));
-  s.add_column('B', new String("isLarge"));
-  s.add_row(new String("First line"));
-
-  assert(s.width() == 2);
-  assert(s.length() == 1);
-  assert(s.col_type(0) == 'I');
-  assert(s.col_type(1) == 'B');
-  assert(strcmp(s.col_name(0)->c_str(), "counts") == 0);
-  assert(s.col_idx("isLarge") == 1);
-  assert(strcmp(s.row_name(0)->c_str(), "First line") == 0);
-
-  DataFrame df(s);
-  assert(df.ncols() == 2);
-  assert(df.get_schema().width() == 2);
+  KVStore kv(0);
+  Key k("main", 0);
+  DataFrame df(&k, &kv);
+  assert(df.ncols() == 0);
+  assert(df.get_schema().width() == 0);
   assert(df.nrows() == 0);
   assert(df.get_schema().length() == 0);
 
-  Column *col = new IntColumn();
-  String *colName = new String("nums");
-  df.add_column(col, colName);
+  int valsI[] = {36, 75, 309};
+  double valsD[] = {34.2, 2.2, 0.8};
+  bool valsB[] = {false, true, false};
+  String s1("abc");
+  String s2("aaa");
+  String s3("!@#");
+  String* valsS[] = {&s1, &s2, &s3};
+  
+  df.add_array(3, valsI);
+  df.add_array(3, valsD);
+  df.add_array(3, valsB);
+  df.add_array(3, valsS);
+
   //make sure both schema and dataframe got updated
-  assert(df.ncols() == 3);
-  assert(df.get_schema().width() == 3);
-  assert(df.nrows() == 0);
-  assert(df.get_schema().length() == 0);
-  assert(df.get_col(*colName) == 2);
+  assert(df.ncols() == 5);
+  assert(df.get_schema().width() == 4);
+  assert(df.nrows() == 3);
+  assert(df.get_schema().length() == 3);
 
-  //create row and set the values
-  Row r(df.get_schema());
-  r.set(0, 4);
-  r.set(1, true);
-  r.set(2, 77);
-
-  df.add_row(r);
-  assert(df.nrows() == 1);
-  assert(s.length() == 1);
-  assert(df.get_schema().length() == 1);
-
-  assert(df.get_int(0, 0) == 4);
-  assert(df.get_bool(1, 0) == true);
-  assert(df.get_int(2, 0) == 77);
+  assert(df.get_int(0, 0) == valsI[0]);
+  assert(df.get_double(1, 0) == valsD[0]);
+  assert(df.get_bool(2, 0) == valsB[0]);
+  assert(df.get_string(3, 0)->equals(valsS[0]));
+  assert(df.get_int(0, 2) == valsI[2]);
+  assert(df.get_double(1, 1) == valsD[1]);
+  assert(df.get_bool(2, 2) == valsB[2]);
+  assert(df.get_string(3, 1)->equals(valsS[1]));
   SYSTEM->pln("Data frame test passed!");
-}
-
-void dataFrameLargeDataTest()
-{
-  Sys *c = new Sys();
-  c->pln("Large data frame test started...");
-
-  int numCols = 50 * 1000;
-  int numRows = 500;
-
-  char *colName = new char[6];
-  Schema s;
-  for (int i = 0; i < numCols; i++)
-  {
-    sprintf(colName, "%05d", i);
-    colName[5] = 0;
-    s.add_column('I', new String(colName));
-  }
-  DataFrame df(s);
-  Row r(df.get_schema());
-  for (int j = 0; j < numRows; j++)
-  {
-    for (int i = 0; i < numCols; i++)
-    {
-      r.set(i, i + j);
-    }
-    df.add_row(r);
-  }
-
-  assert(df.ncols() == numCols);
-  assert(df.nrows() == numRows);
-  assert(df.get_int(0, 0) == 0);
-  assert(df.get_int(40574, 200) == 40774);
-  assert(df.get_int(numCols - 1, numRows - 1) == (numCols - 1) + (numRows - 1));
-  SYSTEM->pln("Large data frame test passed!");
 }*/
-/*
-void basicDfTest()
-{
-  SYSTEM->pln("Basic df test started...");
-
-  Schema s("III");
-
-  DataFrame df(s);
-  Row r(df.get_schema());
-  for (int i = 0; i < 5; i++)
-  {
-    r.set(0, i * 2);
-    r.set(1, i * 4);
-    r.set(2, i * 8);
-    df.add_row(r);
-  }
-
-  DataFrame dfTwo(df);
-
-  //Make sure all column info is same
-  assert(df.ncols() == 3);
-  assert(df.ncols() == dfTwo.ncols());
-
-  //row info should not be same
-  assert(df.nrows() == 5);
-  assert(dfTwo.nrows() == 0);
-  assert(df.nrows() != dfTwo.nrows());
-
-  Row rTwo(s);
-
-  rTwo.set(0, 0);
-  rTwo.set(1, 5);
-  rTwo.set(2, 1);
-
-  dfTwo.add_row(rTwo);
-
-  assert(dfTwo.nrows() == 1);
-  assert(dfTwo.ncols() == 3);
-  assert(df.nrows() != dfTwo.nrows());
-  SYSTEM->pln("Basic df test passed!");
-}
-/*
-void asIntTest()
-{
-  SYSTEM->pln("As int test started...");
-  ColumnArray *columns_ = new ColumnArray();
-  IntColumn *i = new IntColumn();
-  columns_->add(i);
-
-  Column *c = columns_->get(0);
-  IntColumn *ic = columns_->get(0)->as_int();
-  assert(ic != nullptr);
-  BoolColumn *bc = columns_->get(0)->as_bool();
-  assert(bc == nullptr);
-  SYSTEM->pln("As int test passed!");
-}
 
 void genSchemaTest()
 {
@@ -332,23 +208,20 @@ void genSchemaTest()
   assert(s.width() == 5);
   assert(s.length() == 0);
 
-  s.add_column('I', new String("Next col"));
-  s.add_column('F', new String("Anotha col"));
-  s.add_column('B', new String("One more plz"));
+  s.add_column('I');
+  s.add_column('F');
+  s.add_column('B');
 
-  s.add_row(new String("Now the rows"));
-  s.add_row(new String("Last row... for now :)"));
+  s.add_row();
+  s.add_row();
 
   assert(s.width() == 8);
   assert(s.length() == 2);
   assert(s.col_type(5) == 'I');
   assert(s.col_type(7) == 'B');
 
-  assert(s.col_idx("Next col") == 5);
-  assert(s.row_idx("Now the rows") == 0);
-
   SYSTEM->pln("General schema test passed!");
-}*/
+}
 /*
 void lengthRowerTest() {
   SYSTEM->pln("Length rower test started...");
@@ -402,25 +275,12 @@ void lengthRowerTest() {
 
 int main()
 {
-  //basicDfTest();
-  /*columnTests();
+  columnTests();
   testSchema();
-  rowTest();
   testSchema2();
   genSchemaTest();
-  basicDfTest();
-  asIntTest();
-  dataFrameLargeDataTest();
-
-  // longer tests
-  basicTest();
-  dataFrameTest();
-  basicTest2();
-
-  // rowers
-  findIntRowerTest();
-  findIntRowerTest_pmap();
-  findRower_variousTypes();
-  lengthRowerTest();*/
+  //basicTest2
+  //dataFrameTest();
+  //lengthRowerTest();
   return 0;
 }
