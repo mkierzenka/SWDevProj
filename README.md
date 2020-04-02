@@ -25,13 +25,9 @@ It sends the responses if available
 
 * demoTest.cpp does not delete anything, memory leaks here
 
-* Does columnarray need push_back? ColArr has it too. Do we even use it?
-
 * Clean up client and server, try to get more than two clients to connect successfully
 
 * Fix generalTests to use Column and check all 4 types
-
-* Do we want DataFrame.add_row() and Column.push_back()? If not, delete memTest
 
 * Sorer code- make the arrays use our array instead of re-implementing functionality
 
@@ -48,8 +44,6 @@ It sends the responses if available
 
 * Changing Sorer/reading in file to go bottom up instead of top down (create the blocks then add those to arrays)
 
-* fromScalar for int, float, string
-
 * Condense block subclasses into one class -> Block (union type and blocktype)
 
 * Delete code for printing throughout
@@ -65,3 +59,7 @@ It sends the responses if available
 * Create doc to keep track of ownership of objects
 
 * Look at following commits from m3_submission: fromScalar, general code cleanup
+
+* Update schema to use types enum
+
+* Implement push_back for columns
