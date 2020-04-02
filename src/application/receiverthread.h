@@ -78,6 +78,7 @@ public:
 				Key* k = msg->getKey();
 				assert(k->getNode() == nodeNum_);
 				kv_->put(k, msg->getValue());
+                break;
 			}
             default:
                 pln("Weird msg type...");
