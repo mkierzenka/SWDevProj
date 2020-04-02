@@ -4,21 +4,17 @@
 #include "../src/application/nodethread.h"
 #include "../src/network/pseudo/pseudonetwork.h"
 
-///TODO: figure out where this method implementation should go
-DataFrame* KVStore::get(Key *k)
+DataFrame *KVStore::get(Key *k)
 {
-        Value *val = getValue(k);
-        //set up new serializer to deserialize returned data into a dataframe
-        Serializer *s = new Serializer(val->getSize(), val->getData());
+    Value *val = getValue(k);
+    Serializer *s = new Serializer(val->getSize(), val->getData());
+    DataFrame *d = new DataFrame(k, this);
+    d->deserialize(s);
 
-        //create new dataframe and mutate by deserializing
-        DataFrame *d = new DataFrame(k, this);
-        d->deserialize(s);
+    //delete val?
+    delete s;
 
-        //delete val?
-        delete s;
-
-        return d;
+    return d;
 }
 
 //The purpose of this file is to test the Trivial case given to us in M2
