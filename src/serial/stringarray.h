@@ -32,19 +32,23 @@ public:
 		delete[] strList_;
 	}
 
-	void serialize(Serializer* s) {
+	void serialize(Serializer *s)
+	{
 		s->write(len_);
-		for (int i=0; i < len_; i++) {
+		for (int i = 0; i < len_; i++)
+		{
 			strList_[i]->serialize(s);
 		}
 	}
-	
-	void deserialize(Serializer* ser) {
+
+	void deserialize(Serializer *ser)
+	{
 		delete[] strList_;
 		listSize_ = ser->readSizeT();
 		strList_ = new String *[listSize_];
 		len_ = listSize_;
-		for (int i=0; i < len_; i++) {
+		for (int i = 0; i < len_; i++)
+		{
 			strList_[i] = new String(ser->readString());
 		}
 	}
@@ -213,11 +217,13 @@ public:
 		strList_ = new String *[listSize_];
 		len_ = 0;
 	}
-	
+
 	// prints all elements in this array
-	void print() {
+	void print()
+	{
 		printf("[");
-		for (size_t i = 0; i < len_ - 1; i++) {
+		for (size_t i = 0; i < len_ - 1; i++)
+		{
 			printf("%s ", strList_[i]->c_str());
 		}
 		printf("%s]", strList_[len_ - 1]->c_str());

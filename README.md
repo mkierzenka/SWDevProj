@@ -2,13 +2,26 @@
 
 demoTest.cpp has latest waitAndGet
 
+
+Current ReceiverThread Info:
+Receives WaitAndGet message it can't currently respond to -> add to MessageQueue msgsInProg_
+Think of this queue as "linking" to KVStore's receivedMsgs_ (they are the same object for a KVStore-ReceiverThread pair)
+The field receivedMsgs_ is how ReceiverThread sends info to KVStore
+When new data is added to a KVStore (RT calls kv_->put()), KVStore adds it locally
+  then checks the receivedMsgs_ Queue to see if anyone else was looking for the data that just came in
+It sends the responses if available
+
+
+
 ### Notes for things to improve from before:
 
-* waitAndGet has an empty while loop. This should probably be replaced with a lock or other means
-	to notify (instead of burning CPU cycles)
+* Cleanup and free more memory in pseudonetworking stuff -> receiverthread, nodethread, etc.
 
-* getFromNetwork_ has a while loop. This should probably be replaced with a lock or other means
-	to notify (instead of burning CPU cycles)
+* Discuss asserts/proper behavior (receiverthread.h:82, 67)
+
+* waitandgetmsg.h could use comments and maybe cleanup, parallel to getdatamsg
+
+* Put pragma once everywhere
 
 * demoTest.cpp does not delete anything, memory leaks here
 
@@ -45,6 +58,8 @@ demoTest.cpp has latest waitAndGet
 
 * Create application for sorer
 
-* Put all messages in same file
+* Delete doublearray and stringarray, update message classes that use them
 
 * Delete unused message types
+
+* Create doc to keep track of ownership of objects

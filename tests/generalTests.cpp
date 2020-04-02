@@ -6,6 +6,10 @@
 #include "../src/dataframe/sumrower.h"
 #include "../src/dataframe/findrower.h"
 #include "../src/dataframe/lengthrower.h"
+#include "../src/store/key.h"
+#include "../src/serial/serial.h"
+#include "../src/utils/object.h"
+#include "../src/utils/string.h"
 
 Sys *SYSTEM = new Sys();
 
@@ -94,7 +98,7 @@ void testSchema()
 void columnTests()
 {
   SYSTEM->pln("Columns test started...");
-  KVStore* store = new KVStore(0);
+  KVStore* store = new KVStore(0, nullptr);
 
   Key* baseKeyI = new Key("baseInts", 0);
   int numsI[] = {1, 2, 3, 4};

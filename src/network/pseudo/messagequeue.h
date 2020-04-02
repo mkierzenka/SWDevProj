@@ -43,11 +43,9 @@ class MessageQueue : public Object {
             lock_.lock();
             while (messages_->size() == 0) 
             {
-                printf("Waiting for message...\n");
                 lock_.wait();
             }
 
-            printf("Got message!\n");
             Message* res = dynamic_cast<Message*>(messages_->pop());
             lock_.unlock();
             return res;
@@ -55,7 +53,10 @@ class MessageQueue : public Object {
 
         /** Returns the number of entries in this MessageQueue */
         size_t size() {
-            return messages_->size();
+            lock_.lock();
+            size_t sz = messages_->size();
+            lock_.unlock();
+            return sz;
         }
         
 };

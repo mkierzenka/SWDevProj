@@ -2,6 +2,7 @@
 
 #include "../utils/object.h"
 #include "../utils/string.h"
+#include "../serial/serial.h"
 
 /** This class represents a key in our distributed key-value store. It contains a String
  * identifier for the piece of data it maps to and information for the node on which the
@@ -97,7 +98,7 @@ public:
         //format of string should be "{kStr_->c_}-{idx}""
         StrBuff* sb = new StrBuff();
         sb->c(*kStr_);
-        sb->c('-');
+        sb->c("-");
         sb->c(idx);
         String* newStrRes = sb->get();
 

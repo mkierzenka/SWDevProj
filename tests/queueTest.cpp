@@ -72,6 +72,24 @@ void test_queue_pop_object()
 	OK("pop Object");
 }
 
+void test_queue_pop_object2()
+{
+	Object *s = new Object();
+	Object *t = new Object();
+	Object *u = new Object();
+	Queue *q1 = new Queue();
+
+	q1->push(s);
+	t_true(q1->size() == 1);
+	t_true(q1->pop() == s);
+	t_true(q1->size() == 0);
+	q1->push(t);
+	q1->push(u);
+	t_true(q1->size() == 2);
+	t_true(q1->pop() == t);
+	OK("pop Object 2");
+}
+
 void test_queue_pop_string()
 {
 	String *s = new String("Hello");
@@ -209,6 +227,7 @@ int main()
 	test_queue_push_object();
 	test_queue_push_string();
 	test_queue_pop_object();
+	test_queue_pop_object2();
 	test_queue_pop_string();
 	test_queue_is_empty();
 	test_queue_clear();

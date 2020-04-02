@@ -13,7 +13,6 @@ class DemoThread : public Thread
   {
   public:
     size_t nodeNum_;
-    //Demo* dem_;  //owned
     PseudoNetwork* network_;
 
     DemoThread(size_t node, PseudoNetwork* net) : Thread() {
