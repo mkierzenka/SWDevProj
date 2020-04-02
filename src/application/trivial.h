@@ -7,18 +7,28 @@
 #include "../store/key.h"
 #include "../store/kvstore.h"
 #include "../utils/string.h"
+#include "../network/pseudo/pseudonetwork.h"
 
 #include "application.h"
 
 /**
- * Example given to us in milestone 2
+ * Example given to us in milestone 2. Augmented to have a check for each type.
  */
 
 class Trivial : public Application {
  public:
-  Trivial(size_t idx) : Application(idx, nullptr) { }
+  Trivial(size_t idx, PseudoNetwork* net) : Application(idx, net) { }
 
   void run_() {
+	pln("Trivial Test Started");
+    trial1();
+	trial2();
+	trial3();
+	trial4();
+	pln("Trivial Test Passed!");
+  }
+
+  void trial1() {
     size_t SZ = 1000 * 1000;
     double* vals = new double[SZ];
     double sum = 0;
@@ -33,7 +43,7 @@ class Trivial : public Application {
     delete df; delete df2; delete[] vals;
   }
 
-  void run_2() {
+  void trial2() {
     size_t SZ = 1000 * 1000;
     int* vals = new int[SZ];
     int sum = 0;
@@ -48,7 +58,7 @@ class Trivial : public Application {
     delete df; delete df2; delete[] vals;
   }
 
-  void run_3() {
+  void trial3() {
     size_t SZ = 1000 * 1000;
     StrBuff* buf = new StrBuff();
     String** vals = new String*[SZ];
@@ -89,7 +99,7 @@ class Trivial : public Application {
     fprintf(stdout, "String DataFrame OK\n");
   }
 
-  void run_4() {
+  void trial4() {
     size_t SZ = 1000 * 1000;
     bool* vals = new bool[SZ];
     for (size_t i = 0; i < SZ; ++i) {
