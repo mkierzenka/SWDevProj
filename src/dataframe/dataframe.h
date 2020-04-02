@@ -105,20 +105,52 @@ public:
     return df;
   }
 
-  /** Converts double into a dataframe object. Returns df result, which will be owned
+  /** Adds a double to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
   static DataFrame* fromScalar(Key* k, KVStore* kv, double elem)
   {
-    //create array of size 1 and set passed element
     double* elements = new double[1];
     elements[0] = elem;
-
-    //delegate to from array
     DataFrame* df = fromArray(k, kv, 1, elements);
+    delete[] elements;
+    return df;
+  }
 
-    //delete double array and return frame
-    delete elements;
+  /** Adds a String (cloned) to a new dataframe object. Returns df result, which will be owned
+   * by caller
+   */
+  static DataFrame* fromScalar(Key* k, KVStore* kv, String* elem)
+  {
+    String** elements = new String*[1];
+    elements[0] = elem->clone();
+    DataFrame* df = fromArray(k, kv, 1, elements);
+    delete elements[0];
+    delete[] elements;
+    return df;
+  }
+
+  /** Adds an int to a new dataframe object. Returns df result, which will be owned
+   * by caller
+   */
+  static DataFrame* fromScalar(Key* k, KVStore* kv, int elem)
+  {
+    int* elements = new int[1];
+    elements[0] = elem;
+    DataFrame* df = fromArray(k, kv, 1, elements);
+    delete[] elements;
+    return df;
+  }
+
+  /** Adds a bool to a new dataframe object. Returns df result, which will be owned
+   * by caller
+   */
+  static DataFrame* fromScalar(Key* k, KVStore* kv, bool elem)
+  {
+    bool* elements = new bool[1];
+    elements[0] = elem;
+    DataFrame* df = fromArray(k, kv, 1, elements);
+    delete[] elements;
     return df;
   }
 
@@ -140,6 +172,8 @@ public:
   void add_array(size_t numElements, double *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
+    schema_->add_column('D');
+    schema_->add_rows(numElements);
   }
 
   /** Add array of ints to dataframe as a column. Add the data into chunks, and generate
@@ -147,6 +181,8 @@ public:
   void add_array(size_t numElements, int *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
+    schema_->add_column('I');
+    schema_->add_rows(numElements);
   }
 
   /** Add array of booleans to dataframe as a column. Add the data into chunks, and generate
@@ -154,6 +190,8 @@ public:
   void add_array(size_t numElements, bool *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
+    schema_->add_column('B');
+    schema_->add_rows(numElements);
   }
 
   /** Add array of Strings to dataframe as a column. Add the data into chunks, and generate
@@ -161,6 +199,8 @@ public:
   void add_array(size_t numElements, String **elements)
   {
     columns_->add_column_fromarray(numElements, elements);
+    schema_->add_column('S');
+    schema_->add_rows(numElements);
   }
 
   /** Returns the dataframe's schema. Modifying the schema after a dataframe
