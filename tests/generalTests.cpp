@@ -6,6 +6,10 @@
 #include "../src/dataframe/sumrower.h"
 #include "../src/dataframe/findrower.h"
 #include "../src/dataframe/lengthrower.h"
+#include "../src/store/key.h"
+#include "../src/serial/serial.h"
+#include "../src/utils/object.h"
+#include "../src/utils/string.h"
 
 Sys *SYSTEM = new Sys();
 
