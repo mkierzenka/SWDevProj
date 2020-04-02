@@ -3,9 +3,6 @@
 #include "../utils/thread.h"
 #include "../network/pseudo/pseudonetwork.h"
 #include "../serial/message.h"
-#include "../serial/replydatamsg.h"
-#include "../serial/msgkind.h"
-#include "../serial/waitandgetmsg.h"
 #include <assert.h>
 
 /**

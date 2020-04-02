@@ -10,7 +10,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-class Serializer;
+//class Serializer;
 
 /** Enum describing different message types available */
 enum MsgKind

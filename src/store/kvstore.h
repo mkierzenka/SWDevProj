@@ -5,13 +5,10 @@
 #include "../network/pseudo/pseudonetwork.h"
 #include "../serial/serial.h"
 #include "../serial/message.h"
-#include "../serial/getdatamsg.h"
-#include "../serial/replydatamsg.h"
 #include "../utils/map.h"
 #include "key.h"
 #include "value.h"
 #include "../network/pseudo/messagequeue.h"
-#include "../serial/putmsg.h"
 
 class DataFrame;
 
