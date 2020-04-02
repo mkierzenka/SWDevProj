@@ -22,8 +22,8 @@ ourTests:
 	
 memory:
 	#valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testSorer data/datafile.sor
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testTrivial
-
+	#valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testTrivial
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testDemo
 .SILENT: clean
 clean:
 	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray \
