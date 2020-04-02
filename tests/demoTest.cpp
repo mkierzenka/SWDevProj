@@ -4,7 +4,7 @@
 //#include "../src/application/demo_simple.h"
 #include "../src/application/demo.h"
 #include "../src/network/pseudo/pseudonetwork.h"
-#include "../src/serial/waitandgetmsg.h"
+#include "../src/serial/message.h"
 
 DataFrame *KVStore ::waitAndGet(Key *k)
 {
