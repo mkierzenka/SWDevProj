@@ -53,7 +53,10 @@ class MessageQueue : public Object {
 
         /** Returns the number of entries in this MessageQueue */
         size_t size() {
-            return messages_->size();
+            lock_.lock();
+            size_t sz = messages_->size();
+            lock_.unlock();
+            return sz;
         }
         
 };
