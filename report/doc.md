@@ -1,10 +1,11 @@
 ## Usage:
 * "make build" - compiles all tests
-* "make test" - runs tests supplied to us (ex. trivial test)
+* "make test" - runs tests supplied to us (ex. trivial, demo tests)
 * "make ourTests" - runs sorer test and a bunch of others testing different parts 
   of our program
 * "make memory" - runs sorer test through valgrind
 * "make clean" - deletes compiled files
+* there are also targets for specific programs we are focusing on (ex. buildDemo and testDemo for M3)
 
 
 ## Introduction
@@ -70,6 +71,7 @@ Fields:
  * getAndWait(Key): retrieves data with the given Key from the Key's node
  * getValue(Key): return the value that the given key maps to; this method will not do
  any serialization or deserialization, rather will return the result exactly as it is stored
+ * getFromNetwork(Key): helper to get value from network if not stored locally; used by getValue
 
 * Key: these are used to define a piece of data at a level higher than the local KV store. 
 Since data can exist in any of the stores, we need multiple attributes to keep track of data
@@ -94,6 +96,15 @@ tells the client about all other nodes on the system. The client also establishe
 connections to all other nodes to support two-way communication. Like the server, the 
 client will also include essential networking capabilities, and hold sockets for sending 
 and listening.
+
+* PseudoNetwork: for Milestone 3, we created a fake networking layer to aid with debugging
+  for our distributed KV store. Similarly to the videos, we set up a PseudoNetwork to have
+  an array of message queues; each queue keeps track of the messages received and pending for
+  each node. The pseudo network supports sending and receiving messages. Send push the given
+  message to the target node's queue, while receive pops from the node's queue. Due to this 
+  setup with a single message queue array, each node and thread needs access to the same 
+  message queues. Therefore we had to initialize a PseudoNetwork in our .cpp test file and pass
+  it in to numerous objects throughout the program, including the Application and the KVStore.
 
 * DataFrame: The DataFrame API will be similar to that on previous assignments. It will 
 include operations to store and perform operations on data, such as map. A Schema will 
@@ -122,7 +133,8 @@ DataFrame will be serialized and stored under its key in the distributed system.
 
 Fields:
 * ColumnArray (to hold columns)
-* KVStore: dataframe passes store to classes that need it for data lookup; static initialization methods add key-value pair to the store
+* KVStore: dataframe passes store to classes that need it for data lookup; static initialization 
+* methods add key-value pair to the store
 * Schema: keeps track of the DataFrame's column structure
 * Key: key for this dataframe in the store; will be used to create the keys for the
 frame's columns' chunks
@@ -134,7 +146,9 @@ Methods (new ones we anticipate):
 * since a dataframe is immutable, we can remove any that modify the dataframe
 
 
-* Column: A column now stores data in the distributed KV Store, instead of locally. A Column will be a DistributedArray where each Key points to a Value containing a fixed sized number of elements that belong in this Column. Since we are no longer storing elements
+* Column: A column now stores data in the distributed KV Store, instead of locally. A Column will be 
+* a DistributedArray where each Key points to a Value containing a fixed sized number of elements 
+* that belong in this Column. Since we are no longer storing elements
 directly in the column, we do not need separate column implementations for each type
 
 Fields:
@@ -145,14 +159,20 @@ Fields:
 * Key: key of the dataframe that the column belongs to; will be used to build up block keys
 
 Methods:
-* most methods from before, for getting data from the column. not 'set' methods (or anything else that modifies the column). Might include the push_back methods
-* add_all: one for each data type; adds all given elements of that datatype to the column; breaks data up into chunks, creates keys for those chunks, and adds them to the KVStore
-*setStore(KVStore): pass a KVStore to the dataframe; will initially start in the dataframe, which will be passed to the column array and eventually the column
+* most methods from before, for getting data from the column. not 'set' methods (or anything else 
+* that modifies the column). Might include the push_back methods
+* add_all: one for each data type; adds all given elements of that datatype to the column; breaks 
+* data up into chunks, creates keys for those chunks, and adds them to the KVStore
+*setStore(KVStore): pass a KVStore to the dataframe; will initially start in the dataframe, which 
+will be passed to the column array and eventually the column
 
 
-* Serializer: This class will be similar to the one started in Assignment 6. It supports writing primitive types, character pointers (strings), and message types to its buffer, and can also read these when deserializing. It will be 
+* Serializer: This class will be similar to the one started in Assignment 6. It supports writing 
+* primitive types, character pointers (strings), and message types to its buffer, and can also read
+*  these when deserializing. It will be 
 in charge of serializing and deserializing data, and buffering the result. The Serializer 
-will be used in multiple places in this project. All of DataFrame's from... methods need to initialize a Serializer to serialize the constructed dataframe, to store in the 
+will be used in multiple places in this project. All of DataFrame's from... methods need to 
+initialize a Serializer to serialize the constructed dataframe, to store in the 
 key-value store. The wait and waitAndGet methods within Store need to initialize a 
 Serializer; the serializer will need to convert the serialized string data into the dataframe 
 that it represents. Serialization is also needed whenever attempting to retrieve
@@ -179,20 +199,26 @@ Methods:
 
 * containsKey(Key): does the distributed array's key list contain the given key?
 * addKey(Key): add the given key to the distributed array's list of keys
-* get(Key): get the value for the specified key from the distributed array. Check the cache first and if the cache
+* get(Key): get the value for the specified key from the distributed array. Check the cache first and 
+* if the cache
 does not contain the data, then make a call too the KV
 store
 * get(size_t): get key at specified index in array, then return data for that key
 * getKeyAtIndex(size_t): return key at the given index in the array
-* setStore(KVStore): this method will be used to pass a store into the distributed array; the store will come from the dataframe initially and move down the hierarchy (dataframe -> columnarray -> column -> distributed array)
+* setStore(KVStore): this method will be used to pass a store into the distributed array; the store 
+* will come from the dataframe initially and move down the hierarchy (dataframe -> columnarray -> 
+* column -> distributed array)
 * Serialization and deserialization methods
+* get(Key, size_t): one for each of the four types; retrieves the block with the given key, then
+  returns the value at the specified index in the block
 
 *NOTE that the cache methods defined here will delegate to the Cache object, which work 
 on the Cache's map object*
 
 
 * Cache: class that represents a cache within a distributed array. Holds the data of
-some of the array's keys
+some of the array's keys. Holds the actual, deserialized data for improved retrieval
+efficiency
 
 Fields:
 
@@ -200,7 +226,8 @@ Fields:
 this amount of elements at any given time
 * data (Obj-to-Obj map): this map will hold the data within the cache. The keys will 
 be Key objects, and they will map to the serialized data
-* keyOrder (Queue): this queue will keep the order in which keys are added to the cache. This will help us update our cache by adding and removing elements on a FIFO basis
+* keyOrder (Queue): this queue will keep the order in which keys are added to the cache. This will 
+  help us update our cache by adding and removing elements on a FIFO basis
 
 Methods:
 
@@ -220,10 +247,12 @@ Fields:
 * kv (Store): this will be the local kv store for the node that the application is 
 running on. When initialized, it will take in the node id from the Application's 
  and set it as its id
+ *idx (size_t): node index that this application is running on
 
 Methods:
 
 * this_node(): returns id of this node
+* getStore(): retrieve KVStore from application
 * run_(): given the node id, perform a certain set of operations. The node id will be 
 placed in a switch statement, and each case will contain a different helper for each 
 application running (ex.producer to initialize and create the data, summarizer to 
@@ -237,85 +266,87 @@ are an outline of what each node will run.
 
 Application:
 
- * dataA = Key("dataA", 0);
- * dataB = Key("dataB", 1);
- * firstDifPos = Key("firstDifPos", 2);
- * dataAFirstDif = Key("dataAFirstDif", 2);
- * dataBFirstDif = Key("dataBFirstDif", 2);
- * same = Key("areSame", 2);
- * sameSize = Key("sameSize", 2);
+    dataA = Key("dataA", 0);
+    dataB = Key("dataB", 1);
+    firstDifPos = Key("firstDifPos", 2);
+    dataAFirstDif = Key("dataAFirstDif", 2);
+    dataBFirstDif = Key("dataBFirstDif", 2);
+    same = Key("areSame", 2);
+    sameSize = Key("sameSize", 2);
 
- * ProducerA (node_num = 0):
- *	Sorer s = new Sorer();
- *	DataFrame\* df = s.read("fileA");
- *	// store df in distributed key-value store under key dataA
- *	return;
+    ProducerA (node_num = 0):
+    Sorer s = new Sorer();
+    DataFrame\* df = s.read("fileA");
+    // store df in distributed key-value store under key dataA
+    return;
 
- * ProducerB (node_num = 1):
- *	Sorer s = new Sorer();
- *	DataFrame\* df = s.read("fileB");
- *	// store df in distributed key-value store under key dataB
- *	return;
+    ProducerB (node_num = 1):
+    Sorer s = new Sorer();
+    DataFrame\* df = s.read("fileB");
+    // store df in distributed key-value store under key dataB
+    return;
 
- * Comparer (node_num = 2):
- *	DataFrame\* dfA = waitAndGet(dataA);
- *	DataFrame\* dfB = waitAndGet(dataB);
- *	int areSame = 0;
- *	if (size of dfA != size of dfB) {
- *		DataFrame::fromScalar(&sameSize, &kv, 0);
- *		DataFrame::fromScalar(&same, &kv, 0);
- *		return;
- *	}
- *	DataFrame::fromScalar(&sameSize, &kv, 1);
- *	// loop through elements
- *		if (dfA->get(i, j) not equal dfB->get(i, j)) {
- *			int\* pos = new int\[2\];
- *			pos\[0\] = i;
- *			pos\[1\] = j;
- *			DataFrame::fromArray(&firstDifPos, &kv, 2, pos);
- *			// generalize for any type
- *			DataFrame::fromScalar(&dataAFirstDif, &kv, dfA->get(i, j)); 
- *			// generalize for any type
- *			DataFrame::fromScalar(&dataBFirstDif, &kv, dfB->get(i, j)); 
- *		}
- *	DataFrame::fromScalar(&same, &kv, 1);
- *	return;
+    Comparer (node_num = 2):
+    DataFrame\* dfA = waitAndGet(dataA);
+    DataFrame\* dfB = waitAndGet(dataB);
+    int areSame = 0;
+    if (size of dfA != size of dfB) {
+      DataFrame::fromScalar(&sameSize, &kv, 0);
+      DataFrame::fromScalar(&same, &kv, 0);
+      return;
+    }
 
- * Reporter (node_num = 3):
- *	DataFrame\* sameDF = waitAndGet(same);
- *	if (sameDF->get(0, 0)) {
- *		pln("Same Data! :)");
- *		return;
- *	}
- *	pln("Different Data.");
- *	DataFrame\* sizeDF = waitAndGet(sameSize);
- *	if (sizeDF->get(0, 0)) {
- *		pln("Non-Equal Size");
- *		return;
- *	}
- *	DataFrame\* posDF = waitAndGet(firstDifPos);
- *	DataFrame\* aDif = waitAndGet(dataAFirstDif);
- *	DataFrame\* bDif = waitAndGet(dataBFirstDif);
- *	pln("Different Data!");
- *	p("Example: ");
- *	p("dataA\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ")
- *	.p(aDif->get(0));
- *	p(" , dataB\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ")
- *	.p(bDif->get(0));
- *	pln("");
- *	return;
+    DataFrame::fromScalar(&sameSize, &kv, 1);
+    // loop through elements
+    	if (dfA->get(i, j) not equal dfB->get(i, j)) {
+    		int\* pos = new int\[2\];
+    		pos\[0\] = i;
+    		pos\[1\] = j;
+    		DataFrame::fromArray(&firstDifPos, &kv, 2, pos);
+    		// generalize for any type
+    		DataFrame::fromScalar(&dataAFirstDif, &kv, dfA->get(i, j)); 
+    		// generalize for any type
+    		DataFrame::fromScalar(&dataBFirstDif, &kv, dfB->get(i, j)); 
+    	}
 
+    DataFrame::fromScalar(&same, &kv, 1);
+    return;
+
+    Reporter (node_num = 3):
+    DataFrame\* sameDF = waitAndGet(same);
+    if (sameDF->get(0, 0)) {
+    	pln("Same Data! :)");
+    	return;
+    }
+
+    pln("Different Data.");
+    DataFrame\* sizeDF = waitAndGet(sameSize);
+    if (sizeDF->get(0, 0)) {
+    	pln("Non-Equal Size");
+    	return;
+    }
+
+    DataFrame\* posDF = waitAndGet(firstDifPos);
+    DataFrame\* aDif = waitAndGet(dataAFirstDif);
+    DataFrame\* bDif = waitAndGet(dataBFirstDif);
+    pln("Different Data!");
+    p("Example: ");
+    p("dataA\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ")
+    .p(aDif->get(0));
+    p(" , dataB\[").p(posDF->get(0, 0)).p(", ").p(posDF->get(0, 1)).p("\] = ")
+    .p(bDif->get(0));
+    pln("");
+    return;
 
 ## Open questions
 
-Should we serialize and deserialize KV stores? We think no but also not sure if our current strategy is the best way; from the dataframe, we pass the KVStore to any classes that need it, in particular before deserializing it
+Should we serialize and deserialize KV stores? We think no but also not sure if our current strategy 
+is the best way; from the dataframe, we pass the KVStore to any classes that need it, in particular 
+before deserializing it
 
-We pulled out the implementation of KVStore::get into one of our test cpp files. This means we can use it in that file but nowhere else. What is the standard for where a method like that should be implemented? Its own additional cpp file that is compiled separately?
-
-fromScalar: which data types will we need this for? We currently store blocks of data for booleans, strings, integers, and floats. Will we be expected to do the same for size_t values, shorts, longs, etc.
-
-Uncertain if/how some methods will be used. For example, there hasn't been a need for add_row (adds row to a dataframe) as of yet; however some of our tests use this method and it is currently broken.
-Is it worth fixing these broken methods or should we refactor our tests?
+We pulled out the implementation of KVStore::get and waitAndGet into our test cpp files wherever we
+need it. This means we can use it in that file but nowhere else. What is the standard for where a 
+method like that should be implemented? Its own additional cpp file that is compiled separately?
 
 ## Status
 We have decided to use another group's Sorer implementation, as ours was written in Python and 
@@ -329,21 +360,29 @@ We succeeded in creating an adapter to use their Sorer with our DataFrame classe
 demonstrating this can be found in tests/sorerTest.cpp.
 This test highlighted some memory leaks in our implementation, which have now all been fixed.
 
-We have implemented serialization for most of the necessary classes, and are able to use the key-value store for data storage and retrieval. The Trivial case provided to us in M2 passes for smaller array sizes (1000 elements) but larger arrays (1000*1000) segfaults.
+We have implemented serialization for most of the necessary classes, and are able to use the 
+key-value store for data storage and retrieval. The Trivial case provided to us in M2 passes.
 
-We have a good amount of code cleanup to do; this includes removing unused code and print statements, and getting our previously written tests to compile and run.
+We have a good amount of code cleanup to do; this includes removing unused code and print statements, 
+and getting our previously written tests to compile and run.
 
-The networks portion implemented for previous assignments is a good start for what will be 
-required for this project.
-One current problem with it is that it only supports two clients and a server. Working on a
-fix.
-Most of the networking functionality required for this project is set up.
+Our demo test is not in a completely working state. We set up a simplified demo test that passes, 
+which only uses two nodes. The issues arise when we add a third node. With the actual test, it seems 
+that some messages are not being sent and/or received properly. As a result, the program will hang 
+and a node will wait for a message that never arrives. We think a problem might be that nodes are 
+making calls to their local stores to retrieve data before the data is actually in the store. Since 
+we utilize threading to represent nodes, we are unsure to how control the order in which the operations execute.
 
-Remaining tasks for M2
--fromScalar
+A current problem with our networking layer is that it only supports two clients and a server. 
+In order to incorporate the networking portion into our project, we'll need to figure out how to
+support many more nodes. Fortunately, since all nodes will be registered immediately upon the program
+starting, we think registration will become easier. We'll need to figure out how polling will work, 
+as we will no longer be able to do this in .cpp files. There will need to be some adjustments in
+order to make it work with our program. Overall, we feel we need to reduce the amount of network code
+and make it simpler.
 
-Remaining tasks for M3
--Create pseudo-networking to test distributed KV
--Determine message type(s) for communication between KV stores, make sure serializes and deserializes properly
--Fix networking classes
--Try to incorporate networking into KVStores
+Remaining tasks for M3:
+  
+* Clean up leaks from test
+  
+* Fix old tests to compile and pass with new changes

@@ -63,3 +63,5 @@ It sends the responses if available
 * Delete unused message types
 
 * Create doc to keep track of ownership of objects
+
+* Look at following commits from m3_submission: fromScalar, general code cleanup
