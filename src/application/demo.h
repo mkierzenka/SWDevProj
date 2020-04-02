@@ -53,7 +53,7 @@ public:
   }
  
   void summarizer() {
-    pln("Summarizer Finished");
+    pln("Summarizer Started");
     DataFrame* result = kv_->waitAndGet(verify);
     DataFrame* expected = kv_->waitAndGet(check);
     pln(expected->get_double(0,0)==result->get_double(0,0) ? "SUCCESS":"FAILURE");
