@@ -12,6 +12,8 @@
 #include "value.h"
 #include "../network/pseudo/messagequeue.h"
 #include "../serial/putmsg.h"
+#include "../serial/waitandgetmsg.h"
+
 
 class DataFrame;
 
@@ -36,28 +38,32 @@ public:
         kvMap = new MapStrObj();
         storeId = id;
         client_ = client;
-        receivedMsgs_ = new MessageQueue();
+        //receivedMsgs_ = new MessageQueue();
     }
 
     ~KVStore()
     {
         delete kvMap;
     }
+	
+	void setBackChannel(MessageQueue* mq) {
+		receivedMsgs_ = mq;
+	}
 
     /** Puts key-value pair into distributed KV store */
     void put(Key *k, Value *data)
     {
-		PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
-		client_->sendMsg(msg);
-    }
-	
-	/** Puts key-value pair into local map. Will clone the data */
-    void putLocal(Key *k, Value *data)
-    {
-        assert(k->getNode() == storeId);
-		size_t tmp = kvMap->size();
+		if (k->getNode() != storeId) {
+			PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
+			client_->sendMsg(msg);
+			return;
+		}
+		
+		// Add to this store's map
         kvMap->put(k->getKeyStr()->clone(), data->clone());
-		assert(kvMap->size() == tmp + 1);
+
+		// Try to respond to messages in the receivedMsgs_ queue
+		tryToHandleQueue_();
     }
 
     DataFrame *get(Key *k);
@@ -114,4 +120,34 @@ public:
         Value *val = dataMsg->getValue();
         return val;
     }
+	
+	/**
+	 * Go through receivedMsgs_ Queue, respond to any WaitAndGet messages that we can.
+	 */
+	void tryToHandleQueue_() {
+		MessageQueue* tmpQ = new MessageQueue();
+		while (receivedMsgs_->size() > 0) {
+			Message* m = receivedMsgs_->pop();
+			WaitAndGetMsg* wagMsg = dynamic_cast<WaitAndGetMsg *>(m);
+			if (wagMsg) {
+				size_t sender = wagMsg->getSender();
+				Key* k = wagMsg->getKey();
+				Value* val = getValue(k);
+				if(val) {
+					ReplyDataMsg *reply = new ReplyDataMsg(val, storeId, sender);
+					client_->sendMsg(reply);
+					delete wagMsg;
+				} else {
+					tmpQ->push(wagMsg);
+				}
+			} else {
+				// Not a WaitAndGetMsg
+				tmpQ->push(m);
+			}
+		}
+		while(tmpQ->size() > 0) {
+			receivedMsgs_->push(tmpQ->pop());
+		}
+		delete tmpQ;		
+	}
 };
