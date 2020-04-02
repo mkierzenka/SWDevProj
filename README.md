@@ -61,3 +61,5 @@ It sends the responses if available
 * Put all messages in same file
 
 * Delete unused message types
+
+* Create doc to keep track of ownership of objects
