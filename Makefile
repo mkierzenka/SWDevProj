@@ -1,7 +1,7 @@
 build:
 	g++ --std=c++11 -g -pthread tests/generalTests.cpp -o tests/testGeneral
 	g++ --std=c++11 -g tests/serializationTests.cpp -o tests/testSerial
-	g++ --std=c++11 -g tests/trivialTest.cpp -o tests/testTrivial
+	g++ --std=c++11 -g -pthread tests/trivialTest.cpp -o tests/testTrivial
 	g++ --std=c++11 -g tests/mapTest.cpp -o tests/testMap
 	g++ --std=c++11 -g tests/arrayTest.cpp -o tests/testArray
 	g++ --std=c++11 -g tests/queueTest.cpp -o tests/testQueue
@@ -36,7 +36,7 @@ testCache:
 	./tests/testCache
 
 buildTrivial:
-	g++ -std=c++11 -g tests/trivialTest.cpp -o tests/testTrivial
+	g++ -std=c++11 -g -pthread tests/trivialTest.cpp -o tests/testTrivial
 
 testTrivial:
 	./tests/testTrivial
