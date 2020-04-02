@@ -14,6 +14,7 @@
 #include <stddef.h>
 #include <math.h>
 #include <stdarg.h>
+#include <assert.h>
 
 enum ColType {
     Str = 0, 
@@ -110,6 +111,7 @@ public:
     /** Type appropriate push_back methods. Calling the wrong method is
     * undefined behavior. **/
     void push_back(int val) {
+        assert(false);
         if (type_ != ColType::Integer) {
             fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
             exit(1);
@@ -117,6 +119,7 @@ public:
     }
 
     void push_back(bool val) {
+        assert(false);
         if (type_ != ColType::Boolean) {
             fprintf(stderr, "Cannot add boolean to column of type %c", getCharType());
             exit(1);
@@ -124,6 +127,7 @@ public:
     }
 
     void push_back(double val) {
+        assert(false);
         if (type_ != ColType::Double) {
             fprintf(stderr, "Cannot add double to column of type %c", getCharType());
             exit(1);
@@ -131,6 +135,7 @@ public:
     }
 
     void push_back(String* val) {
+        assert(false);
         if (type_ != ColType::Str) {
             fprintf(stderr, "Cannot add String to column of type %c", getCharType());
             exit(1);
