@@ -178,30 +178,29 @@ public:
 		add_column(c);
 	}
 
-	// get the index of the given Column
-	int index_of(Column *c)
-	{
-		//casting needed?
-		return colList_->index_of(c);
-	}
-
 	// ========== METHODS WORKING WITH ELEMENTS IN COLUMNS ==========
 
 	/** Return the value at the given column and row. Accessing rows or
-   *  columns out of bounds, or request the wrong type is undefined.*/
+      *  columns out of bounds, or request the wrong type is undefined.*/
 	int get_int(size_t col, size_t row)
 	{
-		//return colList_->get_int(col, row);
 		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		//can check the type in the row
+		if (c == nullptr)
+		{
+			fprintf(stderr, "Cannot get int from null column\n");
+		}
+
 		return c->get_int(row);
 	}
 
 	bool get_bool(size_t col, size_t row)
 	{
-		//return colList_->get_bool(col, row);
 		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		//can check the type in the row
+		if (c == nullptr)
+		{
+			fprintf(stderr, "Cannot get bool from null column\n");
+		}
+		
 		return c->get_bool(row);
 	}
 
@@ -213,21 +212,23 @@ public:
 			fprintf(stderr, "Cannot get double from null column\n");
 		}
 		
-		//can check the type in the row
 		return c->get_double(row);
 	}
 
 	// gets the actual String*, no copy
 	String *get_string(size_t col, size_t row)
 	{
-		//return colList_->get_string(col, row);
 		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		//can check the type in the row
+		if (c == nullptr)
+		{
+			fprintf(stderr, "Cannot get string from null column\n");
+		}
+
 		return c->get_string(row);
 	}
 
 	/** Type appropriate push_back methods. Appends the element to the end of the
-	* specified column. Calling the wrong method is undefined behavior. **/
+	  * specified column. Calling the wrong method is undefined behavior. **/
 	void push_back(size_t col, int val)
 	{
 		Column *c = dynamic_cast<Column *>(colList_->get(col));
