@@ -10,6 +10,7 @@
 #include "../src/serial/serial.h"
 #include "../src/utils/object.h"
 #include "../src/utils/string.h"
+#include "../src/network/pseudo/messagequeue.h"
 
 Sys *SYSTEM = new Sys();
 
@@ -99,6 +100,8 @@ void columnTests()
 {
   SYSTEM->pln("Columns test started...");
   KVStore* store = new KVStore(0, nullptr);
+  MessageQueue* mq = new MessageQueue();
+  store->setBackChannel(mq);
 
   Key* baseKeyI = new Key("baseInts", 0);
   int numsI[] = {1, 2, 3, 4};
@@ -155,16 +158,18 @@ void columnTests()
   delete sc;
   
   delete store;
+  delete mq;
 
   SYSTEM->pln("Columns test passed!");
 }
 
-/* Adding multiple columns to DF via add_array
 void dataFrameTest()
 {
   SYSTEM->pln("Data frame test started...");
 
-  KVStore kv(0);
+  KVStore kv(0, nullptr);
+  MessageQueue mq;
+  kv.setBackChannel(&mq);
   Key k("main", 0);
   DataFrame df(&k, &kv);
   assert(df.ncols() == 0);
@@ -172,35 +177,23 @@ void dataFrameTest()
   assert(df.nrows() == 0);
   assert(df.get_schema().length() == 0);
 
-  int valsI[] = {36, 75, 309};
-  double valsD[] = {34.2, 2.2, 0.8};
-  bool valsB[] = {false, true, false};
   String s1("abc");
   String s2("aaa");
   String s3("!@#");
   String* valsS[] = {&s1, &s2, &s3};
   
-  df.add_array(3, valsI);
-  df.add_array(3, valsD);
-  df.add_array(3, valsB);
   df.add_array(3, valsS);
 
   //make sure both schema and dataframe got updated
-  assert(df.ncols() == 5);
-  assert(df.get_schema().width() == 4);
+  assert(df.ncols() == 1);
+  assert(df.get_schema().width() == 1);
   assert(df.nrows() == 3);
   assert(df.get_schema().length() == 3);
 
-  assert(df.get_int(0, 0) == valsI[0]);
-  assert(df.get_double(1, 0) == valsD[0]);
-  assert(df.get_bool(2, 0) == valsB[0]);
-  assert(df.get_string(3, 0)->equals(valsS[0]));
-  assert(df.get_int(0, 2) == valsI[2]);
-  assert(df.get_double(1, 1) == valsD[1]);
-  assert(df.get_bool(2, 2) == valsB[2]);
-  assert(df.get_string(3, 1)->equals(valsS[1]));
+  assert(df.get_string(0, 0)->equals(valsS[0]));
+  assert(df.get_string(0, 1)->equals(valsS[1]));
   SYSTEM->pln("Data frame test passed!");
-}*/
+}
 
 void genSchemaTest()
 {
@@ -226,6 +219,7 @@ void genSchemaTest()
 
   SYSTEM->pln("General schema test passed!");
 }
+
 /*
 void lengthRowerTest() {
   SYSTEM->pln("Length rower test started...");
@@ -283,8 +277,8 @@ int main()
   testSchema();
   testSchema2();
   genSchemaTest();
-  //basicTest2
-  //dataFrameTest();
+  //basicTest2();
+  dataFrameTest();
   //lengthRowerTest();
   return 0;
 }
