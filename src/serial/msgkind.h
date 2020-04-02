@@ -1,8 +1,8 @@
-// //lang::CwC
+//lang::CwC
 
-// #pragma once
+#pragma once
 
 
-// enum MsgKind {
-//     Ack, GetData, Put, ReplyData, Get, WaitAndGet, Status, Kill, Register, Directory
-// };
+enum MsgKind {
+    Ack, GetData, Put, ReplyData, Get, WaitAndGet, Status, Kill, Register, Directory
+};

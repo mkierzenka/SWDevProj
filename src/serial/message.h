@@ -6,26 +6,10 @@
 #include "serial.h"
 #include "stringarray.h"
 #include "../store/key.h"
+#include "../store/value.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
-//class Serializer;
-
-/** Enum describing different message types available */
-enum MsgKind
-{
-	Ack,
-	GetData,
-	Put,
-	ReplyData,
-	Get,
-	WaitAndGet,
-	Status,
-	Kill,
-	Register,
-	Directory
-};
 
 /**
  * Stub class representing a TCP message. For Serializer demo.
@@ -159,128 +143,128 @@ public:
 	}
 };
 
-// class StatusMsg : public Message
-// {
-// public:
-// 	String *msg_; //owned
+class StatusMsg : public Message
+{
+public:
+	String *msg_; //owned
 
-// 	StatusMsg() : Message()
-// 	{
-// 		msg_ = new String("");
-// 	}
+	StatusMsg() : Message()
+	{
+		msg_ = new String("");
+	}
 
-// 	StatusMsg(String *msg, size_t sender, size_t target, size_t id) : Message(Status, sender, target, id)
-// 	{
-// 		msg_ = new String(*msg);
-// 	}
+	StatusMsg(String *msg, size_t sender, size_t target, size_t id) : Message(Status, sender, target, id)
+	{
+		msg_ = new String(*msg);
+	}
 
-// 	~StatusMsg()
-// 	{
-// 		delete msg_;
-// 	}
+	~StatusMsg()
+	{
+		delete msg_;
+	}
 
-// 	// Inherits from Message
-// 	virtual void serialize(Serializer *s)
-// 	{
-// 		Message::serialize(s);
-// 		msg_->serialize(s);
-// 	}
+	// Inherits from Message
+	virtual void serialize(Serializer *s)
+	{
+		Message::serialize(s);
+		msg_->serialize(s);
+	}
 
-// 	// Inherits from Message
-// 	virtual void deserialize(Serializer *s)
-// 	{
-// 		Message::deserialize(s);
-// 		msg_->deserialize(s);
-// 	}
-// };
+	// Inherits from Message
+	virtual void deserialize(Serializer *s)
+	{
+		Message::deserialize(s);
+		msg_->deserialize(s);
+	}
+};
 
-// /** This message sends a list of connected nodes */
-// class DirectoryMsg : public Message
-// {
-// public:
-// 	size_t client_;
-// 	size_t port_;
-// 	StringArray *ipList_;
+/** This message sends a list of connected nodes */
+class DirectoryMsg : public Message
+{
+public:
+	size_t client_;
+	size_t port_;
+	StringArray *ipList_;
 
-// 	DirectoryMsg() : Message()
-// 	{
-// 		ipList_ = new StringArray();
-// 	}
+	DirectoryMsg() : Message()
+	{
+		ipList_ = new StringArray();
+	}
 
-// 	DirectoryMsg(size_t client, size_t port, size_t sender, size_t target, size_t id) : Message(Directory, sender, target, id)
-// 	{
-// 		client_ = client;
-// 		port_ = port;
-// 		ipList_ = new StringArray();
-// 	}
+	DirectoryMsg(size_t client, size_t port, size_t sender, size_t target, size_t id) : Message(Directory, sender, target, id)
+	{
+		client_ = client;
+		port_ = port;
+		ipList_ = new StringArray();
+	}
 
-// 	~DirectoryMsg() {}
+	~DirectoryMsg() {}
 
-// 	virtual void serialize(Serializer *s)
-// 	{
-// 		Message::serialize(s);
-// 		ipList_->serialize(s);
-// 		s->write(client_);
-// 		s->write(port_);
-// 	}
+	virtual void serialize(Serializer *s)
+	{
+		Message::serialize(s);
+		ipList_->serialize(s);
+		s->write(client_);
+		s->write(port_);
+	}
 
-// 	virtual void deserialize(Serializer *s)
-// 	{
-// 		Message::deserialize(s);
-// 		ipList_->deserialize(s);
-// 		client_ = s->readSizeT();
-// 		port_ = s->readSizeT();
-// 	}
+	virtual void deserialize(Serializer *s)
+	{
+		Message::deserialize(s);
+		ipList_->deserialize(s);
+		client_ = s->readSizeT();
+		port_ = s->readSizeT();
+	}
 
-// 	void addIp(String *ip)
-// 	{
-// 		ipList_->add(ip);
-// 	}
-// };
+	void addIp(String *ip)
+	{
+		ipList_->add(ip);
+	}
+};
 
-// /** Message to register a new node */
-// class RegisterMsg : public Message
-// {
-// public:
-// 	struct sockaddr_in client_;
-// 	size_t port_;
+/** Message to register a new node */
+class RegisterMsg : public Message
+{
+public:
+	struct sockaddr_in client_;
+	size_t port_;
 
-// 	RegisterMsg() : Message()
-// 	{
-// 		client_.sin_family = AF_INET;
-// 		inet_pton(AF_INET, "127.0.0.1", &client_.sin_addr);
-// 		client_.sin_port = htons(8080);
-// 		port_ = 8080;
-// 	}
+	RegisterMsg() : Message()
+	{
+		client_.sin_family = AF_INET;
+		inet_pton(AF_INET, "127.0.0.1", &client_.sin_addr);
+		client_.sin_port = htons(8080);
+		port_ = 8080;
+	}
 
-// 	RegisterMsg(sockaddr_in client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
-// 	{
-// 		client_ = client;
-// 		port_ = port;
-// 	}
+	RegisterMsg(sockaddr_in client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
+	{
+		client_ = client;
+		port_ = port;
+	}
 
-// 	~RegisterMsg()
-// 	{
-// 	}
+	~RegisterMsg()
+	{
+	}
 
-// 	virtual void serialize(Serializer *s)
-// 	{
-// 		Message::serialize(s);
-// 		s->write((short)client_.sin_family);
-// 		s->write((long)client_.sin_addr.s_addr);
-// 		s->write((short)client_.sin_port);
-// 		s->write(port_);
-// 	}
+	virtual void serialize(Serializer *s)
+	{
+		Message::serialize(s);
+		s->write((short)client_.sin_family);
+		s->write((long)client_.sin_addr.s_addr);
+		s->write((short)client_.sin_port);
+		s->write(port_);
+	}
 
-// 	virtual void deserialize(Serializer *s)
-// 	{
-// 		Message::deserialize(s);
-// 		client_.sin_family = s->readShort();
-// 		client_.sin_addr.s_addr = s->readLong();
-// 		client_.sin_port = s->readShort();
-// 		port_ = s->readSizeT();
-// 	}
-// };
+	virtual void deserialize(Serializer *s)
+	{
+		Message::deserialize(s);
+		client_.sin_family = s->readShort();
+		client_.sin_addr.s_addr = s->readLong();
+		client_.sin_port = s->readShort();
+		port_ = s->readSizeT();
+	}
+};
 
 /**
  * This is the message type that will be sent by a KVStore to put a KV pair in another
@@ -359,19 +343,19 @@ public:
 	}
 };
 
-// /** Message acknowledges that a message was received */
-// class AckMsg : public Message
-// {
-// public:
-// 	AckMsg() : Message() {}
+/** Message acknowledges that a message was received */
+class AckMsg : public Message
+{
+public:
+	AckMsg() : Message() {}
 
-// 	AckMsg(size_t sender, size_t target, size_t id) : Message(Ack, sender, target, id) {}
+	AckMsg(size_t sender, size_t target, size_t id) : Message(Ack, sender, target, id) {}
 
-// 	~AckMsg() {}
+	~AckMsg() {}
 
-// 	// Inherits from Message
-// 	// virtual void serialize(Serializer* s);
+	// Inherits from Message
+	// virtual void serialize(Serializer* s);
 
-// 	// Inherits from Message
-// 	// virtual void deserialize(Serializer* s);
-// };
+	// Inherits from Message
+	// virtual void deserialize(Serializer* s);
+};

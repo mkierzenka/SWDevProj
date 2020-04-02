@@ -58,7 +58,7 @@ It sends the responses if available
 
 * Create application for sorer
 
-* Put all messages in same file
+* Delete doublearray and stringarray, update message classes that use them
 
 * Delete unused message types
 

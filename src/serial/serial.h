@@ -4,7 +4,7 @@
 
 #include <unistd.h>
 #include "../utils/string.h"
-#include "message.h"
+#include "msgkind.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
