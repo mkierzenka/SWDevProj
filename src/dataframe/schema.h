@@ -115,10 +115,14 @@ public:
 		numCols_++;
 	}
 
-	/** Add a row with a name (possibly nullptr), name is external.  Names are
-   *  expected to be unique, duplicates result in undefined behavior. */
+	/** Increment the number of rows tracked by this Schema by 1 */
 	void add_row() {
-	  numRows_++;
+	  add_rows(1);
+  	}
+
+	/** Increase the row count of this Schema */
+	void add_rows(size_t numRows) {
+	  numRows_ += numRows;
   	}
 
 	/** Return type of column at idx. An idx >= width is undefined. */
