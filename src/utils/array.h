@@ -47,7 +47,7 @@ public:
 		}
 
 		Array *o = dynamic_cast<Array *>(other);
-		if (o == nullptr || this->length() != o->length())
+		if (!o || this->length() != o->length())
 		{
 			return false;
 		}
