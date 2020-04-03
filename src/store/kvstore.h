@@ -26,6 +26,8 @@ public:
     PseudoNetwork* client_;        //fake network for demo
     size_t storeId;                //node id that this store belongs to
     MessageQueue* receivedMsgs_;   //WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
+	Map* msgCache_;
+	Lock msgCacheLock_;
 
 
     KVStore(size_t id, PseudoNetwork* client)
@@ -34,6 +36,8 @@ public:
         storeId = id;
         client_ = client;
         receivedMsgs_ = new MessageQueue();
+		msgCache_ = new Map();
+		
     }
 
     ~KVStore()
@@ -54,7 +58,7 @@ public:
         kvMap->put(k->getKeyStr()->clone(), data->clone());
 
 		// Try to respond to messages in the receivedMsgs_ queue
-		tryToHandleQueue_();
+		tryToHandleQueue_(k);
     }
 
     DataFrame *get(Key *k);
@@ -78,14 +82,18 @@ public:
 	 * Add a message another KVStore is waiting on us to reply to
 	 */
 	void addMsgWaitingOn(WaitAndGetMsg* msg) {
+		msgCacheLock_.lock();
 		receivedMsgs_->push(msg);
+		msgCacheLock_.unlock();
 	}
 	
 	/**
 	 * Our ReceiverThread got a response for a key we requested.
 	 */
 	void addReply(ReplyDataMsg* msg) {
+		msgCacheLock_.lock();
 		receivedMsgs_->push(msg);
+		msgCacheLock_.unlock();
 	}
 
     /** Check if two distributed arrats equal - do not use */
@@ -103,7 +111,13 @@ public:
     Value* getFromNetwork_(Key* k) {
         GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
         client_->sendMsg(dm);
-        ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(receivedMsgs_->pop());
+		msgCacheLock_.lock();
+		while (!msgCache_->contains_key(k)) 
+        {
+            msgCacheLock_.wait();
+        }
+        ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(msgCache_->remove(k));
+		msgCacheLock_.unlock();
 		// ^^ Blocks until the message is ready for this store
         assert(dataMsg != nullptr);
         Value *val = dataMsg->getValue();
@@ -111,9 +125,23 @@ public:
     }
 	
 	/**
-	 * Go through receivedMsgs_ Queue, respond to any WaitAndGet messages that we can.
+	 * Given that we just added the k-v pair to the store, see if we can deal
+	 *   with any messages.
 	 */
-	void tryToHandleQueue_() {
+	void tryToHandleQueue_(Key* k) {
+		msgCacheLock_.lock();
+		if (msgCache_->contains_key(k)) {
+			Object* res = msgCache_->remove(k);
+			WaitAndGetMsg* wagMsg = dynamic_cast<WaitAndGetMsg*>(res);
+			assert(wagMsg);
+			size_t sender = wagMsg->getSender();
+			Value* val = getValue(k); //should be local, we just added it in kv.put()
+			ReplyDataMsg *reply = new ReplyDataMsg(k, val, storeId, sender);
+			client_->sendMsg(reply);
+			delete wagMsg;
+		}
+		msgCacheLock_.unlock();
+		/*
 		MessageQueue* tmpQ = new MessageQueue();
 		while (receivedMsgs_->size() > 0) {
 			Message* m = receivedMsgs_->pop();
@@ -137,6 +165,6 @@ public:
 		while(tmpQ->size() > 0) {
 			receivedMsgs_->push(tmpQ->pop());
 		}
-		delete tmpQ;		
+		delete tmpQ;*/
 	}
 };

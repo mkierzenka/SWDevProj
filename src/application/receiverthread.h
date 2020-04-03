@@ -41,7 +41,7 @@ public:
                 size_t sender = gdMsg->getSender();
 				// Respond with data, nullptr if we don't have it right now
 				Value* val = kv_->getValue(gdMsg->getKey());
-				ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
+				ReplyDataMsg *reply = new ReplyDataMsg(gdMsg->getKey(), val, nodeNum_, sender);
 				network_->sendMsg(reply);
 				delete gdMsg;
                 break;
@@ -54,18 +54,26 @@ public:
                 // Respond with data, add it to the queue if we don't have it right now
                 Value* val = kv_->getValue(wagMsg->getKey());
                 if (val) {
-                    ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
+                    ReplyDataMsg *reply = new ReplyDataMsg(wagMsg->getKey(), val, nodeNum_, sender);
                     network_->sendMsg(reply);
                     delete wagMsg;
                 } else {
-                    kv_->addMsgWaitingOn(wagMsg);
+                    //kv_->addMsgWaitingOn(wagMsg);
+					kv_->msgCacheLock_.lock();
+					kv_->msgCache_->put(wagMsg->getKey(), wagMsg);
+					kv_->msgCacheLock_.notify_all();
+					kv_->msgCacheLock_.unlock();
                 }
                 break;
             }
             case (MsgKind::ReplyData):
             {
 				ReplyDataMsg* rdMsg = dynamic_cast<ReplyDataMsg*>(m);
-				kv_->addReply(rdMsg);
+					kv_->msgCacheLock_.lock();
+					kv_->msgCache_->put(rdMsg->getKey(), rdMsg);
+					kv_->msgCacheLock_.notify_all();
+					kv_->msgCacheLock_.unlock();
+				//kv_->addReply(rdMsg);
                 break;
             }
 			case (MsgKind::Put):
