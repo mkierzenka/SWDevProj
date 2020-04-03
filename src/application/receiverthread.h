@@ -69,7 +69,7 @@ public:
             }
             case (MsgKind::ReplyData):
             {
-                kv_->receivedMsgs_->push(m);
+				msgsInProg_->push(m);
                 break;
             }
 			case (MsgKind::Put):
