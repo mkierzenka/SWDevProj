@@ -218,17 +218,6 @@ public:
 		len_ = 0;
 	}
 
-	// prints all elements in this array
-	void print()
-	{
-		printf("[");
-		for (size_t i = 0; i < len_ - 1; i++)
-		{
-			printf("%s ", strList_[i]->c_str());
-		}
-		printf("%s]", strList_[len_ - 1]->c_str());
-	}
-
 	// determine if we have enough space allocated to fit the specified number of additional elements
 	bool hasRoomForMoreElems_(int numElements)
 	{

@@ -409,20 +409,6 @@ public:
     return newFrame;
   }*/
 
-  /** Print the dataframe in SoR format to standard output. */
-  void print()
-  {
-    for (int rowIdx = 0; rowIdx < schema_->length(); rowIdx++)
-    {
-      for (int colIdx = 0; colIdx < schema_->width(); colIdx++)
-      {
-        columns_->get(colIdx)->printElement(rowIdx);
-      }
-
-      printf("\n");
-    }
-  }
-
   /** Add to end of column depending on the type */
   void addToEndOfColByType_(size_t colIdx, Row &row)
   {

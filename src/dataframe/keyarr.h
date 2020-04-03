@@ -30,17 +30,6 @@ public:
 		delete keyList_;
 	}
 
-	 //for debugging purposes
-    void print()
-    {
-		printf("LENGTH: %zu\n", keyList_->length());
-		for (int i = 0; i < keyList_->length(); i++)
-		{
-			printf("Key at index %d: string %s, node %zu\n", i, 
-				get(i)->kStr_->c_str(), get(i)->homeNode_);
-		}
-    }
-
 	/** Serialize a KeyArr into char* representation */
 	void serialize(Serializer* s)
 	{

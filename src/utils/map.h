@@ -256,17 +256,6 @@ class Map : public Object {
 		}
 
 		/**
-		 * @brief Prints a representation of map to the console.
-		 */
-		/*virtual void print() {
-			printf("Map:\n");
-			for(size_t i = 0; i < size_; i++) {
-				buckets_[i]->print();
-				printf("\n");
-			}
-		}*/
-
-		/**
 		 * @brief Determines the number of mappings in this map.
 		 * @return size of map
 		 */

@@ -247,11 +247,6 @@ public:
     {
         return size_;
     }
-
-    /** Print the element in sorer format, with brackets */
-    virtual void printElement(size_t rowIdx)
-    {
-    }
     
 	double get_double(size_t idx) {
         if (!properType(ColType::Double))
