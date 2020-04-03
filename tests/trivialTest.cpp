@@ -3,19 +3,8 @@
 #include "../src/application/trivial.h"
 #include "../src/application/nodethread.h"
 #include "../src/network/pseudo/pseudonetwork.h"
+#include "../src/store/getImpls.h"
 
-DataFrame *KVStore::get(Key *k)
-{
-    Value *val = getValue(k);
-    Serializer *s = new Serializer(val->getSize(), val->getData());
-    DataFrame *d = new DataFrame(k, this);
-    d->deserialize(s);
-
-    //delete val?
-    delete s;
-
-    return d;
-}
 
 //The purpose of this file is to test the Trivial case given to us in M2
 int main()
