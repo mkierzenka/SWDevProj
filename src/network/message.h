@@ -83,7 +83,7 @@ public:
 	//key to be sent in message
 	Value *value_;
 
-	ReplyDataMsg(Value *v, size_t sender, size_t target) : Message(MsgKind::ReplyData, sender, target, 0)
+	ReplyDataMsg(Value *v, size_t sender, size_t target) : Message(ReplyData, sender, target, 0)
 	{
 		value_ = v;
 	}
@@ -109,15 +109,15 @@ public:
 };
 
 /**
- * This is the message type that will be sent by a KVStore to request data for
- * a specific key. The application thread is blocked, waiting for a reply.
+ * This is the message type that will be sent by a KVStore to request data when
+ * an Application calls waitAndGet.
  */
 class WaitAndGetMsg : public Message
 {
 public:
 	Key *key_;
 
-	WaitAndGetMsg(Key *k, size_t sender, size_t target) : Message(MsgKind::WaitAndGet, sender, target, 0)
+	WaitAndGetMsg(Key *k, size_t sender, size_t target) : Message(WaitAndGet, sender, target, 0)
 	{
 		key_ = k;
 	}
@@ -267,7 +267,7 @@ public:
 };
 
 /**
- * This is the message type that will be sent by a KVStore to put a KV pair in another
+ * This is the message type that will be sent by a KVStore to put a KV pair into another
  */
 class PutMsg : public Message
 {
@@ -275,7 +275,7 @@ public:
 	Key *key_;
 	Value *value_;
 
-	PutMsg(Key *k, Value *v, size_t sender, size_t target) : Message(MsgKind::Put, sender, target, 0)
+	PutMsg(Key *k, Value *v, size_t sender, size_t target) : Message(Put, sender, target, 0)
 	{
 		key_ = k;
 		value_ = v;
@@ -314,10 +314,9 @@ public:
 class GetDataMsg : public Message
 {
 public:
-	//key to be sent in message
 	Key *key_;
 
-	GetDataMsg(Key *k, size_t sender, size_t target) : Message(MsgKind::GetData, sender, target, 0)
+	GetDataMsg(Key *k, size_t sender, size_t target) : Message(GetData, sender, target, 0)
 	{
 		key_ = k;
 	}
