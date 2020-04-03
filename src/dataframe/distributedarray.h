@@ -72,28 +72,6 @@ public:
     {
         keyList_->add(k);
     }
-
-    /**
-    * Get the data for the specified key. Adds nullptr if value
-    * cannot be found.
-    */
-    /*Block *get(Key *k)
-    {
-        //check the cache first: return if exists
-        if (cache_->containsKey(k))
-        {
-            return cache_->getBlock(k);
-        }
-
-        //get data from store, and cache and return it
-        Block *val = store_->getBlock(k);
-        if (val != nullptr)
-        {
-            cache_->put(k->clone(), val->clone());
-        }
-
-        return val;
-    }*/
 	
 	/**
 	 * Get specific double from a value stored with key k
@@ -183,14 +161,6 @@ public:
 		}
 		return strData->get(itemIdx); //get should have cloned it
     }
-
-    /**
-     * Gets key with specified index in array, then get data for that key
-     */
-    /*Block *get(size_t idx)
-    {
-        return get(getKeyAtIndex(idx));
-    }*/
 
     /**
      * Get key at specified index, return error if out-of-bounds

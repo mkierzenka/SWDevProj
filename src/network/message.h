@@ -352,10 +352,4 @@ public:
 	AckMsg(size_t sender, size_t target, size_t id) : Message(Ack, sender, target, id) {}
 
 	~AckMsg() {}
-
-	// Inherits from Message
-	// virtual void serialize(Serializer* s);
-
-	// Inherits from Message
-	// virtual void deserialize(Serializer* s);
 };
