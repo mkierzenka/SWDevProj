@@ -10,7 +10,6 @@
 #include "../src/serial/serial.h"
 #include "../src/utils/object.h"
 #include "../src/utils/string.h"
-#include "../src/network/pseudo/messagequeue.h"
 
 Sys *SYSTEM = new Sys();
 
@@ -100,9 +99,6 @@ void columnTests()
 {
   SYSTEM->pln("Columns test started...");
   KVStore* store = new KVStore(0, nullptr);
-  MessageQueue* mq = new MessageQueue();
-  store->setBackChannel(mq);
-
   Key* baseKeyI = new Key("baseInts", 0);
   int numsI[] = {1, 2, 3, 4};
   Column* ic = new Column(store, baseKeyI, ColType::Integer);
@@ -158,7 +154,6 @@ void columnTests()
   delete sc;
   
   delete store;
-  delete mq;
 
   SYSTEM->pln("Columns test passed!");
 }
@@ -168,8 +163,6 @@ void dataFrameTest()
   SYSTEM->pln("Data frame test started...");
 
   KVStore kv(0, nullptr);
-  MessageQueue mq;
-  kv.setBackChannel(&mq);
   Key k("main", 0);
   DataFrame df(&k, &kv);
   assert(df.ncols() == 0);
