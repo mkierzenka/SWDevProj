@@ -25,7 +25,7 @@ public:
     //Client *client_;             //networking class used to talk to other stores
     PseudoNetwork* client_;        //fake network for demo
     size_t storeId;                //node id that this store belongs to
-    MessageQueue* receivedMsgs_;   //for our ReceiverThread to pass msgs to this store
+    MessageQueue* receivedMsgs_;   //WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
 
 
     KVStore(size_t id, PseudoNetwork* client)
@@ -33,17 +33,13 @@ public:
         kvMap = new MapStrObj();
         storeId = id;
         client_ = client;
-        //receivedMsgs_ = new MessageQueue();
+        receivedMsgs_ = new MessageQueue();
     }
 
     ~KVStore()
     {
         delete kvMap;
     }
-	
-	void setBackChannel(MessageQueue* mq) {
-		receivedMsgs_ = mq;
-	}
 
     /** Puts key-value pair into distributed KV store */
     void put(Key *k, Value *data)
@@ -78,33 +74,31 @@ public:
         return val;
     }
 
-    /** Check if two distributed arrats equal */
-    // bool equals(Object *other)
-    // {
-    //     if (this == other)
-    //     {
-    //         return true;
-    //     }
+	/**
+	 * Add a message another KVStore is waiting on us to reply to
+	 */
+	void addMsgWaitingOn(WaitAndGetMsg* msg) {
+		receivedMsgs_->push(msg);
+	}
+	
+	/**
+	 * Our ReceiverThread got a response for a key we requested.
+	 */
+	void addReply(ReplyDataMsg* msg) {
+		receivedMsgs_->push(msg);
+	}
 
-    //     KVStore *kv = dynamic_cast<KVStore *>(other);
+    /** Check if two distributed arrats equal - do not use */
+    bool equals(Object *other)
+    {
+        assert(false);
+    }
 
-    //     if (kv == nullptr || storeId != kv->storeId || !(kvMap->equals(kv->kvMap)))
-    //     {
-    //         return false;
-    //     }
-
-    //     return true;
-    // }
-
-    // /** Compute hash code of this column */
-    // size_t hash_me_()
-    // {
-    //     size_t hash_ = 0;
-    //     hash_ += storeId;
-    //     hash_ += reinterpret_cast<size_t>(kvMap);
-
-    //     return hash_;
-    // }
+    /** Compute hash code of this column - do not use */
+    size_t hash_me_()
+    {
+        assert(false);
+    }
 
     Value* getFromNetwork_(Key* k) {
         GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());

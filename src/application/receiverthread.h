@@ -17,15 +17,12 @@ public:
     size_t nodeNum_;
     PseudoNetwork *network_;
     KVStore *kv_;
-	MessageQueue* msgsInProg_; //messages we should deal with (keys we don't have yet)
 
     ReceiverThread(size_t node, PseudoNetwork *net, KVStore *kv) : Thread()
     {
         nodeNum_ = node;
         network_ = net;
         kv_ = kv;
-		msgsInProg_ = new MessageQueue();
-		kv_->setBackChannel(msgsInProg_);
     }
 
     ~ReceiverThread() {}
@@ -61,15 +58,14 @@ public:
                     network_->sendMsg(reply);
                     delete wagMsg;
                 } else {
-                    size_t t = msgsInProg_->size();
-                    msgsInProg_->push(wagMsg);
-                    assert(msgsInProg_->size() == (t + 1));
+                    kv_->addMsgWaitingOn(wagMsg);
                 }
                 break;
             }
             case (MsgKind::ReplyData):
             {
-				msgsInProg_->push(m);
+				ReplyDataMsg* rdMsg = dynamic_cast<ReplyDataMsg*>(m);
+				kv_->addReply(rdMsg);
                 break;
             }
 			case (MsgKind::Put):
