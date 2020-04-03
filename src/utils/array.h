@@ -3,7 +3,6 @@
 #pragma once
 
 #include "object.h"
-//#include "../serial/serial.h"
 
 /**
 * Array - to represent a list of objects.
@@ -33,13 +32,13 @@ public:
         deleteObjList_();
 	}
 
-	// get the length of this array
+	/** Return length of this Array */
 	size_t length()
 	{
 		return len_;
 	}
 
-	// check if this array equals to other array
+	/** Return true if this Array equals the other Object */
 	bool equals(Object *other)
 	{
 		if (this == other)
@@ -64,7 +63,7 @@ public:
 		return true;
 	}
 
-	// hash_me override
+	/** Return hash of this Array */
 	size_t hash_me()
 	{
 		size_t hash = 0;
@@ -77,29 +76,9 @@ public:
 		return hash;
 	}
 
-	// append two Arrays
-	Array *append(Array *s)
-	{
-		//check if we need to expand array
-		while (!hasRoomForMoreElems_(s->length()))
-		{
-			expandArray_();
-		}
-
-		//copy in elements from new string
-		for (size_t i = 0; i < s->length(); i += 1)
-		{
-			add(s->get(i));
-		}
-
-		//return updated Array
-		return this;
-	}
-
-	// get the object with the index in the array
+	/** Return the Object located at a given index */
 	Object *get(size_t index)
 	{
-		// check for out-of-bounds
 		if (index >= length())
 		{
 			printf("Out-Of-Bounds Error: cannot get value from index %zu", index);
@@ -109,7 +88,7 @@ public:
 		return objList_[index];
 	}
 
-	// add the object to the end of the array
+	/** Add the object to the end of this Array */
 	void add(Object *o)
 	{
 		if (!hasRoomForMoreElems_(1))
@@ -117,16 +96,13 @@ public:
 			expandArray_();
 		}
 
-		//set value
 		objList_[len_] = o;
-		//update list size
 		len_ += 1;
 	}
 
-	// set the element in the given index to the given object
+	/** Set the element at the given index to the specified object */
 	void set(size_t index, Object *o)
 	{
-		// check for out-of-bounds
 		if (index > len_)
 		{
 			printf("Out-Of-Bounds Error: cannot get value from index %zu", index);
@@ -137,12 +113,13 @@ public:
 		if (index == len_)
 		{
 			add(o);
+			return;
 		}
 
 		objList_[index] = o;
 	}
 
-	// remove the element with the given index
+	/** Remove the element at the given index from this Array. Return it */
 	Object *remove(size_t index)
 	{
 		if (index >= len_)
@@ -163,7 +140,10 @@ public:
 		return val;
 	}
 
-	// get the index of the given object
+	/**
+	 * Get the index of the given object within this Array (using equals method)
+	 * Return -1 if not found.
+	 */
 	int index_of(Object *o)
 	{
 		for (size_t i = 0; i < length(); i += 1)
@@ -174,11 +154,10 @@ public:
 			}
 		}
 
-		//if element not in array, return -1
 		return -1;
 	}
 
-	// remove all elements in the array
+	/** Delete all entries in this Array */
 	void clear()
 	{
 		deleteObjList_();
@@ -187,13 +166,16 @@ public:
 		len_ = 0;
 	}
 
-	// determine if we have enough space allocated to fit the specified number of additional elements
+	/**
+	 * Determine if we have enough space allocated to fit the specified number
+	 * of additional elements
+	 */
 	bool hasRoomForMoreElems_(int numElements)
 	{
 		return capacity_ >= (len_ + numElements);
 	}
 
-	//double size of allocated array memory
+	/** Double the capacity of this Array. Entries persist */
 	void expandArray_()
 	{
 		capacity_ *= 2;

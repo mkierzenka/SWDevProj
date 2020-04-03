@@ -37,7 +37,7 @@ void test1()
   OK("Test 1 passed!");
 }
 
-// test length, add, set, remove
+// test length, add, set, remove, get
 void test2()
 {
   String *s = new String("Hello");
@@ -64,24 +64,8 @@ void test3()
   OK("Test 3 passed!");
 }
 
-// test append, get
-void test4()
-{
-  String *s = new String("Hello");
-  String *t = new String("World");
-  Array *a = new Array();
-  a->add(s);
-  Array *b = new Array();
-  b->add(t);
-  b->add(s);
-  a->append(b);
-  t_true(a->length() == 3);
-  t_true(a->get(2)->equals(s));
-  OK("Test 4 passed!");
-}
-
 // test index_of, clear
-void test5()
+void test4()
 {
   String *s = new String("Hello");
   String *t = new String("World");
@@ -92,7 +76,7 @@ void test5()
   t_true(a->index_of(t) == 1);
   a->clear();
   t_true(a->length() == 0);
-  OK("Test 5 passed!");
+  OK("Test 4 passed!");
 }
 
 void testBig() {
@@ -136,7 +120,6 @@ int main()
   test2();
   test3();
   test4();
-  test5();
   testBig();
 
   OK("All array tests passed!");
