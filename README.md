@@ -57,3 +57,7 @@ It sends the responses if available
 * Sorer code- merge Types enum and our col type enum
 
 * Changing Sorer/reading in file to go bottom up instead of top down (create the blocks then add those to arrays)
+
+* doc.md: Add return type to the methods outlined.
+
+* doc.md: Change the field names listed here to be what the fields are actually called

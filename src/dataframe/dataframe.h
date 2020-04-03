@@ -154,19 +154,6 @@ public:
     return df;
   }
 
-  /** Adds the DataFrame to the given KVStore with the given key.
-   *  Returns the DataFrame just added (df).
-   */
-  static DataFrame *addDFToStore_(DataFrame *df, KVStore *kv, Key *k)
-  {
-    Serializer *s = new Serializer();
-    df->serialize(s);
-    Value *v = new Value(s->getBuffer(), s->getNumBytesWritten());
-    kv->put(k->clone(), v);
-    delete s;
-    return df;
-  }
-
   /** Add array of doubles to dataframe as a column. Add the data into chunks, and generate
    * keys for them. Column needs to get dataframe's key and key-value store */
   void add_array(size_t numElements, double *elements)
@@ -456,6 +443,19 @@ public:
     default:
       fprintf(stderr, "Invalid col type: %c", row.col_type(colIdx));
     }
+  }
+
+  /** Adds the DataFrame to the given KVStore with the given key.
+   *  Returns the DataFrame just added (df).
+   */
+  static DataFrame *addDFToStore_(DataFrame *df, KVStore *kv, Key *k)
+  {
+    Serializer *s = new Serializer();
+    df->serialize(s);
+    Value *v = new Value(s->getBuffer(), s->getNumBytesWritten());
+    kv->put(k->clone(), v);
+    delete s;
+    return df;
   }
 
   /** Helper that allows program to error and exit if index-out-of-bounds */
