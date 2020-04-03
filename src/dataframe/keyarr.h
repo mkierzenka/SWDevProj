@@ -8,33 +8,28 @@
 
 
 /**
- * todo
+ * Represents an array of Keys.
  *
  * @author broder.c@husky.neu.edu & kierzenka.m@husky.neu.edu
  */
 class KeyArr : public Object
 {
 public:
-	Array* keyList_; //list of columns, owned
+	Array* keyList_; //Owned
 
-	// constructor
 	KeyArr() : Object()
 	{
 		keyList_ = new Array();
 	}
 
-	// destructor
 	~KeyArr()
 	{
-		//deleteColList_();
 		delete keyList_;
 	}
 
-	/** Serialize a KeyArr into char* representation */
+	/** Serialize this KeyArr */
 	void serialize(Serializer* s)
 	{
-		//will elements be serialized as objects or columns?
-		//colList_->serializeAsColumnArray(s);
 		size_t len = keyList_->length();
 		s->write(len);
 		for (size_t i = 0; i < len; i++) {
@@ -45,6 +40,8 @@ public:
 	/** Deserialize as a KeyArr, set values into this KeyArr*/
 	void deserialize(Serializer* s)
 	{
+		delete keyList_;
+		keyList_ = new Array();
 		size_t len = s->readSizeT();
 		for (size_t i = 0; i < len; i++) {
 			Key* k = new Key();
@@ -53,13 +50,15 @@ public:
 		}
 	}
 	
-	// get the length of this array
+	/** Return the number of elements in this KeyArr */
 	size_t length()
 	{
 		return keyList_->length();
 	}
 
-	// get the specified key (does not make a copy!)
+	/**
+	 * Get the specified key (does not copy!)
+	 */
 	Key *get(size_t index)
 	{
 		Object* keyObj = keyList_->get(index);
@@ -75,14 +74,15 @@ public:
 		keyList_->add(k->clone());
 	}
 
-	// get the index of the given Key
+	/**
+	 * Get the index of the specified Key. Return -1 if not found
+	 */
 	int index_of(Key *k)
 	{
-		//casting needed?
 		return keyList_->index_of(k);
 	}
 	
-	/** Check if two distributed arrats equal */
+	/** Check if this KeyArr is equal to another Object */
     bool equals(Object *other)
     {
         if (this == other)
@@ -92,7 +92,7 @@ public:
 
         KeyArr *ka = dynamic_cast<KeyArr*>(other);
 
-        if (ka == nullptr || !keyList_->equals(ka->keyList_))
+        if (!ka || !keyList_->equals(ka->keyList_))
         {
             return false;
         }
@@ -100,13 +100,7 @@ public:
         return true;
     }
 
-    /** Compute hash code of this column */
-    size_t hash_me_()
-    {
-        size_t hash_ = 0;
-        hash_ += reinterpret_cast<size_t>(keyList_);
-
-        return hash_;
-    }
+    /** Compute hash code of this KeyArr */
+    size_t hash_me_() { assert(false); }
   
 };
