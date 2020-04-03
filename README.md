@@ -19,8 +19,6 @@ It sends the responses if available
 
 * Discuss asserts/proper behavior (receiverthread.h:82, 67)
 
-* waitandgetmsg.h could use comments and maybe cleanup, parallel to getdatamsg
-
 * demoTest.cpp does not delete anything, memory leaks here
 
 * Clean up client and server, try to get more than two clients to connect successfully
@@ -42,8 +40,6 @@ It sends the responses if available
 
 * Create doc to keep track of ownership of objects
 
-* Look at following commits from m3_submission: fromScalar, general code cleanup
-
 * Update schema to use types enum
 
 * Implement push_back for columns
@@ -61,3 +57,9 @@ It sends the responses if available
 * doc.md: Add return type to the methods outlined.
 
 * doc.md: Change the field names listed here to be what the fields are actually called
+
+* Investigate waitAndGet and possibly handling wrong message
+
+* Move method implementations into own header file
+
+* Methods w/o an implementation: add assert(false) and comment
