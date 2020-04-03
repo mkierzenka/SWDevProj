@@ -21,19 +21,9 @@ It sends the responses if available
 
 * waitandgetmsg.h could use comments and maybe cleanup, parallel to getdatamsg
 
-* Put pragma once everywhere
-
 * demoTest.cpp does not delete anything, memory leaks here
 
 * Clean up client and server, try to get more than two clients to connect successfully
-
-* Fix generalTests to use Column and check all 4 types
-
-* Sorer code- make the arrays use our array instead of re-implementing functionality
-
-* Sorer code- merge Types enum and our col type enum
-
-* Fix old tests to compile/run/pass
 
 * DataFrame needs equals and hash (probably other classes do too...)
 
@@ -42,17 +32,11 @@ It sends the responses if available
 
 * Move most of logic (like loop) from Column.add_all into Distributed Array. Remove block imports from Column
 
-* Changing Sorer/reading in file to go bottom up instead of top down (create the blocks then add those to arrays)
-
 * Condense block subclasses into one class -> Block (union type and blocktype)
 
 * Delete code for printing throughout
 
-* Add KVstore to DF constructor with schema and key, remove one that takes in dataframe
-
-* Create application for sorer
-
-* Delete doublearray and stringarray, update message classes that use them
+* Delete stringarray, update message classes that use it
 
 * Delete unused message types
 
@@ -63,3 +47,13 @@ It sends the responses if available
 * Update schema to use types enum
 
 * Implement push_back for columns
+
+* Add KVstore to DF constructor with schema and key, remove one that takes in dataframe
+
+* Create application for sorer
+
+* Sorer code- make the arrays use our array instead of re-implementing functionality
+
+* Sorer code- merge Types enum and our col type enum
+
+* Changing Sorer/reading in file to go bottom up instead of top down (create the blocks then add those to arrays)
