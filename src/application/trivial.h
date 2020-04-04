@@ -7,7 +7,7 @@
 #include "../store/key.h"
 #include "../store/kvstore.h"
 #include "../utils/string.h"
-#include "../network/pseudo/pseudonetwork.h"
+#include "../network/network.h"
 
 #include "application.h"
 
@@ -17,7 +17,7 @@
 
 class Trivial : public Application {
  public:
-  Trivial(size_t idx, PseudoNetwork* net) : Application(idx, net) { }
+  Trivial(size_t idx) : Application(idx) { }
 
   void run_() {
 	pln("Trivial Test Started");

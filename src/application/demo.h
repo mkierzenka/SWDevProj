@@ -4,7 +4,6 @@
 #include "application.h"
 #include "../dataframe/dataframe.h"
 #include "../store/key.h"
-#include "../network/pseudo/pseudonetwork.h"
 
 
 /** 
@@ -17,7 +16,7 @@ public:
   Key* verify;
   Key* check;
  
-  Demo(size_t idx, PseudoNetwork* net): Application(idx, net) {
+  Demo(size_t idx): Application(idx) {
     main = new Key("main", 0);
     verify = new Key("verif", 0);
     check = new Key("ck", 0);

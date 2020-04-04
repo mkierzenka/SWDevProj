@@ -1,7 +1,6 @@
 //lang:Cpp
 #include "../src/application/nodethread.h"
 #include "../src/application/demo.h"
-#include "../src/network/pseudo/pseudonetwork.h"
 #include "../src/network/message.h"
 #include "../src/store/getImpls.h"
 
@@ -10,10 +9,9 @@ int main()
     //Testing on this many nodes
     size_t nodeNum = 3;
     NodeThread** nodes = new NodeThread*[nodeNum];
-    PseudoNetwork *client = new PseudoNetwork(nodeNum);
     for (size_t i = 0; i < nodeNum; i++)
     {
-        Demo* d = new Demo(i, client);
+        Demo* d = new Demo(i);
         nodes[i] = new NodeThread(d);
         nodes[i]->start();
     }

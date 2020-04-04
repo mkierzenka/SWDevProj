@@ -4,7 +4,7 @@
 
 #include "../utils/object.h"
 #include "../store/kvstore.h"
-#include "../network/pseudo/pseudonetwork.h"
+#include "../network/network.h"
 
 /** This class represents the highest layer of the program. This is where the user will specify
  * what operations they'd like to perform on certain data. The application class itself will
@@ -16,14 +16,14 @@ class Application : public Object
 {
 public:
     size_t idx_; //what index node this application is running on
-    PseudoNetwork* net_; //network for sending and receiving messages
+    Network* net_; //network for sending and receiving messages; application will own
     KVStore* kv_;
 
-    Application(size_t i, PseudoNetwork* net)
+    Application(size_t i)
     {
         idx_ = i;
-        net_ = net;
-        kv_ = new KVStore(i, net);
+        net_ = new Network(generateIp_(), idx_);
+        kv_ = new KVStore(i, net_);
     }
 	
     ~Application() {
@@ -35,10 +35,8 @@ public:
         return idx_;
     }
 
-    /** Get network from this application. Some threads that work on this application
-     * may need it.
-     */
-    PseudoNetwork* getNetwork()
+    /** Get network node from application */
+    Network* getNetwork()
     {
         return net_;
     }
@@ -47,6 +45,14 @@ public:
     KVStore* getStore()
     {
         return kv_;
+    }
+
+    /** Create an ip address for this application node, using the home node */
+    char* generateIp_()
+    {
+        char* ip;
+        sprintf(ip, "127.0.0.%zu", idx_ + 1);
+        return ip;
     }
 
     virtual void run_() {}

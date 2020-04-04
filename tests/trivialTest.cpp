@@ -2,7 +2,6 @@
 
 #include "../src/application/trivial.h"
 #include "../src/application/nodethread.h"
-#include "../src/network/pseudo/pseudonetwork.h"
 #include "../src/store/getImpls.h"
 
 
@@ -11,10 +10,9 @@ int main()
 {
   size_t numNodes = 1;
   NodeThread** nodes = new NodeThread*[numNodes];
-  PseudoNetwork *client = new PseudoNetwork(numNodes);
   for (size_t i = 0; i < numNodes; i++)
   {
-      Trivial* t = new Trivial(i, client);
+      Trivial* t = new Trivial(i);
       nodes[i] = new NodeThread(t);
       nodes[i]->start();
   }

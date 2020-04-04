@@ -109,7 +109,7 @@ public:
     /** Attempt to receive a message and return result.
 	 * Caller is responsible for deleting return val.
 	 */
-    Message* receiveMessage(int fileDesc)
+    Message* receiveMsg(int fileDesc)
     {
         Message* tmp = new Message();
         //create buffer for message: will length be an issue?

@@ -2,7 +2,7 @@
 
 #include "../utils/object.h"
 #include "../network/client.h"
-#include "../network/pseudo/pseudonetwork.h"
+#include "../network/network.h"
 #include "../serial/serial.h"
 #include "../network/message.h"
 #include "../utils/map.h"
@@ -23,16 +23,16 @@ class KVStore : public Object
 public:
     MapStrObj *kvMap;              //holds all key-value pairings
     //Client *client_;             //networking class used to talk to other stores
-    PseudoNetwork* client_;        //fake network for demo
+    Network* node_;                //allows KVStore to send and receive data
     size_t storeId;                //node id that this store belongs to
     MessageQueue* receivedMsgs_;   //WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
 
 
-    KVStore(size_t id, PseudoNetwork* client)
+    KVStore(size_t id, Network* net)
     {
         kvMap = new MapStrObj();
         storeId = id;
-        client_ = client;
+        node_ = net;
         receivedMsgs_ = new MessageQueue();
     }
 
@@ -46,7 +46,9 @@ public:
     {
 		if (k->getNode() != storeId) {
 			PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
-			client_->sendMsg(msg);
+
+            //sendMsg should not take in fd: add map of node id to fd in network
+			node_->sendMsg(msg);
 			return;
 		}
 		
@@ -102,7 +104,7 @@ public:
 
     Value* getFromNetwork_(Key* k) {
         GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
-        client_->sendMsg(dm);
+        node_->sendMsg(dm);
         ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(receivedMsgs_->pop());
 		// ^^ Blocks until the message is ready for this store
         assert(dataMsg != nullptr);
@@ -124,7 +126,7 @@ public:
 				Value* val = getValue(k);
 				if(val) {
 					ReplyDataMsg *reply = new ReplyDataMsg(val, storeId, sender);
-					client_->sendMsg(reply);
+					node_->sendMsg(reply);
 					delete wagMsg;
 				} else {
 					tmpQ->push(wagMsg);
