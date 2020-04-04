@@ -16,21 +16,14 @@
 class Server : public Object
 {
 public:
-    Network *network_;
-    const char *servIp_;
+    Network *network_; //node layer of this server
+    //const char *ip_; //ip of this server
     Array *clients_;  //object representations of client information subscribed to server
-    int stagingSock_; //socket that will be linked to new client; reset after client added to array
-    int fd_; //file descriptor of server
 
-    Server(const char *ip)
+    Server(const char *ip, size_t nodeId)
     {
-        servIp_ = ip;
-        network_ = new Network(ip);
-        printf("Trying to bind socket...\n");
-        network_->bindSocket();
-        network_->listenForClient(network_->getServerFd());
-        printf("Socket binded!\n");
-        fd_ = network_->getServerFd();
+        network_ = new Network(ip, nodeId);
+        network_->listenForConnections();
         clients_ = new Array();
     }
 
@@ -40,68 +33,60 @@ public:
         delete clients_;
     }
 
-    /** Wait for client to attempt to make connection and accept it */
-    void listenForClients()
+    /** Accept a new node connection */
+    void acceptConnection()
     {
-        network_->listenForClient(fd_);
-        stagingSock_ = network_->acceptConnection(fd_);
-
-        printf("New client accepted!\n");
+        //accept connection
+        int stagingSock_ = network_->acceptConnection();
+        printf("New node accepted!\n");
     }
 
-    /** Accept a client */
-    void acceptNewClient()
-    {
-        stagingSock_ = network_->acceptConnection(fd_);
-        printf("New client accepted!\n");
-    }
+    // /** Get message type and handle it accordingly */
+    // void handleMessage()
+    // {
+    //     char *msg = network_->receiveMessage(stagingSock_);
+    //     printf("Received message: %s\n", msg);
 
-    /** Get message type and handle it accordingly */
-    void handleMessage()
-    {
-        char *msg = network_->receiveMessage(stagingSock_);
-        printf("Received message: %s\n", msg);
+    //     //pull message type from message
+    //     const char *msgType = strtok(msg, " ");
+    //     printf("Message type: %s\n", msgType);
+    //     assert(msgType != nullptr);
+    //     if (strcmp(msgType, "REGISTER") == 0)
+    //     {
+    //         const char *ip = strtok(NULL, " ");
+    //         assert(ip != nullptr);
+    //         handleIp_(ip);
+    //         sendUpdates_();
+    //     }
 
-        //pull message type from message
-        const char *msgType = strtok(msg, " ");
-        printf("Message type: %s\n", msgType);
-        assert(msgType != nullptr);
-        if (strcmp(msgType, "REGISTER") == 0)
-        {
-            const char *ip = strtok(NULL, " ");
-            assert(ip != nullptr);
-            handleIp_(ip);
-            sendUpdates_();
-        }
-
-        delete msg;
-    }
+    //     delete msg;
+    // }
 
     /** Close the server and connected clients */
-    void initiateTeardown()
-    {
-        //tell all clients they need to close their sockets
-        for (int i = 0; i < clients_->length(); i++)
-        {
-            ClientData* cdata = dynamic_cast<ClientData *>(clients_->get(i));
-            network_->sendMessage("TEARDOWN", cdata->getClientFd());
-        }
+    // void initiateTeardown()
+    // {
+    //     //tell all clients they need to close their sockets
+    //     for (int i = 0; i < clients_->length(); i++)
+    //     {
+    //         ClientData* cdata = dynamic_cast<ClientData *>(clients_->get(i));
+    //         network_->sendMessage("TEARDOWN", cdata->getClientFd());
+    //     }
 
-        int closeVal = close(fd_);
-        assert(closeVal >= 0);
-        printf("Closed socket %d\n", fd_);
-        exit(1);
-    }
+    //     int closeVal = close(fd_);
+    //     assert(closeVal >= 0);
+    //     printf("Closed socket %d\n", fd_);
+    //     exit(1);
+    // }
 
-    /** Return poll struct for listening */
-    struct pollfd *getPollObj()
-    {
-        struct pollfd *fdStruct = new struct pollfd[1];
-        fdStruct[0].fd = fd_;
-        fdStruct[0].events = POLLIN;
+    // /** Return poll struct for listening */
+    // struct pollfd *getPollObj()
+    // {
+    //     struct pollfd *fdStruct = new struct pollfd[1];
+    //     fdStruct[0].fd = fd_;
+    //     fdStruct[0].events = POLLIN;
 
-        return fdStruct;
-    }
+    //     return fdStruct;
+    // }
 
     /** Add ip to list and broadcast this list to all connected clients */
     void handleIp_(const char *ip)
