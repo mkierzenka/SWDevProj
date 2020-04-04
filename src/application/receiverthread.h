@@ -75,6 +75,16 @@ public:
 				kv_->put(k, msg->getValue());
                 break;
 			}
+            case (MsgKind::Register):
+            {
+                network_->handleRegisterMsg();
+                break;
+            }
+            case (MsgKind::Directory):
+            {
+                network_->handleDirectoryMsg();
+                break;
+            }
             default:
                 pln("Weird msg type...");
             }

@@ -149,6 +149,12 @@ public:
         return address;
     }
 
+    /** Handle register message received on this node */
+    void handleRegisterMsg(RegisterMsg* m)
+    {
+        //add new client to directory and broadcast out to other nodes
+    }
+
     /** Binds bock to address and corresponding port number.
      * Only needed by socket.*/
     void bindSocket_()
