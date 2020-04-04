@@ -48,32 +48,23 @@ public:
             }
 			case MsgKind::WaitAndGet:
             {
-                // respond with data
                 WaitAndGetMsg *wagMsg = dynamic_cast<WaitAndGetMsg *>(m);
                 size_t sender = wagMsg->getSender();
-                // Respond with data, add it to the queue if we don't have it right now
+                // Respond with data, add it to the queue if we don't have it yet
                 Value* val = kv_->getValue(wagMsg->getKey());
                 if (val) {
                     ReplyDataMsg *reply = new ReplyDataMsg(wagMsg->getKey(), val, nodeNum_, sender);
                     network_->sendMsg(reply);
                     delete wagMsg;
                 } else {
-                    //kv_->addMsgWaitingOn(wagMsg);
-					kv_->msgCacheLock_.lock();
-					kv_->msgCache_->put(wagMsg->getKey(), wagMsg);
-					kv_->msgCacheLock_.notify_all();
-					kv_->msgCacheLock_.unlock();
+                    kv_->addMsgWaitingOn(wagMsg);
                 }
                 break;
             }
             case (MsgKind::ReplyData):
             {
 				ReplyDataMsg* rdMsg = dynamic_cast<ReplyDataMsg*>(m);
-					kv_->msgCacheLock_.lock();
-					kv_->msgCache_->put(rdMsg->getKey(), rdMsg);
-					kv_->msgCacheLock_.notify_all();
-					kv_->msgCacheLock_.unlock();
-				//kv_->addReply(rdMsg);
+				kv_->addReply(rdMsg);
                 break;
             }
 			case (MsgKind::Put):
