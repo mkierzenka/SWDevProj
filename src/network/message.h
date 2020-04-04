@@ -82,10 +82,12 @@ class ReplyDataMsg : public Message
 public:
 	//key to be sent in message
 	Value *value_;
+	Key* key_;
 
-	ReplyDataMsg(Value *v, size_t sender, size_t target) : Message(ReplyData, sender, target, 0)
+	ReplyDataMsg(Key* k, Value *v, size_t sender, size_t target) : Message(ReplyData, sender, target, 0)
 	{
 		value_ = v;
+		key_ = k;
 	}
 
 	~ReplyDataMsg() {}
@@ -93,18 +95,25 @@ public:
 	void serialize(Serializer *s)
 	{
 		Message::serialize(s);
+		key_->serialize(s);
 		value_->serialize(s);
 	}
 
 	void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
+		key_->deserialize(s);
 		value_->deserialize(s);
 	}
 
 	Value *getValue()
 	{
 		return value_;
+	}
+	
+	Key *getKey()
+	{
+		return key_;
 	}
 };
 

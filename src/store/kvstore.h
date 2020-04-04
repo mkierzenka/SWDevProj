@@ -25,15 +25,17 @@ public:
     //Client *client_;             //networking class used to talk to other stores
     Network* node_;                //allows KVStore to send and receive data
     size_t storeId;                //node id that this store belongs to
-    MessageQueue* receivedMsgs_;   //WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
+    Map* msgCache_;                //WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
+    Lock msgCacheLock_;
 
 
     KVStore(size_t id, Network* net)
     {
         kvMap = new MapStrObj();
         storeId = id;
-        node_ = net;
-        receivedMsgs_ = new MessageQueue();
+        client_ = client;
+        msgCache_ = new Map();
+		
     }
 
     ~KVStore()
@@ -56,14 +58,17 @@ public:
         kvMap->put(k->getKeyStr()->clone(), data->clone());
 
 		// Try to respond to messages in the receivedMsgs_ queue
-		tryToHandleQueue_();
+		tryToHandleQueue_(k);
     }
 
     DataFrame *get(Key *k);
 
     DataFrame* waitAndGet(Key* k);
 
-    /** Get the actual Value that the given key maps to */
+    /**
+     * Get the actual Value that the given key maps to.
+     * Blocking - will call to network as needed.
+     */
     Value *getValue(Key *k)
     {
         Value* val = nullptr;
@@ -76,19 +81,19 @@ public:
         return val;
     }
 
-	/**
-	 * Add a message another KVStore is waiting on us to reply to
-	 */
-	void addMsgWaitingOn(WaitAndGetMsg* msg) {
-		receivedMsgs_->push(msg);
-	}
+    /**
+     * Add a message another KVStore is waiting on us to reply to
+     */
+    void addMsgWaitingOn(WaitAndGetMsg* msg) {
+        addToCache_(msg->getKey(), msg);
+    }
 	
-	/**
-	 * Our ReceiverThread got a response for a key we requested.
-	 */
-	void addReply(ReplyDataMsg* msg) {
-		receivedMsgs_->push(msg);
-	}
+    /**
+     * Our ReceiverThread got a response for a key we requested.
+     */
+    void addReply(ReplyDataMsg* msg) {
+        addToCache_(msg->getKey(), msg);
+    }
 
     /** Check if two distributed arrats equal - do not use */
     bool equals(Object *other)
@@ -103,42 +108,45 @@ public:
     }
 
     Value* getFromNetwork_(Key* k) {
-        GetDataMsg *dm = new GetDataMsg(k, storeId, k->getNode());
-        node_->sendMsg(dm);
-        ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(receivedMsgs_->pop());
-		// ^^ Blocks until the message is ready for this store
-        assert(dataMsg != nullptr);
+        WaitAndGetMsg *dm = new WaitAndGetMsg(k, storeId, k->getNode());
+        client_->sendMsg(dm);
+        msgCacheLock_.lock();
+		while (!msgCache_->contains_key(k))
+        {
+            msgCacheLock_.wait();
+        }
+        // ... now msgCache has what we are looking for
+        ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(msgCache_->remove(k));
+        msgCacheLock_.unlock();
+        assert(dataMsg);
         Value *val = dataMsg->getValue();
         return val;
     }
 	
 	/**
-	 * Go through receivedMsgs_ Queue, respond to any WaitAndGet messages that we can.
+	 * Given that we just added the k-v pair to the store, see if we can deal
+	 *   with any messages.
 	 */
-	void tryToHandleQueue_() {
-		MessageQueue* tmpQ = new MessageQueue();
-		while (receivedMsgs_->size() > 0) {
-			Message* m = receivedMsgs_->pop();
-			WaitAndGetMsg* wagMsg = dynamic_cast<WaitAndGetMsg *>(m);
-			if (wagMsg) {
-				size_t sender = wagMsg->getSender();
-				Key* k = wagMsg->getKey();
-				Value* val = getValue(k);
-				if(val) {
-					ReplyDataMsg *reply = new ReplyDataMsg(val, storeId, sender);
-					node_->sendMsg(reply);
-					delete wagMsg;
-				} else {
-					tmpQ->push(wagMsg);
-				}
-			} else {
-				// Not a WaitAndGetMsg
-				tmpQ->push(m);
-			}
+	void tryToHandleQueue_(Key* k) {
+		msgCacheLock_.lock();
+		if (msgCache_->contains_key(k)) {
+			Object* res = msgCache_->remove(k);
+			WaitAndGetMsg* wagMsg = dynamic_cast<WaitAndGetMsg*>(res);
+			assert(wagMsg);
+			size_t sender = wagMsg->getSender();
+			Value* val = getValue(k); //should be local, we just added it in kv.put()
+			ReplyDataMsg *reply = new ReplyDataMsg(k, val, storeId, sender);
+			client_->sendMsg(reply);
+			delete wagMsg;
 		}
-		while(tmpQ->size() > 0) {
-			receivedMsgs_->push(tmpQ->pop());
-		}
-		delete tmpQ;		
+		msgCacheLock_.unlock();
+	}
+
+	/** Adds a KV pair (Key, Message) to local cache */
+	void addToCache_(Key* k, Message* msg) {
+        msgCacheLock_.lock();
+        msgCache_->put(k, msg);
+        msgCacheLock_.notify_all();
+        msgCacheLock_.unlock();
 	}
 };

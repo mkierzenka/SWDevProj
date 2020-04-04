@@ -41,20 +41,19 @@ public:
                 size_t sender = gdMsg->getSender();
 				// Respond with data, nullptr if we don't have it right now
 				Value* val = kv_->getValue(gdMsg->getKey());
-				ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
+				ReplyDataMsg *reply = new ReplyDataMsg(gdMsg->getKey(), val, nodeNum_, sender);
 				network_->sendMsg(reply);
 				delete gdMsg;
                 break;
             }
 			case MsgKind::WaitAndGet:
             {
-                // respond with data
                 WaitAndGetMsg *wagMsg = dynamic_cast<WaitAndGetMsg *>(m);
                 size_t sender = wagMsg->getSender();
-                // Respond with data, add it to the queue if we don't have it right now
+                // Respond with data, add it to the queue if we don't have it yet
                 Value* val = kv_->getValue(wagMsg->getKey());
                 if (val) {
-                    ReplyDataMsg *reply = new ReplyDataMsg(val, nodeNum_, sender);
+                    ReplyDataMsg *reply = new ReplyDataMsg(wagMsg->getKey(), val, nodeNum_, sender);
                     network_->sendMsg(reply);
                     delete wagMsg;
                 } else {
