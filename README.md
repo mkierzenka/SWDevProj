@@ -60,6 +60,4 @@ It sends the responses if available
 
 * Investigate waitAndGet and possibly handling wrong message
 
-* Move method implementations into own header file
-
 * Methods w/o an implementation: add assert(false) and comment
