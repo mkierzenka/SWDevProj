@@ -17,8 +17,6 @@ It sends the responses if available
 
 * Cleanup and free more memory in pseudonetworking stuff -> receiverthread, nodethread, etc.
 
-* Discuss asserts/proper behavior (receiverthread.h:82, 67)
-
 * demoTest.cpp does not delete anything, memory leaks here
 
 * Clean up client and server, try to get more than two clients to connect successfully
@@ -31,8 +29,6 @@ It sends the responses if available
 * Move most of logic (like loop) from Column.add_all into Distributed Array. Remove block imports from Column
 
 * Condense block subclasses into one class -> Block (union type and blocktype)
-
-* Delete code for printing throughout
 
 * Delete stringarray, update message classes that use it
 
@@ -57,7 +53,5 @@ It sends the responses if available
 * doc.md: Add return type to the methods outlined.
 
 * doc.md: Change the field names listed here to be what the fields are actually called
-
-* Investigate waitAndGet and possibly handling wrong message
 
 * Methods w/o an implementation: add assert(false) and comment
