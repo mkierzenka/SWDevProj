@@ -77,12 +77,13 @@ public:
 			}
             case (MsgKind::Register):
             {
-                network_->handleRegisterMsg();
+                //do we need to cast message to proper type?
+                network_->handleRegisterMsg(m);
                 break;
             }
             case (MsgKind::Directory):
             {
-                network_->handleDirectoryMsg();
+                network_->handleDirectoryMsg(m);
                 break;
             }
             default:
