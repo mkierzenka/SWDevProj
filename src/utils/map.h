@@ -34,13 +34,13 @@ class Entry : public Object {
 		}
 		
 		~Entry() { 
-			if (key_ != nullptr) {
+			if (key_) {
 				delete key_;
 			}
-			if (value_ != nullptr) {
+			if (value_) {
 				delete value_;
 			}
-			if (next_ != nullptr) {
+			if (next_) {
 				delete next_;
 			}
 		}
@@ -84,7 +84,7 @@ class Entry : public Object {
 			}
 			keysArr[nextIdx] = this->key_;
 			nextIdx++;
-			if (!next_ || next_ == nullptr) {
+			if (!next_) {
 				return nextIdx;
 			}
 			return next_->addKeysToArr(keysArr, nextIdx);
@@ -99,7 +99,7 @@ class Entry : public Object {
 			}
 			valuesArr[nextIdx] = this->value_;
 			nextIdx++;
-			if (!next_ || next_ == nullptr) {
+			if (!next_) {
 				return nextIdx;
 			}
 			return next_->addValuesToArr(valuesArr, nextIdx);
@@ -268,7 +268,7 @@ class Map : public Object {
 		//   overwrites the old value with val and returns the old value
 		Object* insertIntoBucket_(size_t index, Object* key, Object* val) {
 			Entry* bucket = this->buckets_[index];
-			if (!bucket || bucket == nullptr) {
+			if (!bucket) {
 				this->buckets_[index] = new Entry(key, val);
 				this->size_++;
 				return nullptr;
@@ -276,7 +276,7 @@ class Map : public Object {
 			
 			Entry* prevEntry = nullptr;
 			Entry* curEntry = bucket;
-			while (curEntry && curEntry != nullptr) {
+			while (curEntry) {
 				if (curEntry->getKey()->equals(key)) {
 					// already seen this key, replace the value
 					Object* oldVal = curEntry->getValue();
@@ -358,7 +358,7 @@ class Map : public Object {
 			Entry* curEntry = bucket;
 			while (curEntry) {
 				if (curEntry->getKey()->equals(key)) {
-					if (!prevEntry || prevEntry == nullptr) {
+					if (!prevEntry) {
 						// deleting curEntry, the first item of the bucket
 						this->buckets_[index] = curEntry->getNext();
 						this->size_--;
@@ -391,8 +391,8 @@ class Map : public Object {
 			size_t index = hash % capacity_;
 			
 			Entry* removedEntry = this->removeFromBucket_(index, key);
-			assert(removedEntry && removedEntry != nullptr);
-			return removedEntry->getValue(); // delete key?
+			assert(removedEntry);
+			return removedEntry->getValue();
 		}
 
 		// Returns true if the bucket of given index contains the key
@@ -465,7 +465,7 @@ class Map : public Object {
 			int nextIdx = 0;
 			for (size_t i = 0; i < this->capacity_; i++) {
 				bucket = this->buckets_[i];
-				if (bucket && bucket != nullptr) {
+				if (bucket) {
 					nextIdx = bucket->addKeysToArr(keys, nextIdx);
 				}
 			}

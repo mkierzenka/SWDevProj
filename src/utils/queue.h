@@ -26,23 +26,23 @@ public:
             return false;
         }
 
-        if (otherNode->o != nullptr && !otherNode->o->equals(o))
+        if (otherNode->o && !otherNode->o->equals(o))
         {
             return false;
         }
 
-        if (o != nullptr && !o->equals(otherNode->o))
+        if (o && !o->equals(otherNode->o))
         {
             return false;
         }
 
         //Current element same and no other elements exist
-        if (next == nullptr && otherNode->next == nullptr)
+        if (!next && !(otherNode->next))
         {
             return true;
         }
 
-        if ((next == nullptr && otherNode->next != nullptr) || (next != nullptr && otherNode->next == nullptr))
+        if ((!next && otherNode->next) || (next && !(otherNode->next)))
         {
             return false;
         }
@@ -121,7 +121,7 @@ public:
         len_ -= 1;
 
         //check if queue now empty; means both front and back need to be null
-        if (front_ == nullptr)
+        if (!front_)
         {
             back_ = nullptr;
         }
@@ -169,12 +169,12 @@ public:
         }
 
         //Current element same and no other elements exist
-        if (front_ == nullptr && other->front_ == nullptr)
+        if (!front_ && !(other->front_))
         {
             return true;
         }
 
-        if ((front_ == nullptr && other->front_ != nullptr) || (front_ != nullptr && other->front_ == nullptr))
+        if ((!front_ && other->front_) || (front_ && !(other->front_)))
         {
             return false;
         }
@@ -221,11 +221,11 @@ public:
     void deleteQueue_()
     {
         Node *cur = front_;
-        while (cur != nullptr)
+        while (cur)
         {
             //set next element, delete existing, and swap
             Node *next = cur->next;
-            delete (cur);
+            delete cur;
             cur = next;
         }
     }

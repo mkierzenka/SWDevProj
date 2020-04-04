@@ -14,7 +14,6 @@
 #include "../src/dataframe/columnarray.h"
 #include "../src/dataframe/schema.h"
 #include "../src/dataframe/column.h"
-#include "../src/network/pseudo/messagequeue.h"
 
 void serializeKeyTest()
 {
@@ -110,9 +109,7 @@ void serializeColumnTest()
 {
     printf("Column serialization test started\n");
 
-    MessageQueue* mq = new MessageQueue();
     KVStore* store = new KVStore(0, nullptr);
-    store->setBackChannel(mq);
     String* keyStr = new String("0-0");
     Key* k = new Key(keyStr, 0);
     delete keyStr;
@@ -135,9 +132,7 @@ void serializeColumnTest()
     newC->deserialize(s);
 
     assert(c->equals(newC));
-    assert(mq->size() == 0);
 
-    delete mq;
     delete store;
     delete c;
     delete s;
