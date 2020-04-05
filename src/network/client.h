@@ -51,6 +51,10 @@ public:
         delete fdArr;
     }
 
+    void client_init() {
+
+    }
+
     /** This method will register this client with the given server. If successful,
      * then it will receive a list of clients that are already connected to the
      * server. */
@@ -62,7 +66,7 @@ public:
 
         //create register message and send
         RegisterMsg* rm = new RegisterMsg(network_->getAddr(), PORT, network_->getNodeId(), server_->getNodeId(), 0);
-        network_->sendMessage(rm, server_->getFd());
+        network_->sendMsg(rm);
     }
 
     /** Get message type and handle it accordingly */
