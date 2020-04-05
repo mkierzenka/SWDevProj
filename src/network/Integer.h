@@ -33,9 +33,22 @@ class Integer: public Object {
             return val_ == other->val_;
         }
 
-        //clones this int
+        /** clones this integer */
         Integer* clone()
         {
             return new Integer(val_);
+        }
+
+        /** Return this integer as an int*/
+        int asInt()
+        {
+            return val_;
+        }
+
+        /** Return this integer as a size_t. Make sure positive */
+        size_t asUnsignedInt()
+        {
+            assert(val_ >= 0);
+            return val_;
         }
 };

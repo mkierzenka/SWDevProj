@@ -7,6 +7,8 @@
 #include "stringarray.h"
 #include "../store/key.h"
 #include "../store/value.h"
+#include "../network/directory.h"
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -191,37 +193,44 @@ public:
 class DirectoryMsg : public Message
 {
 public:
-	size_t client_;
+	//size_t client_;
 	size_t port_;
-	StringArray *ipList_;
+	//StringArray *ipList_;
+	Directory* dir_; //keep track of clients
 
 	DirectoryMsg() : Message()
 	{
-		ipList_ = new StringArray();
+		//ipList_ = new StringArray();
+		dir_ = new Directory();
 	}
 
-	DirectoryMsg(size_t client, size_t port, size_t sender, size_t target, size_t id) : Message(Directory, sender, target, id)
+	DirectoryMsg(Directory* dir, size_t port, size_t sender, size_t target, size_t id) : Message(Dir, sender, target, id)
 	{
-		client_ = client;
+		//client_ = client;
+		dir_ = dir->clone();
 		port_ = port;
-		ipList_ = new StringArray();
+		//ipList_ = new StringArray();
 	}
 
-	~DirectoryMsg() {}
+	~DirectoryMsg() {
+		delete dir_;
+	}
 
 	virtual void serialize(Serializer *s)
 	{
 		Message::serialize(s);
-		ipList_->serialize(s);
-		s->write(client_);
+		//ipList_->serialize(s);
+		//s->write(client_);
+		dir_->serialize(s);
 		s->write(port_);
 	}
 
 	virtual void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
-		ipList_->deserialize(s);
-		client_ = s->readSizeT();
+		//ipList_->deserialize(s);
+		//client_ = s->readSizeT();
+		dir_->deserialize(s);
 		port_ = s->readSizeT();
 	}
 
