@@ -32,4 +32,10 @@ class Integer: public Object {
 
             return val_ == other->val_;
         }
+
+        //clones this int
+        Integer* clone()
+        {
+            return new Integer(val_);
+        }
 };
