@@ -262,6 +262,14 @@ class Map : public Object {
 		virtual size_t size() {
 			return size_;
 		}
+
+		/**
+		 * Return capacity of the map
+		 */
+		size_t capacity()
+		{
+			return capacity_;
+		}
 		
 		// A helper method to insert a <K, V> pair into a specific bucket
 		// Returns nullptr if there was no entry for that key previously, else
