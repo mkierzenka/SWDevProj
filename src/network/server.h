@@ -138,7 +138,7 @@ public:
             if (msg && strlen(msg) > 0)
             {
                 printf("sending update to %s\n", clientInfo->getIp());
-                network_->sendMessage(msg, clientInfo->getClientFd());
+                network_->sendMsg(msg);
             }
         }
     }
