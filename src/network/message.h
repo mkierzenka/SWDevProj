@@ -258,7 +258,7 @@ public:
 	RegisterMsg(sockaddr_in client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
 	{
 		client_ = client;
-		port_ = port;
+		port_ = port; //unused? client has port internally, too?
 	}
 
 	~RegisterMsg()
@@ -281,6 +281,10 @@ public:
 		client_.sin_addr.s_addr = s->readLong();
 		client_.sin_port = s->readShort();
 		port_ = s->readSizeT();
+	}
+
+	struct sockaddr_in getClientInfo() {
+		return client_;
 	}
 };
 
