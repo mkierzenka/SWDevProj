@@ -55,3 +55,5 @@ It sends the responses if available
 * doc.md: Change the field names listed here to be what the fields are actually called
 
 * Methods w/o an implementation: add assert(false) and comment
+
+* Ferd feedback
