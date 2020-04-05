@@ -123,8 +123,8 @@ public:
     t_true(values[0]->equals(b));
 
     delete mss;
-    delete keys;
-    delete values;
+    delete[] keys;
+    delete[] values;
 
     OK("test_get_0");
   }
@@ -139,8 +139,8 @@ public:
     t_true(values != nullptr);
 
     mss->put(s, t);
-    delete values;
-    delete keys;
+    delete[] values;
+    delete[] keys;
     
     keys = mss->get_keys();
     values = mss->get_values();
@@ -160,8 +160,8 @@ public:
     t_true(values != nullptr);
 
     delete mss;
-    delete keys;
-    delete values;
+    delete[] keys;
+    delete[] values;
     OK("test_get_2");
   }
 
@@ -194,8 +194,6 @@ public:
     String* t = new String("World");
     Object * u = new String("hi");
     String * w = new String("w");
-	String * x = new String("x");
-	String * y = new String("Y");
 	String * a = new String("AB");
 	String * b = new String("CD");
     Map* map = new Map();

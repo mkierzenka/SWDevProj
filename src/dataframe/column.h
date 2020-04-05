@@ -383,5 +383,7 @@ public:
         Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
         store_->put(k, val);
         blocks_->addKey(k);
+        delete k;
+        delete val;
     }
 };

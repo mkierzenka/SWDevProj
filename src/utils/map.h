@@ -183,14 +183,14 @@ class Map : public Object {
 			for (size_t i = 0; i < this->size_; i++) {
 				curKey = thisKeys[i];
 				if (!isInArr_(curKey, otherKeys, otherMap->size_)) {
-					delete otherKeys;
-					delete thisKeys;
+					delete[] otherKeys;
+					delete[] thisKeys;
 					return false;
 				}
 			}
 
-			delete otherKeys;
-			delete thisKeys;
+			delete[] otherKeys;
+			delete[] thisKeys;
 
 			// Can't have duplicate keys in same map, so the above (length check and the for loop) should be enough to check equality
 
@@ -201,8 +201,8 @@ class Map : public Object {
 			for (size_t i = 0; i < this->size_; i++) {
 				curValue = thisValues[i];
 				if (!isInArr_(curValue, otherValues, otherMap->size_)) {
-					delete otherValues;
-					delete thisValues;
+					delete[] otherValues;
+					delete[] thisValues;
 					return false;
 				}
 			}
@@ -216,8 +216,8 @@ class Map : public Object {
 					return false;
 				}
 			}
-			delete otherValues;
-			delete thisValues;
+			delete[] otherValues;
+			delete[] thisValues;
 
 			// Duplicate values may be possible for different keys
 			return true;
