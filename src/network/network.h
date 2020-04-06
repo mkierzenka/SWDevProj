@@ -6,6 +6,7 @@
 #include "../utils/thread.h"
 #include "message.h"
 #include "msgkind.h"
+#include "inetwork.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -20,7 +21,7 @@ const size_t SERVER_NODE_NUM = 0;
 
 /** This class wraps the basic functionality of the POSIX libraries.
  * It is used to make connections between clients and the server. */
-class Network : public Object
+class Network : public INetwork
 {
 
 public:

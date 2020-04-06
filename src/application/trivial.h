@@ -17,7 +17,7 @@
 
 class Trivial : public Application {
  public:
-  Trivial(size_t idx) : Application(idx) { }
+  Trivial(size_t idx, INetwork* net) : Application(idx, net) { }
 
   void run_()
   {

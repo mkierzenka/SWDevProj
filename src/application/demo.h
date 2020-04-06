@@ -4,6 +4,7 @@
 #include "application.h"
 #include "../dataframe/dataframe.h"
 #include "../store/key.h"
+#include "../network/inetwork.h"
 
 
 /** 
@@ -16,7 +17,7 @@ public:
   Key* verify;
   Key* check;
  
-  Demo(size_t idx): Application(idx) {
+  Demo(size_t idx, INetwork* net): Application(idx, net) {
     main = new Key("main", 0);
     verify = new Key("verif", 0);
     check = new Key("ck", 0);
@@ -39,7 +40,7 @@ public:
  
   void producer() {
     pln("Producer Started");
-    size_t SZ = 1000;
+    size_t SZ = 10000;
     //size_t SZ = 100*1000;//100*1000;
     double* vals = new double[SZ];
     double sum = 0;
@@ -56,7 +57,7 @@ public:
     pln("Counter Started");
     DataFrame* v = kv_->waitAndGet(main);
     double sum = 0;
-    for (size_t i = 0; i < 1000; ++i) sum += v->get_double(0,i);
+    for (size_t i = 0; i < 10000; ++i) sum += v->get_double(0,i);
     //for (size_t i = 0; i < 100*1000; ++i) sum += v->get_double(0,i);
     p("The sum is  ").pln(sum);
     DataFrame::fromScalar(verify, kv_, sum);

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../utils/object.h"
-#include "../network/client.h"
 #include "../network/inetwork.h"
 #include "../serial/serial.h"
 #include "../network/message.h"
@@ -23,13 +22,13 @@ class KVStore : public Object
 public:
     MapStrObj *kvMap;              //holds all key-value pairings
     //Client *client_;             //networking class used to talk to other stores
-    INetwork* client_;        //fake network for demo
+    INetwork* node_;        //fake network for demo
     size_t storeId;                //node id that this store belongs to
     Map* msgCache_;                //WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
     Lock msgCacheLock_;
 
 
-    KVStore(size_t id, INetwork* client)
+    KVStore(size_t id, INetwork* net)
     {
         kvMap = new MapStrObj();
         storeId = id;
