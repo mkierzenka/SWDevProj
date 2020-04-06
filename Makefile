@@ -46,4 +46,4 @@ testMessage:
 .SILENT: clean
 clean:
 	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray \
-	tests/testQueue tests/testSerial tests/testTrivial tests/testCache tests/testDemo
+	tests/testQueue tests/testSerial tests/testTrivial tests/testCache tests/testDemo tests/testMessage
