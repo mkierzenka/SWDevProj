@@ -11,7 +11,8 @@
  * String does count the terminator character. Most operations
  * work by copy, but there are exceptions (this is mostly to support
  * large strings and avoid them being copied).
- *  author: vitekj@me.com */
+ *  author: vitekj@me.com 
+ *  modified by broder.c@husky.neu.edu */
 class String : public Object {
 public:
     size_t size_; // number of characters excluding terminate (\0)
@@ -121,12 +122,25 @@ public:
         delete[] oldV;
     }
     StrBuff& c(const char* str) {
-        size_t step = strlen(str);
+        // size_t step = strlen(str);
+        // grow_by_(step);
+        // memcpy(val_+size_, str, step);
+        // size_ += step;
+        // return *this;
+        return c(str, strlen(str));
+    }
+
+    /** Write character pointer to buffer
+     * but specify how many bytes */
+    StrBuff& c(const char* str, size_t step)
+    {
         grow_by_(step);
         memcpy(val_+size_, str, step);
         size_ += step;
         return *this;
+
     }
+
     StrBuff& c(String &s) { return c(s.c_str());  }
     StrBuff& c(size_t v) { return c(std::to_string(v).c_str());  } // Cpp
 
@@ -137,5 +151,11 @@ public:
         String *res = new String(true, val_, size_);
         val_ = nullptr; // val_ was consumed above
         return res;
+    }
+
+    /** Return size of buffer */
+    size_t size()
+    {
+        return size_;
     }
 };
