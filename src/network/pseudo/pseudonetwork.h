@@ -3,6 +3,7 @@
 
 #include "messagequeuearray.h"
 #include "../message.h"
+#include "../inetwork.h"
 
 /**
  * This class represents a fake network. It will be used to send messages between
@@ -11,7 +12,7 @@
  * authors: kierzenka.m@husky.neu.edu and broder.c@husky.neu.edu
  */
 
-class PseudoNetwork : public Object
+class PseudoNetwork : public INetwork
 {
 public:
     MsgQueueArr *mqa_; //holds message arrays for each node
@@ -20,18 +21,10 @@ public:
    /**
    * Pass in number of nodes
    */
-    PseudoNetwork(MsgQueueArr* mqa, size_t ourNode)
+    PseudoNetwork(MsgQueueArr* mqa, size_t ourNode) : INetwork()
     {
-        //mqa_ = new MsgQueueArr();
         mqa_ = mqa;
-        // for (size_t i = 0; i < numNodes; i++)
-        // {
-        //     mqa_->push_back(new MessageQueue());
-        // }
-
         nodeId_ = ourNode;
-
-
     }
 
     ~PseudoNetwork()

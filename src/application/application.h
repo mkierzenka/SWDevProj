@@ -4,7 +4,7 @@
 
 #include "../utils/object.h"
 #include "../store/kvstore.h"
-#include "../network/pseudo/pseudonetwork.h"
+#include "../network/inetwork.h"
 
 /** This class represents the highest layer of the program. This is where the user will specify
  * what operations they'd like to perform on certain data. The application class itself will
@@ -16,10 +16,10 @@ class Application : public Object
 {
 public:
     size_t idx_; //what index node this application is running on
-    PseudoNetwork* net_; //network for sending and receiving messages; application will steal ownership
+    INetwork* net_; //network for sending and receiving messages; application will steal ownership
     KVStore* kv_;
 
-    Application(size_t i, PseudoNetwork* net)
+    Application(size_t i, INetwork* net)
     {
         idx_ = i;
         net_ = net;
@@ -39,7 +39,7 @@ public:
     /** Get network from this application. Some threads that work on this application
      * may need it.
      */
-    PseudoNetwork* getNetwork()
+    INetwork* getNetwork()
     {
         return net_;
     }

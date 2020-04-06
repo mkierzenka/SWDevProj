@@ -2,6 +2,7 @@
 
 #include "../src/application/trivial.h"
 #include "../src/application/nodethread.h"
+#include "../src/network/inetwork.h"
 #include "../src/network/pseudo/pseudonetwork.h"
 #include "../src/network/pseudo/messagequeuearray.h"
 #include "../src/store/getImpls.h"
