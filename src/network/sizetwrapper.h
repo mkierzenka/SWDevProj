@@ -33,8 +33,7 @@ class SizeTWrapper: public Object {
         //does this Integer equal another one
         bool equals(Object* o) {
             SizeTWrapper* other = dynamic_cast<SizeTWrapper*>(o);
-
-            return val_ == other->val_;
+            return other && val_ == other->val_;
         }
 
         /** clones this integer */
@@ -43,13 +42,17 @@ class SizeTWrapper: public Object {
             return new SizeTWrapper(val_);
         }
 
-        /** Return this integer as an int*/
-        int asInt()
-        {
-            return val_;
+        /** Serialize this SizeTWrapper */
+        void serialize(Serializer* s) {
+            s->write(val_);
         }
 
-        /** Return this integer as a size_t. Make sure positive */
+        /** Deserialize a serializer into this SizeTWrapper */
+        void deserialize(Serializer* s) {
+            val_ = s->readSizeT();
+        }
+
+        /** Return this integer as a size_t */
         size_t asSizeT()
         {
             return val_;
