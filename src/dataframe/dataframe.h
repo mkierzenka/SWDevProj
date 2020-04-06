@@ -439,7 +439,7 @@ public:
     Serializer *s = new Serializer();
     df->serialize(s);
     Value *v = new Value(s->getBuffer(), s->getNumBytesWritten());
-    kv->put(k->clone(), v);
+    kv->put(k, v);
     delete s;
     return df;
   }

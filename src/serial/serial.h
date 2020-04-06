@@ -41,7 +41,7 @@ public:
 
 	~Serializer()
 	{
-		delete[] buffer_;
+		//delete[] buffer_;
 	}
 
 	void write(double d)
