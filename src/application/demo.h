@@ -33,13 +33,13 @@ public:
     switch(this_node()) {
     case 0:   producer();     break;
     case 1:   counter();      break;
-    //case 2:   summarizer();
+    case 2:   summarizer();
    }
   }
  
   void producer() {
     pln("Producer Started");
-    size_t SZ = 100*1000;
+    size_t SZ = 100;//100*1000;
     double* vals = new double[SZ];
     double sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
@@ -55,17 +55,17 @@ public:
     pln("Counter Started");
     DataFrame* v = kv_->waitAndGet(main);
     double sum = 0;
-    for (size_t i = 0; i < 100*1000; ++i) sum += v->get_double(0,i);
+    for (size_t i = 0; i < 100; ++i) sum += v->get_double(0,i);
     p("The sum is  ").pln(sum);
     DataFrame::fromScalar(verify, kv_, sum);
     pln("Counter Finished");
   }
  
-  // void summarizer() {
-  //   pln("Summarizer Started");
-  //   DataFrame* result = kv_->waitAndGet(verify);
-  //   DataFrame* expected = kv_->waitAndGet(check);
-  //   pln(expected->get_double(0,0)==result->get_double(0,0) ? "SUCCESS":"FAILURE");
-  //   pln("Summarizer Finished");
-  // }
+  void summarizer() {
+    pln("Summarizer Started");
+    DataFrame* result = kv_->waitAndGet(verify);
+    DataFrame* expected = kv_->waitAndGet(check);
+    pln(expected->get_double(0,0)==result->get_double(0,0) ? "SUCCESS":"FAILURE");
+    pln("Summarizer Finished");
+  }
 };

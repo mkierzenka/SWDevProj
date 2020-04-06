@@ -7,7 +7,7 @@
 int main()
 {
     //Testing on this many nodes
-    size_t nodeNum = 2;
+    size_t nodeNum = 3;
     NodeThread** nodes = new NodeThread*[nodeNum];
     for (size_t i = 0; i < nodeNum; i++)
     {

@@ -69,7 +69,7 @@ public:
         // bind a socket
         // - done in the constructor for now
 
-        size_t num_nodes = 2;
+        size_t num_nodes = 3;
         //int* sockets = new int[num_nodes]; //sockets[i] is talking to node i
         // accept conns from nodes that want to register
         listenForConnections();
@@ -106,7 +106,7 @@ public:
     void client_init() {
         // bind a socket to server
         // - in constructor we bind to a fd
-        size_t numNodes = 2;
+        size_t numNodes = 3;
         // send register msg to server
         String* servIp = new String(SERVER_IP);
         dir->addIp(0, servIp);
