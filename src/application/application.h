@@ -50,7 +50,7 @@ public:
     /** Create an ip address for this application node, using the home node */
     char* generateIp_()
     {
-        char* ip;
+        char* ip = new char[15]; //should change this to String
         sprintf(ip, "127.0.0.%zu", idx_ + 1);
         return ip;
     }
