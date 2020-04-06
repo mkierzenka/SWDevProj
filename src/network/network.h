@@ -172,7 +172,7 @@ public:
             fprintf(stderr, "SETSOCKOPT ERRNO: %d\n", errno);
             assert(false);
         }
-        assert(targetFd > 0);
+        assert(targetFd >= 0);
         //hardcode options for now
         int rc = setsockopt(targetFd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
         //SO_REUSEADDR | SO_REUSEPORT
@@ -233,7 +233,7 @@ public:
     {
         //lock_.lock();
         int tmpFd = acceptConnection();
-        assert(tmpFd > 0);
+        assert(tmpFd >= 0);
         Message* tmp = nullptr;
         //create buffer for message: will length be an issue?
         size_t buffLen = 2048;
@@ -329,10 +329,9 @@ public:
     /** Handle directory message */
     void handleDirectoryMsg(DirectoryMsg* m)
     {
-        fprintf(stderr, "Directory message received on node %zu\n", nodeId_);
         //current directories call new directory
         dir->mergeIn(m->getDirectory());
-        fprintf(stderr, "Directory message on node %zu: directory merged in\n", nodeId_);
+        fprintf(stderr, "Node %zu: directory merged in\n", nodeId_);
     }
 
     /** Binds bock to address and corresponding port number.
