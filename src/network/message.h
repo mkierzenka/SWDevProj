@@ -160,7 +160,7 @@ public:
 
 	WaitAndGetMsg(Key *k, size_t sender, size_t target) : Message(WaitAndGet, sender, target, 0)
 	{
-		key_ = k;
+		key_ = k->clone();
 	}
 
 	~WaitAndGetMsg() {
