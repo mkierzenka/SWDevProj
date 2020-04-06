@@ -236,8 +236,9 @@ public:
         //lock_.lock();
         int tmpFd = acceptConnection();
         Message* tmp = nullptr;
-        //create buffer for message: will length be an issue?
-        size_t buffLen = 5000000;//8192;
+        //create dynamically-sized buffer
+        StrBuff* buff = new StrBuff();
+        size_t buffLen = 8192;
         char* buffer = new char[buffLen];
         memset(buffer, 0, buffLen);
 
@@ -249,14 +250,33 @@ public:
             //Better way to do this?
             valread = read(tmpFd, buffer, buffLen);
         }
-        assert(valread >= 0);
+
+        //received message: now read until no more bytes to read
+        while (valread > 0)
+        {
+            //add to dynamic buffer
+            buff->c(buffer, valread);
+            //buff->c(buffer, buffLen);
+
+            //resize static buffer
+            // delete[] buffer;
+            // buffer = new char[buffLen];
+            memset(buffer, 0, buffLen);
+
+            valread = read(tmpFd, buffer, buffLen);
+        }
+
+        //assert(valread >= 0);
+        assert(valread == 0);
         assert(buffer != nullptr);
         close(tmpFd);
 
         fprintf(stderr, "Node %zu received message\n", nodeId_);
         char* msgTypeBuff = new char[buffLen];
         memcpy(msgTypeBuff, buffer, buffLen);
-        Serializer* tmpSer = new Serializer(buffLen, msgTypeBuff);
+        //Serializer* tmpSer = new Serializer(buffLen, msgTypeBuff);
+        String* buffStr = buff->get();
+        Serializer* tmpSer = new Serializer(buff->size(), buffStr->c_str());
         MsgKind type = tmpSer->readMsgKind();
         switch (type) {
             case GetData: tmp = new GetDataMsg(); break;
@@ -276,12 +296,16 @@ public:
         // ?? delete[] msgTypeBuff;
 
         lock_.lock();
-		Serializer* myS = new Serializer(buffLen, buffer);
+		//Serializer* myS = new Serializer(buffLen, buffer);
+        Serializer* myS = new Serializer(buff->size(), buffStr->c_str());
         tmp->deserialize(myS);
 		//delete myS;
         /*s->write(buffLen, buffer);
         tmp->deserialize(s);
         s->clear();*/
+        delete buffStr;
+        delete[] buffer;
+        delete buff;
         lock_.unlock();
 
         //receiver of message owns it?
