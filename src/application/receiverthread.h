@@ -1,7 +1,7 @@
 //lang:Cpp
 
 #include "../utils/thread.h"
-#include "../network/network.h"
+#include "../network/inetwork.h"
 #include "../network/message.h"
 #include <assert.h>
 
@@ -15,10 +15,10 @@ class ReceiverThread : public Thread
 {
 public:
     size_t nodeNum_;
-    Network *network_;
+    INetwork *network_;
     KVStore *kv_;
 
-    ReceiverThread(size_t node, Network *net, KVStore *kv) : Thread()
+    ReceiverThread(size_t node, INetwork *net, KVStore *kv) : Thread()
     {
         nodeNum_ = node;
         network_ = net;
@@ -32,7 +32,6 @@ public:
         while (true)
         {
 			Message *m = network_->receiveMsg(); // blocks until new message arrives
-            //fprintf(stderr, "RT Node %zu received message\n", nodeNum_);
             MsgKind kind = m->getKind();
             fprintf(stderr, "Message kind: %d\n", kind);
             switch (kind)

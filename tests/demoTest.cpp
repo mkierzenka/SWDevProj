@@ -7,16 +7,17 @@
 int main()
 {
     //Testing on this many nodes
-    size_t nodeNum = 3;
-    NodeThread** nodes = new NodeThread*[nodeNum];
-    for (size_t i = 0; i < nodeNum; i++)
+    size_t numNodes = 3;
+    NodeThread** nodes = new NodeThread*[numNodes];
+    MsgQueueArr* sharedMQA = new MsgQueueArr(numNodes);
+    for (size_t i = 0; i < numNodes; i++)
     {
-        Demo* d = new Demo(i);
+        Demo* d = new Demo(i, new PseudoNetwork(sharedMQA, i));
         nodes[i] = new NodeThread(d);
         nodes[i]->start();
     }
 
-     for (size_t j = 0; j < nodeNum; j++)
+     for (size_t j = 0; j < numNodes; j++)
      {
          nodes[j]->join();
          printf("Thread %zu ended\n", j);
