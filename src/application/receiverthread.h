@@ -31,7 +31,7 @@ public:
     {
         while (true)
         {
-			Message *m = network_->receiveMsg(nodeNum_); // blocks until new message arrives
+			Message *m = network_->receiveMsg(); // blocks until new message arrives
             MsgKind kind = m->getKind();
             switch (kind)
             {

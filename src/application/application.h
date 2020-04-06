@@ -16,18 +16,19 @@ class Application : public Object
 {
 public:
     size_t idx_; //what index node this application is running on
-    PseudoNetwork* net_; //network for sending and receiving messages
+    PseudoNetwork* net_; //network for sending and receiving messages; application will steal ownership
     KVStore* kv_;
 
     Application(size_t i, PseudoNetwork* net)
     {
         idx_ = i;
         net_ = net;
-        kv_ = new KVStore(i, net);
+        kv_ = new KVStore(i, net_);
     }
 	
     ~Application() {
         delete kv_;
+        delete net_;
     }
 
     size_t this_node()
