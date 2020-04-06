@@ -172,7 +172,7 @@ public:
             fprintf(stderr, "SETSOCKOPT ERRNO: %d\n", errno);
             assert(false);
         }
-        assert(targetFd > 0);
+        assert(targetFd >= 0);
         //hardcode options for now
         int rc = setsockopt(targetFd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
         //SO_REUSEADDR | SO_REUSEPORT
@@ -233,10 +233,9 @@ public:
     {
         //lock_.lock();
         int tmpFd = acceptConnection();
-        assert(tmpFd > 0);
         Message* tmp = nullptr;
         //create buffer for message: will length be an issue?
-        size_t buffLen = 2048;
+        size_t buffLen = 4096;//2048;
         char* buffer = new char[buffLen];
         memset(buffer, 0, buffLen);
 
@@ -271,13 +270,16 @@ public:
             }
         }
         assert(tmp);
-        delete tmpSer;
+        //delete tmpSer;
         // ?? delete[] msgTypeBuff;
 
         lock_.lock();
-        s->write(buffLen, buffer);
+		Serializer* myS = new Serializer(buffLen, buffer);
+        tmp->deserialize(myS);
+		//delete myS;
+        /*s->write(buffLen, buffer);
         tmp->deserialize(s);
-        s->clear();
+        s->clear();*/
         lock_.unlock();
 
         //receiver of message owns it?
