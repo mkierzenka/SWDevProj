@@ -63,6 +63,18 @@ public:
     delete columns_;
   }
 
+
+ /**
+  * Creates a new DataFrame with given schema (scm) from the Rower.
+  * Returns the df result, caller is responsible for deleting it.
+  */
+ static DataFrame *fromVisitor(Key *k, KVStore *kv, const char* scm, Rower* r) {
+   DataFrame *df = new DataFrame(k->clone(), kv);
+   df->map(r);
+   addDFToStore_(df, kv, k);
+   return df;
+ }
+
   /** Converts an array into a dataframe object.
    *  Returns the df result, caller is responsible for deleting it.
    */
