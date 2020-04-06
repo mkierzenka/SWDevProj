@@ -237,7 +237,7 @@ public:
         int tmpFd = acceptConnection();
         Message* tmp = nullptr;
         //create buffer for message: will length be an issue?
-        size_t buffLen = 4096;//2048;
+        size_t buffLen = 5000000;//8192;
         char* buffer = new char[buffLen];
         memset(buffer, 0, buffLen);
 

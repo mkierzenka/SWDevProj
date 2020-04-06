@@ -354,11 +354,7 @@ Application:
 
 ## Open questions
 
-We pulled out the implementation of KVStore::get and waitAndGet into our test cpp files wherever we
-need it. This means we can use it in that file but nowhere else. What is the standard for where a 
-method like that should be implemented? Its own additional cpp file that is compiled separately?
-
-Will we need to implement our own Sorer for the remaining milestones?
+How do we decide what to make the buffer size for receiving messages? Do we need to be able to fragment messages?
 
 ## Status
 We have decided to use another group's Sorer implementation, as ours was written in Python and 
