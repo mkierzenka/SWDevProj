@@ -17,18 +17,23 @@
 
 const char* SERVER_IP = "127.0.0.1"; //hardcoded server IP (for now)
 const size_t SERVER_NODE_NUM = 0;
+const size_t NUM_NODES = 3;          // TODO: get from commandline
 
-/** This class wraps the basic functionality of the POSIX libraries.
- * It is used to make connections between clients and the server. */
+/**
+ * This class wraps the basic functionality of the POSIX libraries.
+ * It is used to make connections between clients and the server.
+ *
+ * @authors Chase Broder and Marcin Kierzenka
+ */
 class Network : public Object
 {
 
 public:
-    Serializer* s; //used for sending and receiving message
-    Directory* dir; //directory of other nodes on program
-    Lock lock_; //lock for reading from and writing to serializer
-    int fd; //descriptor to send message to this node
-    size_t nodeId_; //id of node
+    Serializer* s;        //used for sending and receiving message
+    Directory* dir;       //directory of other nodes on program
+    Lock lock_;           //lock for reading from and writing to serializer
+    int fd;               //descriptor to send message to this node
+    size_t nodeId_;       //id of this node
     int opt = 1;
     struct sockaddr_in address;
     int addresslen = sizeof(address);
@@ -37,7 +42,8 @@ public:
 
     /**
      * Network constructor. Will take string IP of the client/server
-     * that it was initialized by. */
+     * that it was initialized by.
+	 */
     Network(const char* addr, size_t nodeId)
     {
         s = new Serializer();
@@ -66,19 +72,16 @@ public:
     }
 
     void server_init() {
-        size_t num_nodes = 3;
         listenForConnections();
         // Build a Directory from the msgs each node sends
-        for (int i = 1; i < num_nodes; i++) {
-            //int tmp = acceptConnection();
+        for (int i = 1; i < NUM_NODES; i++) {
             RegisterMsg* rMsg = dynamic_cast<RegisterMsg*>(receiveMsg()); //blocking
             assert(rMsg);
             handleRegisterMsg(rMsg);
-            fprintf(stderr, "Server handled message #%d\n", i);
         }
         fprintf(stderr, "Server got all the nodes\n");
         // When all nodes (expected number) have registered, send directory to everyone
-        for (int i = 1; i < num_nodes; i++) {
+        for (int i = 1; i < NUM_NODES; i++) {
             DirectoryMsg* dMsg = new DirectoryMsg(dir, 8080, nodeId_, i, 0);
             fprintf(stderr, "Server sending Directory Message to Node %d\n", i);
             sendMsg(dMsg);
@@ -88,10 +91,6 @@ public:
     }
 
     void client_init() {
-        // bind a socket to server
-        // - in constructor we bind to a fd
-        size_t numNodes = 3;
-        // send register msg to server
         String* servIp = new String(SERVER_IP);
         dir->addIp(0, servIp);
         RegisterMsg* rMsg = new RegisterMsg(ipAddress_, 8080, nodeId_, SERVER_NODE_NUM, 0);
@@ -99,22 +98,15 @@ public:
         delete servIp;
         fprintf(stderr, "Node %zu Registered\n", nodeId_);
 
-        //handle directory msg
-        for (int i = 1; i < numNodes; i++)
-        {
-            Message* m = receiveMsg();
-            assert(m->getKind() == MsgKind::Dir);
-            fprintf(stderr, "Node %zu received directory message\n", nodeId_);
-            handleDirectoryMsg(dynamic_cast<DirectoryMsg*>(m));
-        }
-        printf("Client done initializing\n");
+		Message* m = receiveMsg();
+		assert(m->getKind() == MsgKind::Dir);
+		handleDirectoryMsg(dynamic_cast<DirectoryMsg*>(m));
+        fprintf(stderr, "Node %zu done initializing\n", nodeId_);
     }
-
 
     /** Allows node to wait for other nodes to make connection to it */
     void listenForConnections()
     {
-        //second parameter doesn't seem like a huge deal
         int val = listen(fd, 32);
         assert(val >= 0);
         fprintf(stderr, "Node %zu listening for connections...\n", nodeId_);
@@ -129,19 +121,15 @@ public:
                       
         assert(newSock >= 0);
         fprintf(stderr, "Node %zu accepted connection!\n", nodeId_);
-
         return newSock;
     }
 
     /** Attempt to connect to socket with given fd */
     void connectToNode(int fileDesc)
     {
-        //printf("Attempting to connect to server...\n");
         int connection = connect(fileDesc, (struct sockaddr *)&address,
                        sizeof(address));
-
         assert(connection >= 0);
-        //printf("Server connected!\n");
     }
 
     /** Send a message to the given IP with the given contents. */
@@ -157,10 +145,7 @@ public:
             assert(false);
         }
         assert(targetFd >= 0);
-        //hardcode options for now
         int rc = setsockopt(targetFd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
-        //SO_REUSEADDR | SO_REUSEPORT
-        //assert(rc >= 0);
         if (rc < 0)
         {
             fprintf(stderr, "SETSOCKOPT ERRNO: %d\n", errno);
@@ -170,31 +155,18 @@ public:
 
         struct sockaddr_in targetAddr;
         targetAddr.sin_family = AF_INET;
-        fprintf(stderr, "Node %zu About to get address for node %zu\n", nodeId_, msg->getTarget());
         String* targetIp = dir->getAddress(msg->getTarget());
-        fprintf(stderr, "Node %zu Got address %s\n", nodeId_, targetIp->c_str());
         int inet = inet_pton(AF_INET, targetIp->c_str(), &targetAddr.sin_addr);
         assert(inet > 0);
         targetAddr.sin_port = htons(8080);
-        fprintf(stderr, "Node %zu Attempting to bind socket: fd %d, port %d, ip %s\n", nodeId_, targetFd, targetAddr.sin_port,
-        targetIp->c_str());
-        // int val = bind(targetFd, (struct sockaddr *)&targetAddr, sizeof(targetAddr));
-
-        // if (val < 0) {
-        //     fprintf(stderr, "BIND ERRNO: %d\n", errno);
-        //     assert(false);
-        // }
-        //fprintf(stderr, "Node %zu binded to other node %zu\n", nodeId_, msg->getTarget());
-
 
         // create conn to client
-        int connection = connect(targetFd, (struct sockaddr *)&targetAddr, sizeof(targetAddr));
+		int connection = connect(targetFd, (struct sockaddr *)&targetAddr, sizeof(targetAddr));
         if (connection < 0) {
             fprintf(stderr, "Node %zu Connection BIND ERRNO: %d\n", nodeId_, errno);
             assert(false);
         }
         assert(connection >= 0);
-        
         fprintf(stderr, "Node %zu Connection established to node %zu\n", nodeId_, msg->getTarget());
 
         //serialize and send message
@@ -203,9 +175,6 @@ public:
         int sendVal = send(targetFd, myS->getBuffer(), myS->getNumBytesWritten(), 0);
         assert(sendVal >= 0);
         fprintf(stderr, "Node %zu Sent message to %zu\n", nodeId_, msg->getTarget());
-
-        //clear serializer
-        //s->clear();
 		delete myS;
         
         close(targetFd);
@@ -217,7 +186,6 @@ public:
 	 */
     Message* receiveMsg()
     {
-        //lock_.lock();
         int tmpFd = acceptConnection();
         Message* tmp = nullptr;
         //create dynamically-sized buffer
@@ -229,8 +197,6 @@ public:
         fprintf(stderr, "Node %zu trying to read\n", nodeId_);
         int valread = read(tmpFd, buffer, buffLen);
         while (valread < 0) {
-            // fprintf(stderr, "ERRNO: %d\n", errno);
-            // assert(false);
             //Better way to do this?
             valread = read(tmpFd, buffer, buffLen);
         }
@@ -238,19 +204,11 @@ public:
         //received message: now read until no more bytes to read
         while (valread > 0)
         {
-            //add to dynamic buffer
             buff->c(buffer, valread);
-            //buff->c(buffer, buffLen);
-
-            //resize static buffer
-            // delete[] buffer;
-            // buffer = new char[buffLen];
             memset(buffer, 0, buffLen);
-
             valread = read(tmpFd, buffer, buffLen);
         }
 
-        //assert(valread >= 0);
         assert(valread == 0);
         assert(buffer != nullptr);
         close(tmpFd);
@@ -258,7 +216,6 @@ public:
         fprintf(stderr, "Node %zu received message\n", nodeId_);
         char* msgTypeBuff = new char[buffLen];
         memcpy(msgTypeBuff, buffer, buffLen);
-        //Serializer* tmpSer = new Serializer(buffLen, msgTypeBuff);
         String* buffStr = buff->get();
         Serializer* tmpSer = new Serializer(buff->size(), buffStr->c_str());
         MsgKind type = tmpSer->readMsgKind();
@@ -280,19 +237,13 @@ public:
         // ?? delete[] msgTypeBuff;
 
         lock_.lock();
-		//Serializer* myS = new Serializer(buffLen, buffer);
         Serializer* myS = new Serializer(buff->size(), buffStr->c_str());
         tmp->deserialize(myS);
-		//delete myS;
-        /*s->write(buffLen, buffer);
-        tmp->deserialize(s);
-        s->clear();*/
         delete buffStr;
         delete[] buffer;
         delete buff;
         lock_.unlock();
 
-        //receiver of message owns it?
         return tmp;
     }
 
@@ -325,7 +276,7 @@ public:
         fprintf(stderr, "Current Directory size = %zu\n", dir->size());
 
         //send out directory message to all nodes
-        SizeTWrapper** nodes = dir->getNodes();
+        /*SizeTWrapper** nodes = dir->getNodes();
         for (size_t i = 0; i < dir->size(); i++)
         {
             DirectoryMsg* dm = new DirectoryMsg(dir, 8080, nodeId_, nodes[i]->asSizeT(), 0);
@@ -334,7 +285,7 @@ public:
             fprintf(stderr, "Server sent DirectoryMessage to node %zu\n", nodes[i]->asSizeT());
             delete dm;
             //delete nodes[i];
-        }
+        }*/
         //delete[] nodes;   
     }
 
