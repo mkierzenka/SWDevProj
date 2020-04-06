@@ -66,23 +66,20 @@ public:
 		case ReplyData:
 			out[0] = '3';
 			break;
-		case Get:
+		case WaitAndGet:
 			out[0] = '4';
 			break;
-		case WaitAndGet:
+		case Status:
 			out[0] = '5';
 			break;
-		case Status:
+		case Kill:
 			out[0] = '6';
 			break;
-		case Kill:
+		case Register:
 			out[0] = '7';
 			break;
-		case Register:
+		case Dir:
 			out[0] = '8';
-			break;
-		case Directory:
-			out[0] = '9';
 			break;
 		default:
 			out[0] = 0;
@@ -232,7 +229,8 @@ public:
 		else if (strcmp(sMsgKind, "3") == 0)
 		{
 			return ReplyData;
-			else if (strcmp(sMsgKind, "4") == 0)
+		}
+		else if (strcmp(sMsgKind, "4") == 0)
 			{
 				return WaitAndGet;
 			}
