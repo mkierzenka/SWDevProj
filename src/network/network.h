@@ -70,7 +70,7 @@ public:
         // - done in the constructor for now
 
         size_t num_nodes = 2;
-        int* sockets = new int[num_nodes]; //sockets[i] is talking to node i
+        //int* sockets = new int[num_nodes]; //sockets[i] is talking to node i
         // accept conns from nodes that want to register
         listenForConnections();
         // Build a Directory from the msgs each node sends
@@ -95,11 +95,11 @@ public:
         }
 
         // Close all the sockets
-        for (int i = 1; i < num_nodes; i++) {
+        /*for (int i = 1; i < num_nodes; i++) {
             int closeVal = close(sockets[i]);
             assert(closeVal >= 0);
             fprintf(stderr, "Server closed socket %d\n", i);
-        }
+        }*/
         // ??Figure out when to send terminate msgs??
     }
 
@@ -214,13 +214,15 @@ public:
         fprintf(stderr, "Node %zu Connection established to node %zu\n", nodeId_, msg->getTarget());
 
         //serialize and send message
-        msg->serialize(s);
-        int sendVal = send(targetFd, s->getBuffer(), s->getNumBytesWritten(), 0);
+		Serializer* myS = new Serializer();
+        msg->serialize(myS);
+        int sendVal = send(targetFd, myS->getBuffer(), myS->getNumBytesWritten(), 0);
         assert(sendVal >= 0);
         fprintf(stderr, "Node %zu Sent message to %zu\n", nodeId_, msg->getTarget());
 
         //clear serializer
-        s->clear();
+        //s->clear();
+		delete myS;
         
         close(targetFd);
         lock_.unlock();
@@ -233,10 +235,9 @@ public:
     {
         //lock_.lock();
         int tmpFd = acceptConnection();
-        assert(tmpFd >= 0);
         Message* tmp = nullptr;
         //create buffer for message: will length be an issue?
-        size_t buffLen = 2048;
+        size_t buffLen = 4096;//2048;
         char* buffer = new char[buffLen];
         memset(buffer, 0, buffLen);
 
@@ -271,13 +272,16 @@ public:
             }
         }
         assert(tmp);
-        delete tmpSer;
+        //delete tmpSer;
         // ?? delete[] msgTypeBuff;
 
         lock_.lock();
-        s->write(buffLen, buffer);
+		Serializer* myS = new Serializer(buffLen, buffer);
+        tmp->deserialize(myS);
+		//delete myS;
+        /*s->write(buffLen, buffer);
         tmp->deserialize(s);
-        s->clear();
+        s->clear();*/
         lock_.unlock();
 
         //receiver of message owns it?

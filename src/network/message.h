@@ -347,8 +347,8 @@ public:
 class PutMsg : public Message
 {
 public:
-	Key *key_;
-	Value *value_;
+	Key *key_;       // owned
+	Value *value_;   // owned
 
 	PutMsg() : Message() {
 		key_ = new Key();
@@ -357,11 +357,14 @@ public:
 
 	PutMsg(Key *k, Value *v, size_t sender, size_t target) : Message(Put, sender, target, 0)
 	{
-		key_ = k;
-		value_ = v;
+		key_ = k->clone();
+		value_ = v->clone();
 	}
 
-	~PutMsg() {}
+	~PutMsg() {
+		delete key_;
+		delete value_;
+	}
 
 	void serialize(Serializer *s)
 	{
@@ -373,7 +376,11 @@ public:
 	void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
+		delete key_;
+		key_ = new Key();
 		key_->deserialize(s);
+		delete value_;
+		value_ = new Value();
 		value_->deserialize(s);
 	}
 
