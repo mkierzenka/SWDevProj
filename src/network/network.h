@@ -333,10 +333,9 @@ public:
     /** Handle directory message */
     void handleDirectoryMsg(DirectoryMsg* m)
     {
-        fprintf(stderr, "Directory message received on node %zu\n", nodeId_);
         //current directories call new directory
         dir->mergeIn(m->getDirectory());
-        fprintf(stderr, "Directory message on node %zu: directory merged in\n", nodeId_);
+        fprintf(stderr, "Node %zu: directory merged in\n", nodeId_);
     }
 
     /** Binds bock to address and corresponding port number.
