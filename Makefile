@@ -37,6 +37,11 @@ buildDemo:
 testDemo:
 	./tests/testDemo
 
+buildMessage:
+	g++ --std=c++11 -g tests/messageTest.cpp -o tests/testMessage
+
+testMessage:
+	./tests/testMessage
 
 .SILENT: clean
 clean:
