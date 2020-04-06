@@ -70,7 +70,7 @@ public:
         // - done in the constructor for now
 
         size_t num_nodes = 2;
-        int* sockets = new int[num_nodes]; //sockets[i] is talking to node i
+        //int* sockets = new int[num_nodes]; //sockets[i] is talking to node i
         // accept conns from nodes that want to register
         listenForConnections();
         // Build a Directory from the msgs each node sends
@@ -95,11 +95,11 @@ public:
         }
 
         // Close all the sockets
-        for (int i = 1; i < num_nodes; i++) {
+        /*for (int i = 1; i < num_nodes; i++) {
             int closeVal = close(sockets[i]);
             assert(closeVal >= 0);
             fprintf(stderr, "Server closed socket %d\n", i);
-        }
+        }*/
         // ??Figure out when to send terminate msgs??
     }
 
@@ -214,13 +214,15 @@ public:
         fprintf(stderr, "Node %zu Connection established to node %zu\n", nodeId_, msg->getTarget());
 
         //serialize and send message
-        msg->serialize(s);
-        int sendVal = send(targetFd, s->getBuffer(), s->getNumBytesWritten(), 0);
+		Serializer* myS = new Serializer();
+        msg->serialize(myS);
+        int sendVal = send(targetFd, myS->getBuffer(), myS->getNumBytesWritten(), 0);
         assert(sendVal >= 0);
         fprintf(stderr, "Node %zu Sent message to %zu\n", nodeId_, msg->getTarget());
 
         //clear serializer
-        s->clear();
+        //s->clear();
+		delete myS;
         
         close(targetFd);
         lock_.unlock();
