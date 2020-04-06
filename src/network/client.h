@@ -7,7 +7,6 @@
 #include "message.h"
 #include "network.h"
 #include "clientdata.h"
-#include "integer.h"
 
 #include <poll.h>
 
