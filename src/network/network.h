@@ -66,12 +66,7 @@ public:
     }
 
     void server_init() {
-        // bind a socket
-        // - done in the constructor for now
-
         size_t num_nodes = 3;
-        //int* sockets = new int[num_nodes]; //sockets[i] is talking to node i
-        // accept conns from nodes that want to register
         listenForConnections();
         // Build a Directory from the msgs each node sends
         for (int i = 1; i < num_nodes; i++) {
@@ -80,11 +75,6 @@ public:
             assert(rMsg);
             handleRegisterMsg(rMsg);
             fprintf(stderr, "Server handled message #%d\n", i);
-            //size_t node = rMsg->getSender();
-            //sockets[node] = tmp;
-            //dir->addIp(node, rMsg->getClient());
-            //delete clientInfo; //depends on what this deletes (the actual objects stored in Dir?)
-            //delete rMsg; //depends on what this deletes, clone data first?
         }
         fprintf(stderr, "Server got all the nodes\n");
         // When all nodes (expected number) have registered, send directory to everyone
@@ -94,12 +84,6 @@ public:
             sendMsg(dMsg);
         }
 
-        // Close all the sockets
-        /*for (int i = 1; i < num_nodes; i++) {
-            int closeVal = close(sockets[i]);
-            assert(closeVal >= 0);
-            fprintf(stderr, "Server closed socket %d\n", i);
-        }*/
         // ??Figure out when to send terminate msgs??
     }
 
