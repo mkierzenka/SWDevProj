@@ -161,6 +161,20 @@ public:
 		return out;
 	}
 
+	/**
+	 * Read character pointer, using given size instead of strlen
+	 */
+	char *readCharPtr(size_t capacity)
+	{
+		char *startPtr = buffer_ + numBytesRead_;
+		//size_t lenNextStr = strlen(startPtr); // get the next string (up to first \0)
+		size_t bytesNeeded = capacity;  //extra for null terminator
+		char *out = new char[bytesNeeded];
+		memcpy(out, startPtr, bytesNeeded);
+		numBytesRead_ += bytesNeeded;
+		return out;
+	}
+
 	double readDouble()
 	{
 		double out;

@@ -57,7 +57,7 @@ public:
         }
         capacity_ = s->readSizeT();
         val_ = (char*)malloc(capacity_);
-        memcpy(val_, s->readString(), capacity_);
+        memcpy(val_, s->readCharPtr(capacity_), capacity_);
     }
 
 

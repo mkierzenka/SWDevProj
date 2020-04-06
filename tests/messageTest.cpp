@@ -42,13 +42,6 @@ void replyDataMsgTest()
     m->deserialize(s);
 
     //check for equality
-    assert(m->getKey()->equals(rdm->getKey()));
-    printf("Original message value: %s\n", rdm->getValue()->val_);
-    printf("New message value: %s\n", m->getValue()->val_);
-    printf("Original message capacity: %zu\n", rdm->getValue()->capacity_);
-    printf("New message capacity: %zu\n", m->getValue()->capacity_);
-    assert(memcpy(m->getValue()->val_, rdm->getValue()->val_, m->getValue()->capacity_) == 0);
-    assert(m->getValue()->equals(rdm->getValue()));
     assert(m->equals(rdm));
 
     //delete memory allocated
