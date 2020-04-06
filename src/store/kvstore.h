@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../utils/object.h"
-#include "../network/client.h"
+//#include "../network/client.h"
 #include "../network/network.h"
 #include "../serial/serial.h"
 #include "../network/message.h"
@@ -33,7 +33,7 @@ public:
     {
         kvMap = new MapStrObj();
         storeId = id;
-        client_ = client;
+        node_ = net;
         msgCache_ = new Map();
 		
     }
@@ -109,7 +109,7 @@ public:
 
     Value* getFromNetwork_(Key* k) {
         WaitAndGetMsg *dm = new WaitAndGetMsg(k, storeId, k->getNode());
-        client_->sendMsg(dm);
+        node_->sendMsg(dm);
         msgCacheLock_.lock();
 		while (!msgCache_->contains_key(k))
         {
@@ -136,7 +136,7 @@ public:
 			size_t sender = wagMsg->getSender();
 			Value* val = getValue(k); //should be local, we just added it in kv.put()
 			ReplyDataMsg *reply = new ReplyDataMsg(k, val, storeId, sender);
-			client_->sendMsg(reply);
+			node_->sendMsg(reply);
 			delete wagMsg;
 		}
 		msgCacheLock_.unlock();

@@ -31,8 +31,10 @@ public:
     {
         while (true)
         {
-			Message *m = network_->receiveMsg(nodeNum_); // blocks until new message arrives
+			Message *m = network_->receiveMsg(); // blocks until new message arrives
+            //fprintf(stderr, "RT Node %zu received message\n", nodeNum_);
             MsgKind kind = m->getKind();
+            fprintf(stderr, "Message kind: %d\n", kind);
             switch (kind)
             {
             case MsgKind::GetData:
@@ -77,13 +79,15 @@ public:
 			}
             case (MsgKind::Register):
             {
-                //do we need to cast message to proper type?
-                network_->handleRegisterMsg(m);
+                RegisterMsg* rMsg = dynamic_cast<RegisterMsg*>(m);
+                assert(rMsg);
+                network_->handleRegisterMsg(rMsg);
                 break;
             }
-            case (MsgKind::Directory):
+            case (MsgKind::Dir):
             {
-                network_->handleDirectoryMsg(m);
+                DirectoryMsg* dirMsg = dynamic_cast<DirectoryMsg*>(m);
+                network_->handleDirectoryMsg(dirMsg);
                 break;
             }
             default:

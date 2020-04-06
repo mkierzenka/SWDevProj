@@ -31,14 +31,15 @@ class NodeThread : public Thread
     {
         printf("Starting NodeThread %zu\n", app_->this_node());
 
-        // Create receiver thread, to handle communication with other nodes
-        ReceiverThread* rt = new ReceiverThread(app_->this_node(), net_, app_->getStore());
-        rt->start();
         if (app_->this_node() == 0) {
           net_->server_init();
         } else {
           net_->client_init();
         }
+
+        // Create receiver thread, to handle communication with other nodes
+        ReceiverThread* rt = new ReceiverThread(app_->this_node(), net_, app_->getStore());
+        rt->start();
         app_->run_();
     }
   };
