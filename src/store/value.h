@@ -14,6 +14,12 @@ public:
     char *val_;       //serialized data stored in character pointer buffer
     size_t capacity_; //max size of data, in bytes
 
+    Value() {
+        capacity_ = 1;
+        val_ = (char*)malloc(capacity_);
+        val_[0] = 0;
+    }
+    
     Value(const char *data, size_t cap)
     {
         capacity_ = cap;

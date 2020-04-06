@@ -86,13 +86,21 @@ public:
 	Value *value_;
 	Key* key_;
 
+	ReplyDataMsg() : Message() {
+		key_ = new Key();
+		value_ = new Value();
+	}
+
 	ReplyDataMsg(Key* k, Value *v, size_t sender, size_t target) : Message(ReplyData, sender, target, 0)
 	{
 		value_ = v;
 		key_ = k;
 	}
 
-	~ReplyDataMsg() {}
+	~ReplyDataMsg() {
+		delete key_;
+		delete value_;
+	}
 
 	void serialize(Serializer *s)
 	{
@@ -104,7 +112,11 @@ public:
 	void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
+		delete key_;
+		key_ = new Key();
 		key_->deserialize(s);
+		delete value_;
+		value_ = new Value();
 		value_->deserialize(s);
 	}
 
@@ -128,12 +140,19 @@ class WaitAndGetMsg : public Message
 public:
 	Key *key_;
 
+	WaitAndGetMsg() : Message()
+	{
+		key_ = new Key();
+	}
+
 	WaitAndGetMsg(Key *k, size_t sender, size_t target) : Message(WaitAndGet, sender, target, 0)
 	{
 		key_ = k;
 	}
 
-	~WaitAndGetMsg() {}
+	~WaitAndGetMsg() {
+		delete key_;
+	}
 
 	void serialize(Serializer *s)
 	{
@@ -144,6 +163,8 @@ public:
 	void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
+		delete key_;
+		key_ = new Key();
 		key_->deserialize(s);
 	}
 
@@ -230,13 +251,21 @@ public:
 		Message::deserialize(s);
 		//ipList_->deserialize(s);
 		//client_ = s->readSizeT();
+		delete dir_;
+		dir_ = new Directory();
 		dir_->deserialize(s);
 		port_ = s->readSizeT();
 	}
 
-	void addIp(String *ip)
+	void addIp(size_t node, String *ip)
 	{
-		ipList_->add(ip);
+		//ipList_->add(ip);
+		dir_->addIp(node, ip);
+	}
+
+	Directory* getDirectory()
+	{
+		return dir_;
 	}
 };
 
@@ -244,47 +273,58 @@ public:
 class RegisterMsg : public Message
 {
 public:
-	struct sockaddr_in client_;
+	//struct sockaddr_in client_;
+	String* client_; //ip address of new client; owned
 	size_t port_;
 
 	RegisterMsg() : Message()
 	{
-		client_.sin_family = AF_INET;
-		inet_pton(AF_INET, "127.0.0.1", &client_.sin_addr);
-		client_.sin_port = htons(8080);
+		// client_.sin_family = AF_INET;
+		// inet_pton(AF_INET, "127.0.0.1", &client_.sin_addr);
+		// client_.sin_port = htons(8080);
 		port_ = 8080;
+		client_ = new String("127.0.0.1");
 	}
 
-	RegisterMsg(sockaddr_in client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
+	RegisterMsg(String* client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
 	{
-		client_ = client;
-		port_ = port; //unused? client has port internally, too?
+		client_ = client->clone();
+		port_ = port;
 	}
 
 	~RegisterMsg()
 	{
+		delete client_;
 	}
 
 	virtual void serialize(Serializer *s)
 	{
 		Message::serialize(s);
-		s->write((short)client_.sin_family);
-		s->write((long)client_.sin_addr.s_addr);
-		s->write((short)client_.sin_port);
+		// s->write((short)client_.sin_family);
+		// s->write((long)client_.sin_addr.s_addr);
+		// s->write((short)client_.sin_port);
+		client_->serialize(s);
 		s->write(port_);
 	}
 
 	virtual void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
-		client_.sin_family = s->readShort();
-		client_.sin_addr.s_addr = s->readLong();
-		client_.sin_port = s->readShort();
+		delete client_;
+		client_ = new String("");
+		client_->deserialize(s);
+		// client_.sin_family = s->readShort();
+		// client_.sin_addr.s_addr = s->readLong();
+		// client_.sin_port = s->readShort();
 		port_ = s->readSizeT();
 	}
 
-	struct sockaddr_in getClientInfo() {
+	String* getClient() {
 		return client_;
+	}
+
+	size_t getPort() {
+		return port_;
 	}
 };
 
@@ -296,6 +336,11 @@ class PutMsg : public Message
 public:
 	Key *key_;
 	Value *value_;
+
+	PutMsg() : Message() {
+		key_ = new Key();
+		value_ = new Value();
+	}
 
 	PutMsg(Key *k, Value *v, size_t sender, size_t target) : Message(Put, sender, target, 0)
 	{
@@ -338,12 +383,18 @@ class GetDataMsg : public Message
 public:
 	Key *key_;
 
+	GetDataMsg() : Message()
+	{
+		key_ = new Key();
+	}
 	GetDataMsg(Key *k, size_t sender, size_t target) : Message(GetData, sender, target, 0)
 	{
-		key_ = k;
+		key_ = k->clone();
 	}
 
-	~GetDataMsg() {}
+	~GetDataMsg() {
+		delete key_;
+	}
 
 	void serialize(Serializer *s)
 	{
@@ -354,6 +405,8 @@ public:
 	void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
+		delete key_;
+		key_ = new Key();
 		key_->deserialize(s);
 	}
 
