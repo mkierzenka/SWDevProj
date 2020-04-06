@@ -2,7 +2,7 @@
 
 
 #include "../utils/thread.h"
-#include "../network/network.h"
+#include "../network/inetwork.h"
 #include "application.h"
 #include "demo.h"
 #include "receiverthread.h"
@@ -18,7 +18,7 @@ class NodeThread : public Thread
   {
   public:
     Application* app_;
-    Network* net_;
+    INetwork* net_;
 
     NodeThread(Application* a) : Thread() {
         app_ = a;

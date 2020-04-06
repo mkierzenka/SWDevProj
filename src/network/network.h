@@ -6,6 +6,7 @@
 #include "../utils/thread.h"
 #include "message.h"
 #include "msgkind.h"
+#include "inetwork.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -17,15 +18,10 @@
 
 const char* SERVER_IP = "127.0.0.1"; //hardcoded server IP (for now)
 const size_t SERVER_NODE_NUM = 0;
-const size_t NUM_NODES = 3;          // TODO: get from commandline
 
-/**
- * This class wraps the basic functionality of the POSIX libraries.
- * It is used to make connections between clients and the server.
- *
- * @authors Chase Broder and Marcin Kierzenka
- */
-class Network : public Object
+/** This class wraps the basic functionality of the POSIX libraries.
+ * It is used to make connections between clients and the server. */
+class Network : public INetwork
 {
 
 public:
