@@ -93,8 +93,8 @@ public:
 
 	ReplyDataMsg(Key* k, Value *v, size_t sender, size_t target) : Message(ReplyData, sender, target, 0)
 	{
-		value_ = v;
-		key_ = k;
+		value_ = v->clone();
+		key_ = k->clone();
 	}
 
 	~ReplyDataMsg() {
@@ -128,6 +128,19 @@ public:
 	Key *getKey()
 	{
 		return key_;
+	}
+
+	/**
+	 * Check if this reply message equals the given one
+	 */
+	bool equals(ReplyDataMsg* other)
+	{
+		if (this == other)
+		{
+			return true;
+		}
+
+		return (value_->equals(other->getValue())) && (key_->equals(other->getKey()));
 	}
 };
 
