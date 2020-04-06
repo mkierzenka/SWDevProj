@@ -34,7 +34,7 @@ public:
     bool done() override { return (i_ >= end_) && feof(file_);  }
  
     /** Creates the reader and opens the file for reading.  */
-    FileReader() {
+    FileReader() : Writer() {
         file_ = fopen(arg.file, "r");
         if (file_ == nullptr) FATAL_ERROR("Cannot open file " << arg.file);
         buf_ = new char[BUFSIZE + 1]; //  null terminator
@@ -42,6 +42,8 @@ public:
         skipWhitespace_();
     }
  
+    ~FileReader() {}
+
     static const size_t BUFSIZE = 1024;
  
     /** Reads more data from the file. */

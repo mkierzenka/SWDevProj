@@ -7,9 +7,8 @@
 #include "../store/kvstore.h"
 #include "../store/key.h"
 #include "../serial/serial.h"
-
+#include "../filereader/writer.h"
 #include "columnarray.h"
-
 #include "schema.h"
 #include "rower.h"
 #include "row.h"
@@ -41,6 +40,19 @@ public:
     columns_ = new ColumnArray(store_, key_);
   }
 
+  /**
+   * Create a data frame from a schema description and columns and a store.
+   * All columns are created empty.
+   */
+  DataFrame(const char* scm, Key *k, KVStore *kv)
+  {
+    schema_ = new Schema(scm);
+    store_ = kv;
+    size_t numCols = schema_->width();
+    key_ = k;
+    columns_ = new ColumnArray(store_, key_);
+  }
+
   /** Create a data frame with the same columns as the give df but no rows */
   DataFrame(DataFrame &df, Key *k) : DataFrame(df.get_schema(), k)
   {
@@ -65,12 +77,12 @@ public:
 
 
  /**
-  * Creates a new DataFrame with given schema (scm) from the Rower.
+  * Creates a new DataFrame with given schema (scm) from the Writer.
   * Returns the df result, caller is responsible for deleting it.
   */
- static DataFrame *fromVisitor(Key *k, KVStore *kv, const char* scm, Rower* r) {
-   DataFrame *df = new DataFrame(k->clone(), kv);
-   df->map(r);
+ static DataFrame *fromVisitor(Key *k, KVStore *kv, const char* scm, Writer* r) {
+   DataFrame *df = new DataFrame(scm, k->clone(), kv);
+   df->visit(r);
    addDFToStore_(df, kv, k);
    return df;
  }
@@ -299,6 +311,19 @@ public:
   size_t ncols()
   {
     return schema_->width();
+  }
+
+  /** Add rows to this DataFrame built by Writer. Until wr->done() */
+  void visit(Writer* wr)
+  {
+    Row row(*schema_);
+    size_t rowIdx = 0;
+    while(!wr->done()) {
+      wr->visit(row);
+      add_row(row);
+      row.clear();
+      rowIdx++;
+    }
   }
 
   /** Visit rows in order */

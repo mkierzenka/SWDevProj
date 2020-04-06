@@ -11,7 +11,9 @@ public:
   size_t j = 0;
   size_t seen = 0;
  
-  Summer(Map& map) : map_() {}
+  Summer(Map& map) : Writer() {
+      map_ = map;
+  }
  
 //   void next() {
 //       if (i == map_.capacity_ ) return;
@@ -25,10 +27,12 @@ public:
 //           if (k()) ++seen;
 //       }
 //   }
+
+~Summer() {}
 void next()
 {
     if (i == map_.capacity_) return;
-    if (i < map_.getKeys().size())
+    if (i < map_.get_keys().size())
     {
         i++;
         seen++;
