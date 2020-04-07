@@ -4,8 +4,10 @@
 
 #include "object.h"
 
+#include <assert.h>
+
 /**
-* Array - to represent a list of objects.
+* Array - to represent a list of objects. Array owns its elements
 *
 *Specification by Yiwen Ma & Viswajith Gopinathan
 *Authors: broder.c@husky.neu.edu and kierzenka.m@husky.neu.edu
@@ -88,7 +90,7 @@ public:
 		return objList_[index];
 	}
 
-	/** Add the object to the end of this Array */
+	/** Add the object to the end of this Array. Array owns this object */
 	void add(Object *o)
 	{
 		if (!hasRoomForMoreElems_(1))
@@ -100,8 +102,10 @@ public:
 		len_ += 1;
 	}
 
-	/** Set the element at the given index to the specified object */
-	void set(size_t index, Object *o)
+	/** Set the element at the given index to the specified object. Return the old value.
+	 * Caller responsible for deleting returned value
+	 */
+	Object* set(size_t index, Object *o)
 	{
 		if (index > len_)
 		{
@@ -112,14 +116,18 @@ public:
 		//if index to insert at is the length, treat as if you're adding to end of array
 		if (index == len_)
 		{
-			add(o);
-			return;
+			assert(false);
 		}
 
+		Object* rep = objList_[index];
 		objList_[index] = o;
+
+		return rep;
 	}
 
-	/** Remove the element at the given index from this Array. Return it */
+	/** Remove the element at the given index from this Array. Return it.
+	 * Caller responsible for deleting returned value
+	 */
 	Object *remove(size_t index)
 	{
 		if (index >= len_)
