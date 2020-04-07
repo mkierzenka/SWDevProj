@@ -48,6 +48,15 @@ public:
         type_ = t;
     }
 
+    /** Default constructor: start column to fit two elements. Steals key ownership */
+    Column(KVStore* store, Key* baseKey, const char colType) {
+        blocks_ = new DistributedArray(store);
+        store_ = store;
+        baseKey_ = baseKey;
+        size_ = 0;
+        type_ = getColType_(colType);
+    }
+
     // For deserializing, hopefully these values will be updated in a few calls
     Column() {
         blocks_ = new DistributedArray(nullptr);
