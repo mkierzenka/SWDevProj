@@ -1,9 +1,12 @@
 # SWDevProj
 
-demoTest.cpp has latest waitAndGet
+
+###Memory/Ownership Notes
+Array, Map, Queue all steal ownership of what's passed into them
 
 
-Current ReceiverThread Info:
+
+###ReceiverThread Info
 Receives WaitAndGet message it can't currently respond to -> add to MessageQueue msgsInProg_
 Think of this queue as "linking" to KVStore's receivedMsgs_ (they are the same object for a KVStore-ReceiverThread pair)
 The field receivedMsgs_ is how ReceiverThread sends info to KVStore
@@ -41,8 +44,6 @@ It sends the responses if available
 * Implement push_back for columns
 
 * Add KVstore to DF constructor with schema and key, remove one that takes in dataframe
-
-* Create application for sorer
 
 * Sorer code- make the arrays use our array instead of re-implementing functionality
 
