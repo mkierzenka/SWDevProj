@@ -13,13 +13,15 @@ int main()
 {
     printf("Cache test starting...\n");
     //create cache and some elements to put into the cache
-    Cache* c = new Cache(3);
+    Cache* myCache = new Cache(3);
 
     //create some key-value pairs
     Key* key1 = new Key("key1", 0);
-    Key* key2 = new Key("key2", 1); 
+    Key* key1c = key1->clone();
+    Key* key2 = new Key("key2", 1);
+    Key* key2c = key2->clone();
     Key* key3 = new Key("key3", 2);
-    Key* key4 = new Key("key4", 3);    
+    Key* key4 = new Key("key4", 3);
     Key* key5 = new Key("key5", 2);
 
     IntBlock* ib = new IntBlock();
@@ -56,39 +58,39 @@ int main()
     ib2->add(229375);
 
     //add pairings to cache
-    c->put(key1, ib);
-    c->put(key2, sb);
-    c->put(key3, bb);
+    myCache->put(key1, ib);
+    myCache->put(key2, sb);
+    myCache->put(key3, bb);
 
-    assert(c->keyOrder_->size() == 3);
+    assert(myCache->keyOrder_->size() == 3);
 
-    assert(c->containsKey(key1));
-    assert(c->getBlock(key1)->equals(ib));
-    assert(c->containsKey(key2));
-    assert(c->getBlock(key2)->equals(sb));
-    assert(c->containsKey(key3));
-    assert(c->getBlock(key3)->equals(bb));
-    assert(c->keyOrder_->size() == 3);
-    assert(c->data_->size() == 3);
-    assert(!c->containsKey(key4));
+    assert(myCache->containsKey(key1));
+    assert(myCache->getBlock(key1)->equals(ib));
+    assert(myCache->containsKey(key2));
+    assert(myCache->getBlock(key2)->equals(sb));
+    assert(myCache->containsKey(key3));
+    assert(myCache->getBlock(key3)->equals(bb));
+    assert(myCache->keyOrder_->size() == 3);
+    assert(myCache->data_->size() == 3);
+    assert(!myCache->containsKey(key4));
 
-    c->put(key4, db);
-    assert(!c->containsKey(key1)); //because we dropped it (Cache size = 3)
-    assert(c->containsKey(key4));
-    assert(c->getBlock(key4)->equals(db));
+    myCache->put(key4, db);
+    assert(!myCache->containsKey(key1c)); //because we dropped it (Cache size = 3)
+    assert(myCache->containsKey(key4));
+    assert(myCache->getBlock(key4)->equals(db));
 
-    c->put(key5, ib2);
-    assert(!c->containsKey(key1));
-    assert(!c->containsKey(key2));
-    assert(c->containsKey(key3));
-    assert(c->getBlock(key3)->equals(bb));
-    assert(c->containsKey(key4));
-    assert(c->getBlock(key4)->equals(db));
-    assert(c->containsKey(key5));
-    assert(c->getBlock(key5)->equals(ib2));
+    myCache->put(key5, ib2);
+    assert(!myCache->containsKey(key1c));
+    assert(!myCache->containsKey(key2c));
+    assert(myCache->containsKey(key3));
+    assert(myCache->getBlock(key3)->equals(bb));
+    assert(myCache->containsKey(key4));
+    assert(myCache->getBlock(key4)->equals(db));
+    assert(myCache->containsKey(key5));
+    assert(myCache->getBlock(key5)->equals(ib2));
 
-    delete c;
-    delete key1, key2, key3, key4, key5;
-    delete ib, sb, bb, db, ib2;
+    delete key1c;
+    delete key2c;
+    delete myCache;
     printf("Cache test passed!\n");
 }
