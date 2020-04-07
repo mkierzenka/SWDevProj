@@ -1,17 +1,5 @@
 # SWDevProj
 
-demoTest.cpp has latest waitAndGet
-
-
-Current ReceiverThread Info:
-Receives WaitAndGet message it can't currently respond to -> add to MessageQueue msgsInProg_
-Think of this queue as "linking" to KVStore's receivedMsgs_ (they are the same object for a KVStore-ReceiverThread pair)
-The field receivedMsgs_ is how ReceiverThread sends info to KVStore
-When new data is added to a KVStore (RT calls kv_->put()), KVStore adds it locally
-  then checks the receivedMsgs_ Queue to see if anyone else was looking for the data that just came in
-It sends the responses if available
-
-
 
 ### Notes for things to improve from before:
 
@@ -57,3 +45,5 @@ It sends the responses if available
 * Methods w/o an implementation: add assert(false) and comment
 
 * Ferd feedback
+
+* Add underscore to all private fields (KVStore)
