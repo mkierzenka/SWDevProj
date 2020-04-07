@@ -7,6 +7,7 @@ void OK(const char *m)
   Sys *c = new Sys();
   c->p("OK: ");
   c->pln(m);
+  delete c;
 }
 
 void FAIL() { exit(1); }
@@ -27,13 +28,16 @@ void test1()
   String *s = new String("Hello");
   Array *a = new Array();
   Array *b = new Array();
-  a->add(s);
-  b->add(s);
+  a->add(s->clone());
+  b->add(s->clone());
   t_true(a->equals(a));
   t_true(b->equals(b));
   t_true(a->equals(b));
-  b->add(s);
+  b->add(s->clone());
   t_false(a->equals(b));
+  delete a;
+  delete b;
+  delete s;
   OK("Test 1 passed!");
 }
 
@@ -48,9 +52,11 @@ void test2()
   a->add(t);
   t_true(a->get(1)->equals(t));
   t_true(a->length() == 2);
-  a->remove(1);
+  String* r = dynamic_cast<String*>(a->remove(1));
   t_true(a->length() == 1);
   t_true(a->get(0)->equals(s));
+  delete a;
+  delete r;
   OK("Test 2 passed!");
 }
 
@@ -61,6 +67,7 @@ void test3()
   Array *a = new Array();
   a->add(s);
   t_true(a->hash() == a->hash());
+  delete a;
   OK("Test 3 passed!");
 }
 
@@ -76,6 +83,7 @@ void test4()
   t_true(a->index_of(t) == 1);
   a->clear();
   t_true(a->length() == 0);
+  delete a;
   OK("Test 4 passed!");
 }
 
@@ -99,7 +107,7 @@ void testBig() {
 	assert(arr->get(1)->equals(b));
 	assert(arr->get(3)->equals(d));
 	assert(arr->index_of(e) == (arr->length() - 1));
-	arr->set(1, f);
+	String* b_rem = dynamic_cast<String*>(arr->set(1, f));
 	assert(arr->length() == 5);
 	assert(arr->index_of(b) == -1);
 	assert(arr->index_of(f) == 1);
@@ -108,6 +116,7 @@ void testBig() {
 	assert(arr->length() == 4);
 	assert(arr->get(2)->equals(d));
 	
+  delete b_rem;
 	delete c_rem;
 	delete arr;
 	OK("Test Big passed!");
