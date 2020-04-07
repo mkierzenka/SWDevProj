@@ -125,7 +125,9 @@ public:
 		return rep;
 	}
 
-	/** Remove the element at the given index from this Array. Return it */
+	/** Remove the element at the given index from this Array. Return it.
+	 * Caller responsible for deleting returned value
+	 */
 	Object *remove(size_t index)
 	{
 		if (index >= len_)
