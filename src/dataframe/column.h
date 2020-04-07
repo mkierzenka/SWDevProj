@@ -269,7 +269,7 @@ public:
 
         Key* k = genKey_(chunk); //Key to look up data
 		double out = blocks_->getDouble(k, idxInChunk);
-		delete k;
+		//delete k;
 		return out;
      }
 	
@@ -285,7 +285,7 @@ public:
 
         Key* k = genKey_(chunk); //Key to look up data
 		bool out = blocks_->getBool(k, idxInChunk);
-        delete k;
+        //delete k;
 		return out;
      }
 	
@@ -301,7 +301,7 @@ public:
 
         Key* k = genKey_(chunk); //Key to look up data
         String* out = blocks_->getString(k, idxInChunk);
-        delete k;
+        //delete k;
 		return out;
     }
 	
@@ -319,7 +319,7 @@ public:
 
         Key* k = genKey_(chunk); //Key to look up data
         int out = blocks_->getInt(k, idxInChunk);
-        delete k;
+        //delete k;
 		return out;
     }
 
@@ -337,7 +337,7 @@ public:
         String* keyStr = buff->get();
         delete buff;
         Key* k = new Key(keyStr, baseKey_->getNode()); //clones String; figure out node value later
-        delete keyStr;
+        //delete keyStr;
         return k;
     }
 	
