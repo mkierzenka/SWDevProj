@@ -2,53 +2,96 @@
 #pragma once
 #include "object.h"
 
-//This class will be used to represent an element on the queue.
-//It will contain the value of the element and a reference to the next index
+/**
+ * This class represents an entry in the Queue. It steals ownership of the
+ * Object passed into it. Calling delete will chain through all Nodes connected
+ * to this one.
+ *
+ * @authors kierzenka.m@husky.neu.edu & broder.c@husky.neu.edu
+ */
 class Node : public Object
 {
 public:
-    Object *o;  //element
-    Node *next; //reference to next element in queue
+    Object *val_;   //owned
+    Node *next_;    //reference to next element in queue
 
-    //checks if two nodes are equal
+    /** Create a new Node from an Object. Steals ownership. */
+	Node(Object* val) : Object() {
+		val_ = val;
+		next_ = nullptr;
+	}
+
+	~Node() {
+		if (val_) {
+			delete val_;
+		}
+		if (next_) {
+			delete next_;
+		}
+	}
+
+	/** Returns a pointer to the value at this node. Does not copy. */
+	Object* getValue() {
+		return val_;
+	}
+
+	/**
+	 * Sets the value of this Node to newVal. Returns the previous value
+	 * Caller is responsible for deleting returned Object.
+	 */
+	Object* setValue(Object* newVal) {
+		Object* oldVal = val_;
+		val_ = newVal;
+		return oldVal;
+	}
+
+	/** Returns the pointer to the next Node, does not clone */
+	Node* getNext() {
+		return next_;
+	}
+
+	/** Sets the value of next. Returns the old value (no clone) */
+	Node* setNext(Node* newNext) {
+		next_ = newNext;
+	}
+
+	/** Returns true if this node is equal to the other Object */
     bool equals(Object *other)
     {
-        //same memory; must be equal
         if (this == other)
         {
             return true;
         }
 
         Node *otherNode = dynamic_cast<Node *>(other);
-        //can't cast to Node
         if (!otherNode)
         {
             return false;
         }
 
-        if (otherNode->o && !otherNode->o->equals(o))
+        if (otherNode->getValue() && !otherNode->getValue()->equals(getValue()))
         {
             return false;
         }
 
-        if (o && !o->equals(otherNode->o))
+        if (getValue() && !getValue()->equals(otherNode->getValue()))
         {
             return false;
         }
 
         //Current element same and no other elements exist
-        if (!next && !(otherNode->next))
+        if (!next_ && !(otherNode->next_))
         {
             return true;
         }
 
-        if ((!next && otherNode->next) || (next && !(otherNode->next)))
+        if ((!next_ && otherNode->next_) || (next_ && !(otherNode->next_)))
         {
             return false;
         }
 
         //both not null: continue
-        return next->equals(otherNode->next);
+        return next_->equals(otherNode->next_);
     }
 };
 
@@ -59,8 +102,8 @@ public:
 class Queue : public Object
 {
 public:
-    Node *front_; //pointer to first element in queue
-    Node *back_;  //pointer to last element in queue
+    Node *front_; //Owned, pointer to first element in queue
+    Node *back_;  //Owned, pointer to last element in queue
     size_t len_;  //number of elements in queue
 
     /** Default constructor ensure that everything is initialized */
@@ -85,39 +128,38 @@ public:
     void push(Object *o)
     {
         //if queue is empty, make it front and back of queue
-        if (len_ == 0)
+        if (size() == 0)
         {
-            front_ = back_ = createNode_(o);
+            front_ = back_ = new Node(o);
             len_ += 1;
             return;
         }
 
         //create new node to eventually push to back
-        Node *newBack = createNode_(o);
+        Node *newBack = new Node(o);
 
         //update current end of queue
-        back_->next = newBack;
+        back_->setNext(newBack);
 
         //set new end of queue and update length
         back_ = newBack;
         len_ += 1;
     }
 
-    /** Returns and removes object from the beginning of the queue if anything is in queue**/
+    /**
+     * Removes and returns object from the beginning of the queue.
+     * Will return nullptr if the Queue is empty;
+     *
+     * Caller is responsible for deleting the return value.
+     */
     Object *pop()
     {
-        //first check if queue has elements in it
-        if (is_empty())
+        if (size() == 0)
         {
             return nullptr;
         }
-
-        //store removed node
         Node *temp = front_;
-        //delete(temp);
-
-        //update front node
-        front_ = front_->next;
+        front_ = temp->getNext(); // new front is old front's next
         len_ -= 1;
 
         //check if queue now empty; means both front and back need to be null
@@ -125,14 +167,10 @@ public:
         {
             back_ = nullptr;
         }
-
-        return temp->o;
-    }
-
-    /** Returns whether the queue is empty **/
-    bool is_empty()
-    {
-        return len_ == 0;
+    	Object* retVal = temp->setValue(nullptr);
+    	temp->setNext(nullptr);
+    	delete temp;
+        return retVal;
     }
 
     /** Removes all of elements from this queue **/
@@ -197,22 +235,10 @@ public:
         {
             size_t nodeHash = reinterpret_cast<size_t>(cur);
             hash += nodeHash;
-            cur = cur->next;
+            cur = cur->getNext();
         }
 
         return hash;
-    }
-
-    /**
-	 * Helper to create a queue node with the given object
-	 */
-    Node *createNode_(Object *obj)
-    {
-        Node *n = new Node();
-        n->o = obj;
-        n->next = nullptr;
-
-        return n;
     }
 
     /**
@@ -220,13 +246,6 @@ public:
 	 */
     void deleteQueue_()
     {
-        Node *cur = front_;
-        while (cur)
-        {
-            //set next element, delete existing, and swap
-            Node *next = cur->next;
-            delete cur;
-            cur = next;
-        }
+        delete front_;
     }
 };
