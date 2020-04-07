@@ -122,6 +122,14 @@ public:
 		colList_->add(c);
 	}
 
+	/**
+	 * Appends new column of specified type to this columnarray.
+	 */
+	void add_column(const char colType)
+	{
+		add_column(new Column(store_, dfKey_->addIndex(length()), colType));
+	}
+
 	/** Create a new column of the given types and add in the elements, chunks at a
 	 * time */
 	void add_column_fromarray(size_t numElements, double *elements)
