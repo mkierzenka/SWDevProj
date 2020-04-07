@@ -292,6 +292,6 @@ int main()
   //basicTest2();
   dataFrameTest();
   //lengthRowerTest();
-  //dataFrameFromWriter();
+  dataFrameFromWriter();
   return 0;
 }
