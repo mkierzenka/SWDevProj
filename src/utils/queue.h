@@ -176,10 +176,7 @@ public:
     /** Removes all of elements from this queue **/
     void clear()
     {
-        //delete queue
         deleteQueue_();
-
-        //reset values
         front_ = nullptr;
         back_ = nullptr;
         len_ = 0;
