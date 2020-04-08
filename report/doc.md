@@ -333,6 +333,8 @@ Application:
 
 How do we decide what to make the buffer size for receiving messages? Do we need to be able to fragment messages? We are getting segfaults when we make the demo test too large, not sure if this is related to our buffer
 
+Should all columns be the same length? If so, how should this be enforced?
+
 ## Status
 We have decided to use another group's Sorer implementation, as ours was written in Python and 
 not fully correct.
