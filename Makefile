@@ -27,6 +27,7 @@ ourTests:
 memory:
 	#valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testTrivial
 	#valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testDemo
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testGeneral
 
 buildTrivial:
 	g++ --std=c++11 -g -pthread tests/trivialTest.cpp -o tests/testTrivial
@@ -39,6 +40,9 @@ buildDemo:
 
 testDemo:
 	./tests/testDemo
+
+buildGeneral:
+	g++ --std=c++11 -g tests/blockTest.cpp -o tests/testGeneral
 
 .SILENT: clean
 clean:

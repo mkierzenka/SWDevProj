@@ -1,11 +1,17 @@
 # SWDevProj
 
 
-###Memory/Ownership Notes
-Array, Map, Queue all steal ownership of what's passed into them
+### Memory/Ownership Notes
+* Array, Map, Queue all steal ownership of what's passed into them
+* Test files without memory leaks: array, queue, map, message, cache, block, serial, general
+* Tests with memory leaks/unchecked
+  * Distributed array (test not developed)
+  * Trivial
+  * Demo
+  * Sorer (test not working yet)
 
 
-###ReceiverThread Info
+### ReceiverThread Info
 Receives WaitAndGet message it can't currently respond to -> add to MessageQueue msgsInProg_
 Think of this queue as "linking" to KVStore's receivedMsgs_ (they are the same object for a KVStore-ReceiverThread pair)
 The field receivedMsgs_ is how ReceiverThread sends info to KVStore
@@ -50,3 +56,5 @@ It sends the responses if available
 * doc.md: create diagram for architecture section
 
 * Add underscore to all private fields (KVStore)
+
+* Distribute data across nodes

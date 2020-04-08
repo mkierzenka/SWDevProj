@@ -198,6 +198,7 @@ void dataFrameTest()
   assert(df->get_string(0, 1)->equals(valsS[1]));
 
   delete kv;
+  delete df;
   SYSTEM->pln("Data frame test passed!");
 }
 
