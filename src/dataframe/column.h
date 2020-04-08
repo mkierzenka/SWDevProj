@@ -336,8 +336,8 @@ public:
         buff->c(blockNum);
         String* keyStr = buff->get();
         delete buff;
-        Key* k = new Key(keyStr, baseKey_->getNode()); //clones String; figure out node value later
-        //delete keyStr;
+        Key* k = new Key(keyStr, baseKey_->getNode()); //clones String
+        delete keyStr;
         return k;
     }
 	
@@ -392,5 +392,7 @@ public:
         Value* val = new Value(s->getBuffer(), s->getNumBytesWritten());
         store_->put(k, val);
         blocks_->addKey(k);
+        delete val;
+        delete k;
     }
 };

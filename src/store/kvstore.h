@@ -39,9 +39,12 @@ public:
     ~KVStore()
     {
         delete kvMap;
+        delete msgCache_;
     }
 
-    /** Puts key-value pair into distributed KV store */
+    /** Puts key-value pair into distributed KV store. Clone key and data in put msg, clone before we 
+     * put into map
+     */
     void put(Key *k, Value *data)
     {
 		if (k->getNode() != storeId) {

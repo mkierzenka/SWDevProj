@@ -66,7 +66,7 @@ public:
     }
 
     /**
-          * Add key to the array
+          * Add key to the array. Key is cloned.
           */
     void addKey(Key *k)
     {

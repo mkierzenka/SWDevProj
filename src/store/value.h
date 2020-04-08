@@ -61,7 +61,10 @@ public:
         }
         capacity_ = s->readSizeT();
         val_ = new char[capacity_];
-        memcpy(val_, s->readCharPtr(capacity_), capacity_);
+        char* newVal = s->readCharPtr(capacity_);
+        //memcpy(val_, s->readCharPtr(capacity_), capacity_);
+        memcpy(val_, newVal, capacity_);
+        delete[] newVal;
     }
 
 

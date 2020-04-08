@@ -41,7 +41,7 @@ public:
 
 	~Serializer()
 	{
-		//delete[] buffer_;
+		delete[] buffer_;
 	}
 
 	void write(double d)
@@ -162,7 +162,7 @@ public:
 	}
 
 	/**
-	 * Read character pointer, using given size instead of strlen
+	 * Read character pointer, using given size instead of strlen. Caller owns this char*
 	 */
 	char *readCharPtr(size_t capacity)
 	{

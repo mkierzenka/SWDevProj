@@ -32,7 +32,7 @@ DataFrame* KVStore::get(Key *k)
 		return nullptr;
 	}
     Serializer* s = new Serializer(val->getSize(), val->getData());
-    DataFrame* d = new DataFrame(k, this);
+    DataFrame* d = new DataFrame(k->clone(), this);
     d->deserialize(s);
     delete s;
     return d;	
