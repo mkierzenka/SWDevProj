@@ -7,6 +7,7 @@
 #include "../src/dataframe/findrower.h"
 #include "../src/dataframe/lengthrower.h"
 #include "../src/store/key.h"
+#include "../src/store/value.h"
 #include "../src/serial/serial.h"
 #include "../src/utils/object.h"
 #include "../src/utils/string.h"
@@ -283,6 +284,76 @@ void dataFrameFromWriter() {
   SYSTEM->pln("Data frame from writer test passed!");
 }
 
+void keyTest() {
+	SYSTEM->pln("Key test started...");
+	Key* k1 = new Key("ABC", 0);
+	String* abc = new String("ABC");
+	Key* k2 = new Key("4-7", 12);
+	String* s = new String("KeyStr");
+	Key* k3 = new Key(s, 1);
+	Key* k3_2 = k3->addIndex(2);
+	Key* k3c = k3->clone();
+	Key* k3cc = new Key(s, 1);
+
+	assert(k1->getKeyStr()->equals(abc));
+	assert(k1->getNode() == 0);
+	assert(k3->getKeyStr()->equals(s));
+	assert(k2->getNode() == 12);
+	assert(k3->equals(k3));
+	assert(k3c->getKeyStr()->equals(k3->getKeyStr()));
+	assert(k3c->getNode() == k3->getNode());
+	assert(k3c->equals(k3));
+	assert(k3cc->equals(k3));
+	String* expected = new String("KeyStr-2");
+	assert(k3_2->getKeyStr()->equals(expected));
+
+	delete expected;
+	delete k3cc;
+	delete k3c;
+	delete k3_2;
+	delete k3;
+	delete s;
+	delete k2;
+	delete abc;
+	delete k1;
+	SYSTEM->pln("Key test passed!");
+}
+
+void valueTest() {
+	SYSTEM->pln("Value test started...");
+	const char* v1_str = "Value1";
+	Value* v1 = new Value(v1_str, strlen(v1_str));
+	assert(memcmp(v1->getData(), v1_str, strlen(v1_str)) == 0);
+	assert(v1->getSize() == strlen(v1_str));
+	assert(v1->equals(v1));
+	char* tricky = new char[6];
+	tricky[0] = 'a';
+	tricky[1] = 'b';
+	tricky[2] = 'c';
+	tricky[3] = '\0';
+	tricky[4] = 'D';
+	tricky[5] = '\0';
+	Value* v2 = new Value(tricky, 6);
+	assert(memcmp(v1->getData(), v1_str, 6) == 0);
+	assert(v1->getSize() == 6);
+	assert(!v1->equals(v2));
+
+	char* v1_str_fake = new char[8];
+	strcpy(v1_str_fake, v1_str);
+	v1_str_fake[6] = '\0';
+	v1_str_fake[7] = 'M';
+	Value* v1_fake = new Value(v1_str_fake, 8);
+	assert(!v1->equals(v1_fake));
+	assert(!v1_fake->equals(v1));
+
+	delete v1_fake;
+	delete[] v1_str_fake;
+	delete v2;
+	delete[] tricky;
+	delete v1;
+	SYSTEM->pln("Value test passed!");
+}
+
 int main()
 {
   columnTests();
@@ -293,5 +364,7 @@ int main()
   dataFrameTest();
   //lengthRowerTest();
   dataFrameFromWriter();
+  keyTest();
+  valueTest();
   return 0;
 }
