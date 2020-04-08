@@ -5,14 +5,14 @@
 
 /** This class represents the serialized data that's stored in our key-value store. 
  * It can be used to store either a dataframe or a chunk of data. Values are immutable,
- * once they are set
+ * once they are set.
  * 
  * Authors: Marcin Kierzenka and Chase Broder */
 class Value : public Object
 {
 public:
-    char *val_;       //serialized data stored in character pointer buffer
-    size_t capacity_; //max size of data, in bytes
+    char *val_;        //owned, serialized data stored in char pointer buffer
+    size_t capacity_;  //max size of data, in bytes
 
     Value() {
         capacity_ = 2;
@@ -20,6 +20,10 @@ public:
         memset(val_, 0, capacity_);
     }
     
+    /**
+     * Creates a new Value from the first cap bytes of a given array of chars.
+     * Copies memory, caller is responsible for deleting data.
+     */
     Value(const char *data, size_t cap)
     {
         capacity_ = cap;
@@ -32,13 +36,13 @@ public:
         delete[] val_;
     }
 
-    /** Returns serialized data */
+    /** Returns a pointer to the data stored in this Value (no clone) */
     char *getData()
     {
         return val_;
     }
 
-    /**Return size of the data */
+    /**Return size of the data stored in this Value */
     size_t getSize()
     {
         return capacity_;
