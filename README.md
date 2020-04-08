@@ -3,12 +3,16 @@
 
 ### Memory/Ownership Notes
 * Array, Map, Queue all steal ownership of what's passed into them
-* Test files without memory leaks: array, queue, map, message, cache, block, serial, general
+* Test files without memory leaks: array, queue, map, message, cache, blocks, serial, general
 * Tests with memory leaks/unchecked
   * Distributed array (test not developed)
+  * Schema
+  * Column
+  * Network
   * Trivial
   * Demo
   * Sorer (test not working yet)
+
 
 
 ### ReceiverThread Info
@@ -51,7 +55,7 @@ It sends the responses if available
 
 * Methods w/o an implementation: add assert(false) and comment
 
-* Unit test KVStore
+* Add unit tests: KVStore, column array, distributed array
 
 * doc.md: create diagram for architecture section
 

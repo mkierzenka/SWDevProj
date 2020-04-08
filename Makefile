@@ -25,9 +25,8 @@ ourTests:
 	#./tests/testSorer data/datafile.sor
 	
 memory:
-	#valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testTrivial
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testTrivial
 	#valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testDemo
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testGeneral
 
 buildTrivial:
 	g++ --std=c++11 -g -pthread tests/trivialTest.cpp -o tests/testTrivial
