@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "../dataframe/dataframe.h"
 #include "../network/message.h"
 
 DataFrame* KVStore::waitAndGet(Key *k)
