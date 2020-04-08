@@ -22,12 +22,15 @@ int main()
   size_t numNodes = 1;
   NodeThread **nodes = new NodeThread *[numNodes];
   MsgQueueArr *sharedMQA = new MsgQueueArr(numNodes);
+
+  //Create list of demos so we can delete them once they're done
+  Trivial** demos = new Trivial*[numNodes];
   for (size_t i = 0; i < numNodes; i++)
   {
     //here, you decide whether you want your nodes to have a real or fake network
-    Trivial *t = new Trivial(i, new Network(generateIp_(i), i));
+    demos[i] = new Trivial(i, new Network(generateIp_(i), i));
     //Trivial* t = new Trivial(i, new PseudoNetwork(sharedMQA, i));
-    nodes[i] = new NodeThread(t);
+    nodes[i] = new NodeThread(demos[i]);
     nodes[i]->start();
   }
 
@@ -36,8 +39,11 @@ int main()
     nodes[j]->join();
     printf("Thread %zu ended\n", j);
     delete nodes[j];
+    delete demos[j];
   }
 
   delete[] nodes;
+  delete[] demos;
+
   exit(0);
 }

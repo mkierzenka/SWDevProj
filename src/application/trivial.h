@@ -23,15 +23,16 @@ class Trivial : public Application {
   {
     pln("Trivial Test Started");
     trial1();
-    trial2();
-    trial3();
-    trial4();
+    //trial2();
+    //trial3();
+    //trial4();
     pln("Trivial Test Passed!");
   }
 
   void trial1()
   {
-    size_t SZ = 1000 * 1000;
+    //size_t SZ = 1000 * 1000;
+    size_t SZ = 10;
     double *vals = new double[SZ];
     double sum = 0;
     for (size_t i = 0; i < SZ; ++i)
