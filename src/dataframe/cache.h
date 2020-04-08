@@ -77,7 +77,7 @@ public:
     {
         if (isFull_())
         {
-            removeFirstAddedElement_();
+            delete removeFirstAddedElement_();
         }
 
         data_->put(k, val); //used to clone
