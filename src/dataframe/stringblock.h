@@ -13,9 +13,7 @@
 class StringBlock : public Block
 {
 public:
-	String** vals_; //list of String*, owned
-	size_t size_;
-	size_t capacity_;
+	String** vals_; //owned, list of String*
 
 	StringBlock()
 	{
@@ -58,7 +56,7 @@ public:
 		}
 	}
 
-	/** Get a clone of the String with the index in the block */
+	/** Get a pointer to the String with the index in the block. Does not clone! */
 	String* get(size_t index)
 	{
 		// check for out-of-bounds
@@ -67,7 +65,7 @@ public:
 			fprintf(stderr, "Out-Of-Bounds Error: cannot get value from index %zu", index);
 			exit(1);
 		}
-		return vals_[index]->clone();
+		return vals_[index];
 	}
 
 	/** Adds the String to end of this block, does not clone. Now owns.
@@ -83,8 +81,11 @@ public:
 		size_++;
 	}
 
-	/** Set the element in the given index to a clone of the given String */
-	void set(size_t index, String* s)
+	/**
+	 * Set the element in the given index to the given String pointer.
+	 * Now owns, returns the old value which the caller is responsible for deleting.
+	 */
+	String* set(size_t index, String* s)
 	{
 		// check for out-of-bounds
 		if (index >= size_)
@@ -92,8 +93,9 @@ public:
 			printf("Out-Of-Bounds Error: cannot set value at index %zu", index);
 			exit(1);
 		}
-		
-		vals_[index] = s->clone();
+		String* out = vals_[index];
+		vals_[index] = s;
+		return out;
 	}
 
 	/** Check if two blocks equal */

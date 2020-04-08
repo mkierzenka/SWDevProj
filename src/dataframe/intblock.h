@@ -69,8 +69,8 @@ public:
 		size_++;
 	}
 
-	/** Sets the element at the given index */
-	void set(size_t index, int v)
+	/** Sets the element at the given index. Returns the previous value */
+	int set(size_t index, int v)
 	{
 		// check for out-of-bounds
 		if (index >= size_)
@@ -78,8 +78,9 @@ public:
 			printf("Out-Of-Bounds Error: cannot set value at index %zu", index);
 			exit(1);
 		}
-		
+		int oldVal = vals_[index];
 		vals_[index] = v;
+		return oldVal;
 	}
 
 	/** Check if two blocks equal */

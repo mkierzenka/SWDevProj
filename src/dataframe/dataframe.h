@@ -285,7 +285,7 @@ public:
 
   String *get_string(size_t col, size_t row)
   {
-    return columns_->get_string(col, row);
+    return columns_->get_string(col, row)->clone();
   }
 
   /** Add a row at the end of this dataframe. The row is expected to have

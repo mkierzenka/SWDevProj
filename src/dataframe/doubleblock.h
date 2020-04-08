@@ -70,8 +70,8 @@ public:
 		size_++;
 	}
 
-	/** Set the double at the given index */
-	void set(size_t index, double s)
+	/** Set the double at the given index. Returns the old value at that index */
+	double set(size_t index, double s)
 	{
 		// check for out-of-bounds
 		if (index >= size_)
@@ -79,8 +79,9 @@ public:
 			printf("Out-Of-Bounds Error: cannot set value at index %zu", index);
 			exit(1);
 		}
-		
+		double oldVal = vals_[index];
 		vals_[index] = s;
+		return oldVal;
 	}
 
 	/** Check if two blocks equal */
