@@ -66,6 +66,7 @@ public:
         delete s;
         delete dir;
         delete ipAddress_;
+        close(fd); //close socket
     }
 
     void server_init() {
