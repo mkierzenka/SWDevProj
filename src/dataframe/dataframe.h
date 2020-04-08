@@ -45,16 +45,17 @@ public:
    * Create a data frame from a schema description and columns and a store.
    * All columns are created empty.
    */
-  DataFrame(const char* scm, Key *k, KVStore *kv)
+  DataFrame(const char *scm, Key *k, KVStore *kv)
   {
     schema_ = new Schema(scm);
     store_ = kv;
     size_t numCols = schema_->width();
     key_ = k;
     columns_ = new ColumnArray(store_, key_);
-	for(size_t i = 0; i < numCols; i++) {
-		columns_->add_column(new Column(store_, key_, scm[i]));
-	}
+    for (size_t i = 0; i < numCols; i++)
+    {
+      columns_->add_column(new Column(store_, key_, scm[i]));
+    }
   }
 
   /** Create a data frame with the same columns as the give df but no rows */
@@ -80,17 +81,17 @@ public:
     delete key_;
   }
 
-
- /**
+  /**
   * Creates a new DataFrame with given schema (scm) from the Writer.
   * Returns the df result, caller is responsible for deleting it.
   */
- static DataFrame *fromVisitor(Key *k, KVStore *kv, const char* scm, Writer* r) {
-   DataFrame *df = new DataFrame(scm, k->clone(), kv);
-   df->visit(r);
-   addDFToStore_(df, kv, k);
-   return df;
- }
+  static DataFrame *fromVisitor(Key *k, KVStore *kv, const char *scm, Writer *r)
+  {
+    DataFrame *df = new DataFrame(scm, k->clone(), kv);
+    df->visit(r);
+    addDFToStore_(df, kv, k);
+    return df;
+  }
 
   /** Converts an array into a dataframe object.
    *  Returns the df result, caller is responsible for deleting it.
@@ -137,11 +138,11 @@ public:
   /** Adds a double to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
-  static DataFrame* fromScalar(Key* k, KVStore* kv, double elem)
+  static DataFrame *fromScalar(Key *k, KVStore *kv, double elem)
   {
-    double* elements = new double[1];
+    double *elements = new double[1];
     elements[0] = elem;
-    DataFrame* df = fromArray(k, kv, 1, elements);
+    DataFrame *df = fromArray(k, kv, 1, elements);
     delete[] elements;
     return df;
   }
@@ -149,11 +150,11 @@ public:
   /** Adds a String (cloned) to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
-  static DataFrame* fromScalar(Key* k, KVStore* kv, String* elem)
+  static DataFrame *fromScalar(Key *k, KVStore *kv, String *elem)
   {
-    String** elements = new String*[1];
+    String **elements = new String *[1];
     elements[0] = elem->clone();
-    DataFrame* df = fromArray(k, kv, 1, elements);
+    DataFrame *df = fromArray(k, kv, 1, elements);
     delete elements[0];
     delete[] elements;
     return df;
@@ -162,11 +163,11 @@ public:
   /** Adds an int to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
-  static DataFrame* fromScalar(Key* k, KVStore* kv, int elem)
+  static DataFrame *fromScalar(Key *k, KVStore *kv, int elem)
   {
-    int* elements = new int[1];
+    int *elements = new int[1];
     elements[0] = elem;
-    DataFrame* df = fromArray(k, kv, 1, elements);
+    DataFrame *df = fromArray(k, kv, 1, elements);
     delete[] elements;
     return df;
   }
@@ -174,11 +175,11 @@ public:
   /** Adds a bool to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
-  static DataFrame* fromScalar(Key* k, KVStore* kv, bool elem)
+  static DataFrame *fromScalar(Key *k, KVStore *kv, bool elem)
   {
-    bool* elements = new bool[1];
+    bool *elements = new bool[1];
     elements[0] = elem;
-    DataFrame* df = fromArray(k, kv, 1, elements);
+    DataFrame *df = fromArray(k, kv, 1, elements);
     delete[] elements;
     return df;
   }
@@ -317,79 +318,40 @@ public:
     return schema_->width();
   }
 
-  void helper_(Array* rowChunk, size_t numRowsInChunk) {
-	  for (size_t i = 0; i < schema_->width(); i++) {
-		  char colType = schema_->col_type(i);
-		  switch (colType) {
-			  case 'I': {
-				  int* ints = new int[numRowsInChunk];
-				  for (size_t j = 0; j < numRowsInChunk; j++) {
-					ints[j] = (dynamic_cast<Row*>(rowChunk->get(j)))->get_int(i);
-				  }
-				  columns_->get(i)->add_all(numRowsInChunk, ints);
-				  break;
-			  }
-			  case 'B': {
-				  bool* bools = new bool[numRowsInChunk];
-				  for (size_t j = 0; j < numRowsInChunk; j++) {
-					bools[j] = (dynamic_cast<Row*>(rowChunk->get(j)))->get_bool(i);
-				  }
-				  columns_->get(i)->add_all(numRowsInChunk, bools);
-				  break;
-			  }
-			  case 'S': {
-				  String** strs = new String*[numRowsInChunk];
-				  for (size_t j = 0; j < numRowsInChunk; j++) {
-					strs[j] = (dynamic_cast<Row*>(rowChunk->get(j)))->get_string(i)->clone();
-				  }
-				  columns_->get(i)->add_all(numRowsInChunk, strs);
-				  break;
-			  }
-			  case 'D': {
-				  double* dbls = new double[numRowsInChunk];
-				  for (size_t j = 0; j < numRowsInChunk; j++) {
-					dbls[j] = (dynamic_cast<Row*>(rowChunk->get(j)))->get_double(i);
-				  }
-				  columns_->get(i)->add_all(numRowsInChunk, dbls);
-				  break;
-			  }
-			  default: {
-				  fprintf(stderr, "Error in helper_\n");
-				  exit(1);
-			  }
-		  }
-	  }
-	  schema_->add_rows(numRowsInChunk);
-  }
 
   /** Add rows to this DataFrame built by Writer. Until wr->done() */
-  void visit(Writer* wr)
+  void visit(Writer *wr)
   {
     size_t block_size = 1024; // Should match BLOCK_SIZE in block.h
-	Array* rowChunk = new Array(block_size);
-	for (size_t i = 0; i < block_size; i++) {
-		rowChunk->add(new Row(*schema_));
-	}
-
-	size_t idxInCurBlock = 0;
-    size_t rowIdx = 0;
-    while(!wr->done()) {
-	  if (idxInCurBlock == block_size) {
-		helper_(rowChunk, idxInCurBlock);
-		for (size_t i = 0; i < block_size; i++) {
-			(dynamic_cast<Row*>(rowChunk->get(i)))->clear();
-		}
-		idxInCurBlock = 0;
-	  }
-      (dynamic_cast<Row*>(rowChunk->get(idxInCurBlock)))->set_idx(rowIdx);
-	  wr->visit(*(dynamic_cast<Row*>(rowChunk->get(idxInCurBlock))));
-	  rowIdx++;
-	  idxInCurBlock++;
+    Array *rowChunk = new Array(block_size);
+    for (size_t i = 0; i < block_size; i++)
+    {
+      rowChunk->add(new Row(*schema_));
     }
-	if (idxInCurBlock > 0) {
-		helper_(rowChunk, idxInCurBlock);
-	}
-	delete rowChunk;
+
+    size_t idxInCurBlock = 0;
+    size_t rowIdx = 0;
+    while (!wr->done())
+    {
+      if (idxInCurBlock == block_size)
+      {
+        addRowChunk_(rowChunk, idxInCurBlock);
+        for (size_t i = 0; i < block_size; i++)
+        {
+          (dynamic_cast<Row *>(rowChunk->get(i)))->clear();
+        }
+        idxInCurBlock = 0;
+      }
+      (dynamic_cast<Row *>(rowChunk->get(idxInCurBlock)))->set_idx(rowIdx);
+      wr->visit(*(dynamic_cast<Row *>(rowChunk->get(idxInCurBlock))));
+      rowIdx++;
+      idxInCurBlock++;
+    }
+    if (idxInCurBlock > 0)
+    {
+      addRowChunk_(rowChunk, idxInCurBlock);
+    }
+    delete rowChunk;
   }
 
   /** Visit rows in order */
@@ -617,4 +579,74 @@ public:
       fprintf(stderr, "Invalid col type: %c", colType);
     }
   }
+
+  /**
+   * Appends a set of rows to this DataFrame, in order. Does it by making temporary arrays
+   *   and adding them to specific columns in one shot. The length of rowChunk nor numRowsInChunk
+   *   should not exceed the BLOCK_SIZE defined in block.h
+   * 
+   * Approach: For each column in the schema, get the type and make a temporary (c-style) array of those values
+   *            Iterate through each of the rows in the array, pulling a copy of the value into the c-style arr
+   *            Add them in one shot directly into the necessary column using add_all
+   * 
+   * rowChunk - an Array of Row* that should be used to add data to this DataFrame
+   * numRowsInChunk - how many rows to take from this chunk (array may contain more)
+   */
+  void addRowChunk_(Array *rowChunk, size_t numRowsInChunk)
+  {
+    for (size_t i = 0; i < schema_->width(); i++)
+    {
+      char colType = schema_->col_type(i);
+      switch (colType)
+      {
+      case 'I':
+      {
+        int *ints = new int[numRowsInChunk];
+        for (size_t j = 0; j < numRowsInChunk; j++)
+        {
+          ints[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_int(i);
+        }
+        columns_->get(i)->add_all(numRowsInChunk, ints);
+        break;
+      }
+      case 'B':
+      {
+        bool *bools = new bool[numRowsInChunk];
+        for (size_t j = 0; j < numRowsInChunk; j++)
+        {
+          bools[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_bool(i);
+        }
+        columns_->get(i)->add_all(numRowsInChunk, bools);
+        break;
+      }
+      case 'S':
+      {
+        String **strs = new String *[numRowsInChunk];
+        for (size_t j = 0; j < numRowsInChunk; j++)
+        {
+          strs[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_string(i)->clone();
+        }
+        columns_->get(i)->add_all(numRowsInChunk, strs);
+        break;
+      }
+      case 'D':
+      {
+        double *dbls = new double[numRowsInChunk];
+        for (size_t j = 0; j < numRowsInChunk; j++)
+        {
+          dbls[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_double(i);
+        }
+        columns_->get(i)->add_all(numRowsInChunk, dbls);
+        break;
+      }
+      default:
+      {
+        fprintf(stderr, "Bad schema column type (%c) in addRowChunk_\n", colType);
+        exit(1);
+      }
+      }
+    }
+    schema_->add_rows(numRowsInChunk);
+  }
+
 };
