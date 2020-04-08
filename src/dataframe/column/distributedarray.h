@@ -5,14 +5,14 @@
 #include "cache.h"
 #include "keyarr.h"
 
-#include "../store/key.h"
-#include "../store/kvstore.h"
-#include "../utils/object.h"
-#include "../serial/serial.h"
-#include "intblock.h"
-#include "boolblock.h"
-#include "stringblock.h"
-#include "doubleblock.h"
+#include "../../store/key.h"
+#include "../../store/kvstore.h"
+#include "../../utils/object.h"
+#include "../../serial/serial.h"
+#include "../block/intblock.h"
+#include "../block/boolblock.h"
+#include "../block/stringblock.h"
+#include "../block/doubleblock.h"
 
 /**
  * This class represents a distributed array. It holds a list of keys

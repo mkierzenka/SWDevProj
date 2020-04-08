@@ -7,13 +7,14 @@
 #include "../src/store/value.h"
 #include "../src/store/kvstore.h"
 #include "../src/utils/string.h"
-#include "../src/dataframe/boolblock.h"
-#include "../src/dataframe/doubleblock.h"
-#include "../src/dataframe/intblock.h"
-#include "../src/dataframe/distributedarray.h"
-#include "../src/dataframe/columnarray.h"
+#include "../src/dataframe/block/boolblock.h"
+#include "../src/dataframe/block/doubleblock.h"
+#include "../src/dataframe/block/stringblock.h"
+#include "../src/dataframe/block/intblock.h"
+#include "../src/dataframe/column/distributedarray.h"
+#include "../src/dataframe/column/columnarray.h"
 #include "../src/dataframe/schema.h"
-#include "../src/dataframe/column.h"
+#include "../src/dataframe/column/column.h"
 
 void serializeKeyTest()
 {
@@ -35,6 +36,32 @@ void serializeKeyTest()
     delete k;
     delete s;
     delete newK;
+}
+
+void serializeStringBlockTest()
+{
+    printf("Serialize String block test started\n");
+
+    StringBlock* b = new StringBlock();
+    b->add(new String("ABC"));
+    b->add(new String("DDDD$"));
+    b->add(new String("fdsafdsaf"));
+    b->add(new String("2122222"));
+    b->add(new String("apple"));
+
+    Serializer* s = new Serializer();
+    b->serialize(s);
+
+    StringBlock* newB = new StringBlock();
+    newB->deserialize(s);
+
+    assert(b->equals(newB));
+
+    printf("Serialize String block test passed!\n");
+
+    delete b;
+    delete s;
+    delete newB;
 }
 
 void serializeBoolBlockTest()
@@ -83,6 +110,30 @@ void serializeDoubleBlockTest()
     delete b;
     delete s;
     delete newB;
+}
+
+void serializeIntBlockTest()
+{
+    printf("Serialize int block test started\n");
+
+    IntBlock* ib = new IntBlock();
+    ib->add(0);
+    ib->add(3);
+    ib->add(5792);
+
+    Serializer* s = new Serializer();
+    ib->serialize(s);
+
+    IntBlock* newIB = new IntBlock();
+    newIB->deserialize(s);
+
+    assert(ib->equals(newIB));
+
+    printf("Serialize int block test passed!\n");
+
+    delete ib;
+    delete s;
+    delete newIB;
 }
 
 void serializeSchemaTest()
@@ -212,6 +263,8 @@ int main()
     serializeKeyTest();
     serializeBoolBlockTest();
     serializeDoubleBlockTest();
+    serializeStringBlockTest();
+    serializeIntBlockTest();
     serializeSchemaTest();
     serializeColumnTest();
 	serializeDistArrTest();

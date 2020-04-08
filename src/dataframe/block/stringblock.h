@@ -1,8 +1,8 @@
 #pragma once
 
 #include "block.h"
-#include "../utils/string.h"
-#include "../serial/serial.h"
+#include "../../utils/string.h"
+#include "../../serial/serial.h"
 
 
 

@@ -1,31 +1,32 @@
 #pragma once
 
 #include "block.h"
-#include "../serial/serial.h"
+#include "../../serial/serial.h"
+
 
 /**
-* IntBlock - to represent a block of integers.
+* BoolBlock - to represent a block of booleans.
 *
 */
-class IntBlock : public Block
+class BoolBlock : public Block
 {
 public:
-	int* vals_; //list of ints, owned
+	bool* vals_; //list of bools, owned
 
-	IntBlock()
+	BoolBlock()
 	{
 		capacity_ = BLOCK_SIZE;
 		size_ = 0;
-		vals_ = new int[capacity_];
-		memset(vals_, 0, capacity_ * sizeof(int));
+		vals_ = new bool[capacity_];
+		memset(vals_, 0, capacity_ * sizeof(bool));
 	}
 
-	~IntBlock()
+	~BoolBlock()
 	{
 		delete[] vals_;
 	}
 	
-	/** Serialize this block of integers into s */
+	/** Serialize this block of booleans into s */
 	void serialize(Serializer* s) {
 		s->write(capacity_);
 		s->write(size_);
@@ -34,20 +35,20 @@ public:
 		}
 	}
 	
-	/** Deserialize a block of strings into this block (mutate) */
+	/** Deserialize a block of booleans into this block (mutate) */
 	void deserialize(Serializer* s) {
 		delete[] vals_;
 		capacity_ = s->readSizeT();
-		vals_ = new int[capacity_];
-		memset(vals_, 0, capacity_ * sizeof(int));
+		vals_ = new bool[capacity_];
+		memset(vals_, 0, capacity_ * sizeof(bool));
 		size_ = s->readSizeT();
 		for (size_t i = 0; i < size_; i++) {
-			vals_[i] = s->readInt();
+			vals_[i] = s->readBool();
 		}
 	}
 
-	/** Gets the int at the specified index of the array */
-	int get(size_t index)
+	/** Get the boolean at the specified index of the array */
+	bool get(size_t index)
 	{
 		// check for out-of-bounds
 		if (index >= size_)
@@ -58,8 +59,8 @@ public:
 		return vals_[index];
 	}
 
-	/** Adds the int to end of this block. If can't fit, return -1 */
-	int add(int n)
+	/** Add a boolean to end of this block. If can't fit, return -1 */
+	int add(bool n)
 	{
 		if (size_ >= capacity_)
 		{
@@ -69,8 +70,8 @@ public:
 		size_++;
 	}
 
-	/** Sets the element at the given index. Returns the previous value */
-	int set(size_t index, int v)
+	/** set the element in the given index to the given bool. Returns the previous value */
+	bool set(size_t index, bool v)
 	{
 		// check for out-of-bounds
 		if (index >= size_)
@@ -78,7 +79,7 @@ public:
 			printf("Out-Of-Bounds Error: cannot set value at index %zu", index);
 			exit(1);
 		}
-		int oldVal = vals_[index];
+		bool oldVal = vals_[index];
 		vals_[index] = v;
 		return oldVal;
 	}
@@ -91,7 +92,7 @@ public:
 			return true;
 		}
 
-		IntBlock* b = dynamic_cast<IntBlock*>(other);
+		BoolBlock* b = dynamic_cast<BoolBlock*>(other);
 		
 		if (b == nullptr || size_ != b->size_ || capacity_ != b->capacity_)
 		{
@@ -118,21 +119,24 @@ public:
 
 		for (size_t i = 0; i < size_; i++)
 		{
-			hash_ += vals_[i];
+			if (vals_[i])
+			{
+				hash_ += 1;
+			}
 		}
 
 		return hash_;
 	}
 	
-	/** Clears the memory in this IntBlock */
+	/** Clears the memory in this BoolBlock */
 	void clear() {
-		memset(vals_, 0, capacity_ * sizeof(int));
+		memset(vals_, 0, capacity_ * sizeof(bool));
 		size_ = 0;
 	}
 	
-	/** Returns a new IntBlock with duplicate elements */
-	IntBlock* clone() {
-		IntBlock* out = new IntBlock();
+	/** Returns a new BoolBlock with duplicate elements */
+	BoolBlock* clone() {
+		BoolBlock* out = new BoolBlock();
 		for (size_t i = 0; i < size_; i++) {
 			out->add(get(i));
 		}

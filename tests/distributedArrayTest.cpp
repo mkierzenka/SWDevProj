@@ -1,6 +1,6 @@
 //lang:cpp
 
-#include "../src/dataframe/distributedarray.h"
+#include "../src/dataframe/column/distributedarray.h"
 #include "../src/store/kvstore.h"
 
 /**

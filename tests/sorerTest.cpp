@@ -12,8 +12,8 @@
 #include <sys/mman.h>
 
 #include "../src/sorer/sorer.h"
-#include "../src/dataframe/lengthrower.h"
-#include "../src/dataframe/column.h"
+#include "../src/dataframe/row/lengthrower.h"
+#include "../src/dataframe/column/column.h"
 
 
 const char *USAGE = "Usage: ./sorer [-f] [-from] [-len] [-print_col_type] " \

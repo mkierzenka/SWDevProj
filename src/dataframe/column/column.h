@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../utils/object.h"
-#include "../utils/string.h"
-#include "../store/kvstore.h"
+#include "../../utils/object.h"
+#include "../../utils/string.h"
+#include "../../store/kvstore.h"
 
 #include "distributedarray.h"
-#include "block.h"
-#include "intblock.h"
-#include "boolblock.h"
-#include "stringblock.h"
-#include "doubleblock.h"
+#include "../block/block.h"
+#include "../block/intblock.h"
+#include "../block/boolblock.h"
+#include "../block/stringblock.h"
+#include "../block/doubleblock.h"
 
 #include <stddef.h>
 #include <math.h>

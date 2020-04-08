@@ -9,10 +9,10 @@
 #include "../store/key.h"
 #include "../serial/serial.h"
 #include "../filereader/writer.h"
-#include "columnarray.h"
+#include "column/columnarray.h"
 #include "schema.h"
-#include "rower.h"
-#include "row.h"
+#include "row/rower.h"
+#include "row/row.h"
 
 /****************************************************************************
  * DataFrame::

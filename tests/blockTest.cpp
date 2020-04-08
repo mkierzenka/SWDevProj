@@ -1,10 +1,10 @@
 #include "../src/store/key.h"
 #include "../src/store/value.h"
-#include "../src/dataframe/block.h"
-#include "../src/dataframe/intblock.h"
-#include "../src/dataframe/doubleblock.h"
-#include "../src/dataframe/boolblock.h"
-#include "../src/dataframe/stringblock.h"
+#include "../src/dataframe/block/block.h"
+#include "../src/dataframe/block/intblock.h"
+#include "../src/dataframe/block/doubleblock.h"
+#include "../src/dataframe/block/boolblock.h"
+#include "../src/dataframe/block/stringblock.h"
 
 #include <assert.h>
 
