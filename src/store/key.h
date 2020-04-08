@@ -13,15 +13,23 @@
 class Key : public Object
 {
 public:
-    String *kStr_;    //string that identifies data
-    size_t homeNode_; //where data lives
+    String *kStr_;      //owned, string that identifies data
+    size_t homeNode_;   //node number where data lives
 
+    /**
+     * Makes a new Key based on a char array and node number.
+     * Copies the memory internally, caller should delete keyStr;
+     */
     Key(const char* keyStr, size_t node)
     {
         kStr_ = new String(keyStr);
         homeNode_ = node;
     }
 
+    /**
+     * Makes a new Key based on a String and node number.
+     * Clones the String internally, caller should delete str;
+     */
     Key(String *str, size_t node)
     {
         kStr_ = str->clone();
@@ -85,11 +93,11 @@ public:
     {
         return kStr_->hash() + homeNode_;
     }
-	
-	/** Returns a new Key with cloned values */
-	Key* clone() {
-		return new Key(kStr_->clone(), homeNode_);
-	}
+
+    /** Returns a new Key with cloned values */
+    Key* clone() {
+        return new Key(kStr_, homeNode_); //kStr_ is cloned in constructor
+    }
 
     /** Add an index to the Key's string and return a new key */
     Key* addIndex(size_t idx)
@@ -101,8 +109,9 @@ public:
         sb->c("-");
         sb->c(idx);
         String* newStrRes = sb->get();
-
         delete sb;
-        return new Key(newStrRes, homeNode_);
+        Key* out = new Key(newStrRes, homeNode_);
+        delete newStrRes;
+        return out;
     }
 };
