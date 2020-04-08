@@ -43,8 +43,14 @@ testDemo:
 buildGeneral:
 	g++ --std=c++11 -g tests/blockTest.cpp -o tests/testGeneral
 
+buildColumnArray:
+	g++ --std=c++11 -g tests/columnArrayTest.cpp -o tests/testColumnArray
+
+testColumnArray:
+	./tests/testColumnArray
+
 .SILENT: clean
 clean:
 	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray \
 	tests/testQueue tests/testSerial tests/testTrivial tests/testCache tests/testDemo tests/testMessage \
-	tests/testBlock
+	tests/testBlock tests/testColumnArray
