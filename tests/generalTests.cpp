@@ -164,29 +164,43 @@ void dataFrameTest()
 {
   SYSTEM->pln("Data frame test started...");
 
-  KVStore kv(0, nullptr);
-  Key k("main", 0);
-  DataFrame df(&k, &kv);
-  assert(df.ncols() == 0);
-  assert(df.get_schema().width() == 0);
-  assert(df.nrows() == 0);
-  assert(df.get_schema().length() == 0);
+  //KVStore kv(0, nullptr);
+  //Key k("main", 0);
+  KVStore* kv = new KVStore(0, nullptr);
+  Key* k = new Key("main", 0);
+  //DataFrame df(&k, &kv);
+  DataFrame* df = new DataFrame(k, kv);
+  // assert(df.ncols() == 0);
+  // assert(df.get_schema().width() == 0);
+  // assert(df.nrows() == 0);
+  // assert(df.get_schema().length() == 0);
+  assert(df->ncols() == 0);
+  assert(df->get_schema().width() == 0);
+  assert(df->nrows() == 0);
+  assert(df->get_schema().length() == 0);
 
   String s1("abc");
   String s2("aaa");
   String s3("!@#");
   String* valsS[] = {&s1, &s2, &s3};
   
-  df.add_array(3, valsS);
+  //df.add_array(3, valsS);
+  df->add_array(3, valsS);
 
   //make sure both schema and dataframe got updated
-  assert(df.ncols() == 1);
-  assert(df.get_schema().width() == 1);
-  assert(df.nrows() == 3);
-  assert(df.get_schema().length() == 3);
+  // assert(df.ncols() == 1);
+  // assert(df.get_schema().width() == 1);
+  // assert(df.nrows() == 3);
+  // assert(df.get_schema().length() == 3);
+  assert(df->ncols() == 1);
+  assert(df->get_schema().width() == 1);
+  assert(df->nrows() == 3);
+  assert(df->get_schema().length() == 3);
 
-  assert(df.get_string(0, 0)->equals(valsS[0]));
-  assert(df.get_string(0, 1)->equals(valsS[1]));
+  assert(df->get_string(0, 0)->equals(valsS[0]));
+  assert(df->get_string(0, 1)->equals(valsS[1]));
+
+  delete kv;
   SYSTEM->pln("Data frame test passed!");
 }
 

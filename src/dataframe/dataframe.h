@@ -29,7 +29,7 @@ public:
   ColumnArray *columns_; //keeps track of columns in data frame
   KVStore *store_;
   Schema *schema_; //owned, schema of dataframe
-  Key *key_;       //key for this dataframe in the KV store
+  Key *key_;       //key for this dataframe in the KV store; owns the key passed in
 
   /** This constructor is for the purpose of adding arrays */
   DataFrame(Key *k, KVStore *kv)
@@ -77,6 +77,7 @@ public:
   {
     delete schema_;
     delete columns_;
+    delete key_;
   }
 
 
@@ -543,6 +544,7 @@ public:
     Value *v = new Value(s->getBuffer(), s->getNumBytesWritten());
     kv->put(k, v);
     delete s;
+    delete v;
     return df;
   }
 

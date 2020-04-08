@@ -37,10 +37,13 @@ class Trivial : public Application {
     for (size_t i = 0; i < SZ; ++i)
       sum += vals[i] = i;
     String* trivKey = new String("triv");
-    Key key(trivKey, 0);
-    DataFrame *df = DataFrame::fromArray(&key, kv_, SZ, vals);
+    //Key key(trivKey, 0);
+    Key* key = new Key(trivKey, 0);
+    // DataFrame *df = DataFrame::fromArray(&key, kv_, SZ, vals);
+    DataFrame *df = DataFrame::fromArray(key->clone(), kv_, SZ, vals);
     assert(df->get_double(0, 1) == 1);
-    DataFrame *df2 = kv_->get(&key);
+    //DataFrame *df2 = kv_->get(&key);
+    DataFrame *df2 = kv_->get(key);
     for (size_t i = 0; i < SZ; ++i)
       sum -= df2->get_double(0, i);
     fprintf(stdout, "Final double sum = %3.6lf\n", sum);
@@ -49,6 +52,7 @@ class Trivial : public Application {
     delete df2;
     delete[] vals;
     delete trivKey;
+    delete key;
   }
 
   void trial2()
