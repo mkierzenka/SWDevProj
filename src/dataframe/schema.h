@@ -14,7 +14,7 @@
 class Schema : public Object
 {
 public:
-	char *types_;
+	char *types_;      //owned
 	size_t numCols_;
 	size_t capCols_;
 	size_t numRows_;
@@ -184,7 +184,7 @@ public:
 				case 'I':
 					hash_ += 2;
 					break;
-				case 'F':
+				case 'D':
 					hash_ += 3;
 					break;
 				case 'S':
