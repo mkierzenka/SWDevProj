@@ -7,7 +7,8 @@
 
 /**
  * This class represents a fake network. It will be used to send messages between
- * "nodes" and will have a message queue for each node
+ * "nodes" and will have a message queue for each node. The MsgQueueArr object
+ * field should be the same for all threads on the same "pseudo-network".
  * 
  * authors: kierzenka.m@husky.neu.edu and broder.c@husky.neu.edu
  */
@@ -15,11 +16,12 @@
 class PseudoNetwork : public INetwork
 {
 public:
-    MsgQueueArr *mqa_; //holds message arrays for each node
+    MsgQueueArr *mqa_;   //Not Owned! Holds message arrays for each node
     size_t nodeId_;
 
    /**
-   * Pass in number of nodes
+   * Pass in number of nodes and a shared Message Queue Array.
+   * mqa is external, the caller is responsible for deleting it.
    */
     PseudoNetwork(MsgQueueArr* mqa, size_t ourNode) : INetwork()
     {
@@ -27,10 +29,7 @@ public:
         nodeId_ = ourNode;
     }
 
-    ~PseudoNetwork()
-    {
-        delete mqa_;
-    }
+    ~PseudoNetwork() {}
 
     void sendMsg(Message *m)
     {

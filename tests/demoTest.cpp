@@ -38,5 +38,6 @@ int main()
      }
 
     delete[] nodes;
+    delete sharedMQA;
     exit(0);
 }

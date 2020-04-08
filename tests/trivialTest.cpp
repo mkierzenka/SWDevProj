@@ -44,6 +44,7 @@ int main()
 
   delete[] nodes;
   delete[] demos;
+  delete sharedMQA;
 
   exit(0);
 }
