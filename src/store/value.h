@@ -14,16 +14,22 @@ public:
     char *val_;       //serialized data stored in character pointer buffer
     size_t capacity_; //max size of data, in bytes
 
+    Value() {
+        capacity_ = 2;
+        val_ = new char[capacity_];
+        memset(val_, 0, capacity_);
+    }
+    
     Value(const char *data, size_t cap)
     {
         capacity_ = cap;
-        val_ = (char*)malloc(cap);
+        val_ = new char[capacity_];
         memcpy(val_, data, capacity_);
     }
 
     ~Value()
     {
-        free(val_);
+        delete[] val_;
     }
 
     /** Returns serialized data */
@@ -46,12 +52,12 @@ public:
 
     /** Deserializes s into this Value */
     void deserialize(Serializer* s) {
-        if (val_ && val_ != nullptr) {
-            free(val_);
+        if (val_) {
+            delete[] val_;
         }
         capacity_ = s->readSizeT();
-        val_ = (char*)malloc(capacity_);
-        memcpy(val_, s->readString(), capacity_);
+        val_ = new char[capacity_];
+        memcpy(val_, s->readCharPtr(capacity_), capacity_);
     }
 
 

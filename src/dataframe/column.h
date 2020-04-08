@@ -48,6 +48,15 @@ public:
         type_ = t;
     }
 
+    /** Default constructor: start column to fit two elements. Steals key ownership */
+    Column(KVStore* store, Key* baseKey, const char colType) {
+        blocks_ = new DistributedArray(store);
+        store_ = store;
+        baseKey_ = baseKey;
+        size_ = 0;
+        type_ = getColType_(colType);
+    }
+
     // For deserializing, hopefully these values will be updated in a few calls
     Column() {
         blocks_ = new DistributedArray(nullptr);
@@ -260,7 +269,7 @@ public:
 
         Key* k = genKey_(chunk); //Key to look up data
 		double out = blocks_->getDouble(k, idxInChunk);
-		delete k;
+		//delete k;
 		return out;
      }
 	
@@ -276,7 +285,7 @@ public:
 
         Key* k = genKey_(chunk); //Key to look up data
 		bool out = blocks_->getBool(k, idxInChunk);
-        delete k;
+        //delete k;
 		return out;
      }
 	
@@ -292,7 +301,7 @@ public:
 
         Key* k = genKey_(chunk); //Key to look up data
         String* out = blocks_->getString(k, idxInChunk);
-        delete k;
+        //delete k;
 		return out;
     }
 	
@@ -310,7 +319,7 @@ public:
 
         Key* k = genKey_(chunk); //Key to look up data
         int out = blocks_->getInt(k, idxInChunk);
-        delete k;
+        //delete k;
 		return out;
     }
 
@@ -328,7 +337,7 @@ public:
         String* keyStr = buff->get();
         delete buff;
         Key* k = new Key(keyStr, baseKey_->getNode()); //clones String; figure out node value later
-        delete keyStr;
+        //delete keyStr;
         return k;
     }
 	

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../utils/object.h"
-#include "../network/client.h"
 #include "../network/inetwork.h"
 #include "../serial/serial.h"
 #include "../network/message.h"
@@ -22,18 +21,17 @@ class KVStore : public Object
 {
 public:
     MapStrObj *kvMap;              //holds all key-value pairings
-    //Client *client_;             //networking class used to talk to other stores
-    INetwork* client_;        //fake network for demo
+    INetwork* node_;        //fake network for demo
     size_t storeId;                //node id that this store belongs to
     Map* msgCache_;                //WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
     Lock msgCacheLock_;
 
 
-    KVStore(size_t id, INetwork* client)
+    KVStore(size_t id, INetwork* net)
     {
         kvMap = new MapStrObj();
         storeId = id;
-        client_ = client;
+        node_ = net;
         msgCache_ = new Map();
 		
     }
@@ -48,7 +46,9 @@ public:
     {
 		if (k->getNode() != storeId) {
 			PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
-			client_->sendMsg(msg);
+
+            //sendMsg should not take in fd: add map of node id to fd in network
+			node_->sendMsg(msg);
 			return;
 		}
 		
@@ -107,7 +107,7 @@ public:
 
     Value* getFromNetwork_(Key* k) {
         WaitAndGetMsg *dm = new WaitAndGetMsg(k, storeId, k->getNode());
-        client_->sendMsg(dm);
+        node_->sendMsg(dm);
         msgCacheLock_.lock();
 		while (!msgCache_->contains_key(k))
         {
@@ -134,7 +134,7 @@ public:
 			size_t sender = wagMsg->getSender();
 			Value* val = getValue(k); //should be local, we just added it in kv.put()
 			ReplyDataMsg *reply = new ReplyDataMsg(k, val, storeId, sender);
-			client_->sendMsg(reply);
+			node_->sendMsg(reply);
 			delete wagMsg;
 		}
 		msgCacheLock_.unlock();

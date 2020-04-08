@@ -262,6 +262,14 @@ class Map : public Object {
 		virtual size_t size() {
 			return size_;
 		}
+
+		/**
+		 * Return capacity of the map
+		 */
+		size_t capacity()
+		{
+			return capacity_;
+		}
 		
 		// A helper method to insert a <K, V> pair into a specific bucket
 		// Returns nullptr if there was no entry for that key previously, else
@@ -293,8 +301,10 @@ class Map : public Object {
 		}	
 		
 		/**
-		 * Adds a mapping from key to val to the map. A key must be unique, if there is already a key
+		 * Adds a mapping from key to val to the map. If there is already a key
 		 * of the same value in the map, the value will be overwritten by the new value.
+		 * Caller is responsible for deleting returned value.
+		 * If the key already exists in the map, caller responsible for deleting key.
 		 * 
 		 * NOTE: This function will mutate the Map
 		 * 
@@ -330,7 +340,7 @@ class Map : public Object {
 		}
 
 		 /**
-		 * Returns the object that the key maps to.
+		 * Returns the actual object that the key maps to.
 		 * 
 		 * @param key Object unique key
 		 * @return Object value for the key, a nullptr is returned if no value exists
@@ -348,6 +358,8 @@ class Map : public Object {
 		// A helper method for remove()
 		// Removes an object, equality based on key, from the specific bucket
 		// Returns nullptr if the key isn't found, returns the entry removed if it is
+		// Note, the entry returned is modified from what was stored:
+		//   - the next field will be set to nullptr
 		Entry* removeFromBucket_(size_t index, Object* key) {
 			Entry* bucket = this->buckets_[index];
 			if (!bucket) {
@@ -362,6 +374,7 @@ class Map : public Object {
 						// deleting curEntry, the first item of the bucket
 						this->buckets_[index] = curEntry->getNext();
 						this->size_--;
+						curEntry->setNext(nullptr);
 						return curEntry;
 					}
 					// deleting curEntry, an item in the middle of the bucket
@@ -379,6 +392,7 @@ class Map : public Object {
 
 		/**
 		 * Removes the key value mapping from the map.
+		 * Caller responsible for deleting returned value.
 		 * 
 		 * @param key Object key of mapping to remove
 		 * @return value that was removed, a nullptr is returned if no value exists
@@ -392,7 +406,10 @@ class Map : public Object {
 			
 			Entry* removedEntry = this->removeFromBucket_(index, key);
 			assert(removedEntry);
-			return removedEntry->getValue();
+			Object* val = removedEntry->getValue();
+			removedEntry->setValue(nullptr);
+			delete removedEntry;
+			return val;
 		}
 
 		// Returns true if the bucket of given index contains the key

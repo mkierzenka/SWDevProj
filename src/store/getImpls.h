@@ -22,7 +22,7 @@ DataFrame* KVStore::get(Key *k)
         val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
     } else {
         GetDataMsg* dm = new GetDataMsg(k, storeId, k->getNode());
-        client_->sendMsg(dm);
+        node_->sendMsg(dm);
 		if (msgCache_->contains_key(k)) {
 			ReplyDataMsg* dataMsg = dynamic_cast<ReplyDataMsg*>(msgCache_->remove(k));
             val = dataMsg->getValue();

@@ -7,6 +7,8 @@
 #include "stringarray.h"
 #include "../store/key.h"
 #include "../store/value.h"
+#include "../network/directory.h"
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -84,13 +86,21 @@ public:
 	Value *value_;
 	Key* key_;
 
-	ReplyDataMsg(Key* k, Value *v, size_t sender, size_t target) : Message(ReplyData, sender, target, 0)
-	{
-		value_ = v;
-		key_ = k;
+	ReplyDataMsg() : Message() {
+		key_ = new Key();
+		value_ = new Value();
 	}
 
-	~ReplyDataMsg() {}
+	ReplyDataMsg(Key* k, Value *v, size_t sender, size_t target) : Message(ReplyData, sender, target, 0)
+	{
+		value_ = v->clone();
+		key_ = k->clone();
+	}
+
+	~ReplyDataMsg() {
+		delete key_;
+		delete value_;
+	}
 
 	void serialize(Serializer *s)
 	{
@@ -102,7 +112,11 @@ public:
 	void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
+		delete key_;
+		key_ = new Key();
 		key_->deserialize(s);
+		delete value_;
+		value_ = new Value();
 		value_->deserialize(s);
 	}
 
@@ -115,6 +129,19 @@ public:
 	{
 		return key_;
 	}
+
+	/**
+	 * Check if this reply message equals the given one
+	 */
+	bool equals(ReplyDataMsg* other)
+	{
+		if (this == other)
+		{
+			return true;
+		}
+
+		return (value_->equals(other->getValue())) && (key_->equals(other->getKey()));
+	}
 };
 
 /**
@@ -126,12 +153,19 @@ class WaitAndGetMsg : public Message
 public:
 	Key *key_;
 
-	WaitAndGetMsg(Key *k, size_t sender, size_t target) : Message(WaitAndGet, sender, target, 0)
+	WaitAndGetMsg() : Message()
 	{
-		key_ = k;
+		key_ = new Key();
 	}
 
-	~WaitAndGetMsg() {}
+	WaitAndGetMsg(Key *k, size_t sender, size_t target) : Message(WaitAndGet, sender, target, 0)
+	{
+		key_ = k->clone();
+	}
+
+	~WaitAndGetMsg() {
+		delete key_;
+	}
 
 	void serialize(Serializer *s)
 	{
@@ -142,6 +176,8 @@ public:
 	void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
+		delete key_;
+		key_ = new Key();
 		key_->deserialize(s);
 	}
 
@@ -191,43 +227,58 @@ public:
 class DirectoryMsg : public Message
 {
 public:
-	size_t client_;
+	//size_t client_;
 	size_t port_;
-	StringArray *ipList_;
+	//StringArray *ipList_;
+	Directory* dir_; //keep track of clients
 
 	DirectoryMsg() : Message()
 	{
-		ipList_ = new StringArray();
+		//ipList_ = new StringArray();
+		dir_ = new Directory();
 	}
 
-	DirectoryMsg(size_t client, size_t port, size_t sender, size_t target, size_t id) : Message(Directory, sender, target, id)
+	DirectoryMsg(Directory* dir, size_t port, size_t sender, size_t target, size_t id) : Message(Dir, sender, target, id)
 	{
-		client_ = client;
+		//client_ = client;
+		dir_ = dir->clone();
 		port_ = port;
-		ipList_ = new StringArray();
+		//ipList_ = new StringArray();
 	}
 
-	~DirectoryMsg() {}
+	~DirectoryMsg() {
+		delete dir_;
+	}
 
 	virtual void serialize(Serializer *s)
 	{
 		Message::serialize(s);
-		ipList_->serialize(s);
-		s->write(client_);
+		//ipList_->serialize(s);
+		//s->write(client_);
+		dir_->serialize(s);
 		s->write(port_);
 	}
 
 	virtual void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
-		ipList_->deserialize(s);
-		client_ = s->readSizeT();
+		//ipList_->deserialize(s);
+		//client_ = s->readSizeT();
+		delete dir_;
+		dir_ = new Directory();
+		dir_->deserialize(s);
 		port_ = s->readSizeT();
 	}
 
-	void addIp(String *ip)
+	void addIp(size_t node, String *ip)
 	{
-		ipList_->add(ip);
+		//ipList_->add(ip);
+		dir_->addIp(node, ip);
+	}
+
+	Directory* getDirectory()
+	{
+		return dir_;
 	}
 };
 
@@ -235,43 +286,58 @@ public:
 class RegisterMsg : public Message
 {
 public:
-	struct sockaddr_in client_;
+	//struct sockaddr_in client_;
+	String* client_; //ip address of new client; owned
 	size_t port_;
 
 	RegisterMsg() : Message()
 	{
-		client_.sin_family = AF_INET;
-		inet_pton(AF_INET, "127.0.0.1", &client_.sin_addr);
-		client_.sin_port = htons(8080);
+		// client_.sin_family = AF_INET;
+		// inet_pton(AF_INET, "127.0.0.1", &client_.sin_addr);
+		// client_.sin_port = htons(8080);
 		port_ = 8080;
+		client_ = new String("127.0.0.1");
 	}
 
-	RegisterMsg(sockaddr_in client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
+	RegisterMsg(String* client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
 	{
-		client_ = client;
+		client_ = client->clone();
 		port_ = port;
 	}
 
 	~RegisterMsg()
 	{
+		delete client_;
 	}
 
 	virtual void serialize(Serializer *s)
 	{
 		Message::serialize(s);
-		s->write((short)client_.sin_family);
-		s->write((long)client_.sin_addr.s_addr);
-		s->write((short)client_.sin_port);
+		// s->write((short)client_.sin_family);
+		// s->write((long)client_.sin_addr.s_addr);
+		// s->write((short)client_.sin_port);
+		client_->serialize(s);
 		s->write(port_);
 	}
 
 	virtual void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
-		client_.sin_family = s->readShort();
-		client_.sin_addr.s_addr = s->readLong();
-		client_.sin_port = s->readShort();
+		delete client_;
+		client_ = new String("");
+		client_->deserialize(s);
+		// client_.sin_family = s->readShort();
+		// client_.sin_addr.s_addr = s->readLong();
+		// client_.sin_port = s->readShort();
 		port_ = s->readSizeT();
+	}
+
+	String* getClient() {
+		return client_;
+	}
+
+	size_t getPort() {
+		return port_;
 	}
 };
 
@@ -281,16 +347,24 @@ public:
 class PutMsg : public Message
 {
 public:
-	Key *key_;
-	Value *value_;
+	Key *key_;       // owned
+	Value *value_;   // owned
+
+	PutMsg() : Message() {
+		key_ = new Key();
+		value_ = new Value();
+	}
 
 	PutMsg(Key *k, Value *v, size_t sender, size_t target) : Message(Put, sender, target, 0)
 	{
-		key_ = k;
-		value_ = v;
+		key_ = k->clone();
+		value_ = v->clone();
 	}
 
-	~PutMsg() {}
+	~PutMsg() {
+		delete key_;
+		delete value_;
+	}
 
 	void serialize(Serializer *s)
 	{
@@ -302,7 +376,11 @@ public:
 	void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
+		delete key_;
+		key_ = new Key();
 		key_->deserialize(s);
+		delete value_;
+		value_ = new Value();
 		value_->deserialize(s);
 	}
 
@@ -325,12 +403,18 @@ class GetDataMsg : public Message
 public:
 	Key *key_;
 
+	GetDataMsg() : Message()
+	{
+		key_ = new Key();
+	}
 	GetDataMsg(Key *k, size_t sender, size_t target) : Message(GetData, sender, target, 0)
 	{
-		key_ = k;
+		key_ = k->clone();
 	}
 
-	~GetDataMsg() {}
+	~GetDataMsg() {
+		delete key_;
+	}
 
 	void serialize(Serializer *s)
 	{
@@ -341,6 +425,8 @@ public:
 	void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
+		delete key_;
+		key_ = new Key();
 		key_->deserialize(s);
 	}
 

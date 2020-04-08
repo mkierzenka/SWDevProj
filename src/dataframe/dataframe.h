@@ -3,13 +3,13 @@
 #include "../utils/object.h"
 #include "../utils/string.h"
 #include "../utils/helper.h"
+#include "../utils/array.h"
 #include "../utils/thread.h"
 #include "../store/kvstore.h"
 #include "../store/key.h"
 #include "../serial/serial.h"
-
+#include "../filereader/writer.h"
 #include "columnarray.h"
-
 #include "schema.h"
 #include "rower.h"
 #include "row.h"
@@ -41,6 +41,22 @@ public:
     columns_ = new ColumnArray(store_, key_);
   }
 
+  /**
+   * Create a data frame from a schema description and columns and a store.
+   * All columns are created empty.
+   */
+  DataFrame(const char* scm, Key *k, KVStore *kv)
+  {
+    schema_ = new Schema(scm);
+    store_ = kv;
+    size_t numCols = schema_->width();
+    key_ = k;
+    columns_ = new ColumnArray(store_, key_);
+	for(size_t i = 0; i < numCols; i++) {
+		columns_->add_column(new Column(store_, key_, scm[i]));
+	}
+  }
+
   /** Create a data frame with the same columns as the give df but no rows */
   DataFrame(DataFrame &df, Key *k) : DataFrame(df.get_schema(), k)
   {
@@ -62,6 +78,18 @@ public:
     delete schema_;
     delete columns_;
   }
+
+
+ /**
+  * Creates a new DataFrame with given schema (scm) from the Writer.
+  * Returns the df result, caller is responsible for deleting it.
+  */
+ static DataFrame *fromVisitor(Key *k, KVStore *kv, const char* scm, Writer* r) {
+   DataFrame *df = new DataFrame(scm, k->clone(), kv);
+   df->visit(r);
+   addDFToStore_(df, kv, k);
+   return df;
+ }
 
   /** Converts an array into a dataframe object.
    *  Returns the df result, caller is responsible for deleting it.
@@ -212,7 +240,6 @@ public:
   {
     //deserialized column array needs store
     columns_->setStore(store_);
-
     columns_->deserialize(s);
     schema_->deserialize(s);
     key_->deserialize(s);
@@ -287,6 +314,81 @@ public:
   size_t ncols()
   {
     return schema_->width();
+  }
+
+  void helper_(Array* rowChunk, size_t numRowsInChunk) {
+	  for (size_t i = 0; i < schema_->width(); i++) {
+		  char colType = schema_->col_type(i);
+		  switch (colType) {
+			  case 'I': {
+				  int* ints = new int[numRowsInChunk];
+				  for (size_t j = 0; j < numRowsInChunk; j++) {
+					ints[j] = (dynamic_cast<Row*>(rowChunk->get(j)))->get_int(i);
+				  }
+				  columns_->get(i)->add_all(numRowsInChunk, ints);
+				  break;
+			  }
+			  case 'B': {
+				  bool* bools = new bool[numRowsInChunk];
+				  for (size_t j = 0; j < numRowsInChunk; j++) {
+					bools[j] = (dynamic_cast<Row*>(rowChunk->get(j)))->get_bool(i);
+				  }
+				  columns_->get(i)->add_all(numRowsInChunk, bools);
+				  break;
+			  }
+			  case 'S': {
+				  String** strs = new String*[numRowsInChunk];
+				  for (size_t j = 0; j < numRowsInChunk; j++) {
+					strs[j] = (dynamic_cast<Row*>(rowChunk->get(j)))->get_string(i)->clone();
+				  }
+				  columns_->get(i)->add_all(numRowsInChunk, strs);
+				  break;
+			  }
+			  case 'D': {
+				  double* dbls = new double[numRowsInChunk];
+				  for (size_t j = 0; j < numRowsInChunk; j++) {
+					dbls[j] = (dynamic_cast<Row*>(rowChunk->get(j)))->get_double(i);
+				  }
+				  columns_->get(i)->add_all(numRowsInChunk, dbls);
+				  break;
+			  }
+			  default: {
+				  fprintf(stderr, "Error in helper_\n");
+				  exit(1);
+			  }
+		  }
+	  }
+	  schema_->add_rows(numRowsInChunk);
+  }
+
+  /** Add rows to this DataFrame built by Writer. Until wr->done() */
+  void visit(Writer* wr)
+  {
+    size_t block_size = 1024; // Should match BLOCK_SIZE in block.h
+	Array* rowChunk = new Array(block_size);
+	for (size_t i = 0; i < block_size; i++) {
+		rowChunk->add(new Row(*schema_));
+	}
+
+	size_t idxInCurBlock = 0;
+    size_t rowIdx = 0;
+    while(!wr->done()) {
+	  if (idxInCurBlock == block_size) {
+		helper_(rowChunk, idxInCurBlock);
+		for (size_t i = 0; i < block_size; i++) {
+			(dynamic_cast<Row*>(rowChunk->get(i)))->clear();
+		}
+		idxInCurBlock = 0;
+	  }
+      (dynamic_cast<Row*>(rowChunk->get(idxInCurBlock)))->set_idx(rowIdx);
+	  wr->visit(*(dynamic_cast<Row*>(rowChunk->get(idxInCurBlock))));
+	  rowIdx++;
+	  idxInCurBlock++;
+    }
+	if (idxInCurBlock > 0) {
+		helper_(rowChunk, idxInCurBlock);
+	}
+	delete rowChunk;
   }
 
   /** Visit rows in order */
@@ -439,7 +541,7 @@ public:
     Serializer *s = new Serializer();
     df->serialize(s);
     Value *v = new Value(s->getBuffer(), s->getNumBytesWritten());
-    kv->put(k->clone(), v);
+    kv->put(k, v);
     delete s;
     return df;
   }

@@ -1,6 +1,19 @@
 # SWDevProj
 
 
+###Memory/Ownership Notes
+Array, Map, Queue all steal ownership of what's passed into them
+
+
+###ReceiverThread Info
+Receives WaitAndGet message it can't currently respond to -> add to MessageQueue msgsInProg_
+Think of this queue as "linking" to KVStore's receivedMsgs_ (they are the same object for a KVStore-ReceiverThread pair)
+The field receivedMsgs_ is how ReceiverThread sends info to KVStore
+When new data is added to a KVStore (RT calls kv_->put()), KVStore adds it locally
+  then checks the receivedMsgs_ Queue to see if anyone else was looking for the data that just came in
+It sends the responses if available
+
+
 ### Notes for things to improve from before:
 
 * Cleanup and free more memory in pseudonetworking stuff -> receiverthread, nodethread, etc.
@@ -29,8 +42,6 @@
 * Implement push_back for columns
 
 * Add KVstore to DF constructor with schema and key, remove one that takes in dataframe
-
-* Create application for sorer
 
 * Sorer code- make the arrays use our array instead of re-implementing functionality
 

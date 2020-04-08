@@ -1,14 +1,15 @@
 #pragma once
 
 #include "../utils/object.h"
-#include "network.h"
-#include "../utils/array.h"
-#include "clientdata.h"
 #include "../utils/string.h"
-#include "integer.h"
+#include "../utils/array.h"
+#include "../serial/serial.h"
+#include "message.h"
+#include "network.h"
+#include "clientdata.h"
+
 #include <poll.h>
 
-#include <string.h>
 
 /** This class represents a Client object. Its purpose is to
  * register itself with a server, and connect with any other clients
@@ -16,23 +17,27 @@
 class Client : public Object
 {
 public:
+    Serializer* s; //for serializing and deserializing messages
+    Lock lock_; //lock for reading from and writing to serializer
     const char *clientIp_;
     const char *serverIp_;
-    Network *network_;   //network to connect to server
-    Network *listening_; //network to listen for client connections
+    Network *network_;   //node object
+    Network* server_; //network object to communicate with server
     Array *clients_; //connection info of neighboring clients
     Array *fdArr;
+    int PORT = 8080;
 
-    Client(const char *selfIp, const char *servIp)
+    Client(const char *selfIp, const char *servIp, size_t nodeId)
     {
         clientIp_ = selfIp;
         serverIp_ = servIp;
-        network_ = new Network(servIp);
-        printf("Server network established\n");
-        listening_ = new Network(selfIp);
-        listening_->bindSocket();
-        printf("Binded listening socket\n");
-        listening_->listenForClient(listening_->getServerFd());
+        network_ = new Network(selfIp, nodeId);
+
+        //server will always be first node
+        server_ = new Network(servIp, 0);
+        //listening_ = new Network(selfIp);
+        //listening_->bindSocket();
+        network_->listenForConnections();
         clients_ = new Array();
         fdArr = new Array();
     }
@@ -40,8 +45,13 @@ public:
     ~Client()
     {
         delete network_;
+        delete server_;
         delete clients_;
         delete fdArr;
+    }
+
+    void client_init() {
+
     }
 
     /** This method will register this client with the given server. If successful,
@@ -49,14 +59,13 @@ public:
      * server. */
     void registerSelf()
     {
-        network_->connectToServer();
-        puts("Client registered!");
+        //create connection to server
+        int serverFd = server_->getFd();
+        network_->connectToNode(server_->getFd());
 
-        char msg[100];
-        strcpy(msg, "REGISTER ");
-        strcat(msg, clientIp_);
-        //send IP over
-        network_->sendMessage(msg, network_->getServerFd());
+        //create register message and send
+        RegisterMsg* rm = new RegisterMsg(network_->getAddr(), PORT, network_->getNodeId(), server_->getNodeId(), 0);
+        network_->sendMsg(rm);
     }
 
     /** Get message type and handle it accordingly */

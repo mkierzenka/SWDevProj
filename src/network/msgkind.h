@@ -4,5 +4,5 @@
 
 
 enum MsgKind {
-    Ack, GetData, Put, ReplyData, Get, WaitAndGet, Status, Kill, Register, Directory
+    Ack, GetData, Put, ReplyData, WaitAndGet, Status, Kill, Register, Dir
 };

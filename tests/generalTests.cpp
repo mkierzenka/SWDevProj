@@ -10,6 +10,7 @@
 #include "../src/serial/serial.h"
 #include "../src/utils/object.h"
 #include "../src/utils/string.h"
+#include "incwriter.h"
 
 Sys *SYSTEM = new Sys();
 
@@ -264,6 +265,24 @@ void lengthRowerTest() {
 }
 */
 
+void dataFrameFromWriter() {
+  SYSTEM->pln("Data frame from writer test started...");
+  KVStore kv(0, nullptr);
+  Key k("main", 0);
+  int SZ = 30;
+  IncWriter wr(SZ);
+  
+  DataFrame* df = DataFrame::fromVisitor(&k, &kv, "I", &wr);
+  assert(df->ncols() == 1);
+  assert(df->nrows() == SZ);
+
+  for (size_t i = 0; i < SZ; i++) {
+    assert(df->get_int(0, i) == i);
+  }
+
+  SYSTEM->pln("Data frame from writer test passed!");
+}
+
 int main()
 {
   columnTests();
@@ -273,5 +292,6 @@ int main()
   //basicTest2();
   dataFrameTest();
   //lengthRowerTest();
+  dataFrameFromWriter();
   return 0;
 }

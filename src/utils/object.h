@@ -13,7 +13,7 @@ public:
 
     Object() { hash_ = 0; }
       
-    /** Subclasses may have something to do on finalziation */
+    /** Subclasses may have something to do on finalization */
     virtual ~Object() { }
 
     /** Return the hash value of this object */
@@ -23,7 +23,8 @@ public:
     virtual bool equals(Object  * other) { return this == other;  }
 
     /** Return a copy of the object; nullptr is considered an error */
-    virtual Object* clone() { return nullptr; }
+    virtual Object* clone() { 
+        return nullptr; }
 
     /** Compute the hash code (subclass responsibility) */
     virtual size_t hash_me() { return 1; };

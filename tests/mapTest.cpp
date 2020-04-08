@@ -35,10 +35,10 @@ public:
     t_true(e == nullptr);
 
     Object * c = new Object();
-    Object * d = mss->put(a, c);
+    Object * d = mss->put(a, c); //takes b out of the map
     t_true(mss->get(a)->equals(c));
     t_true(d->equals(b));
-
+	delete b;
     delete mss;
 
     OK("test_put_0");
@@ -59,10 +59,10 @@ public:
     t_true(e == nullptr);
 
     Object * c = new Object();
-    Object * d = mss->put(s, c);
+    Object * d = mss->put(s, c); //takes a out of map
     t_true(mss->get(s)->equals(c));
     t_true(d->equals(a));
-
+	delete a;
     delete mss;
 
     OK("test_put_1");
@@ -70,25 +70,32 @@ public:
 
   void test_remove_0() {
     String* s = new String("Hello");
+	String* sc = s->clone();
     String* t = new String("World");
     Object * a = new Object();
     Object * b = new Object();
     Map * mss = new Map();
-    mss->put(s, t);
-    mss->put(a, b);
+
+    Object* res = mss->put(s, t);
+	t_true(!res);
+    res = mss->put(a, b);
+	t_true(!res);
     t_true(mss->size() == 2);
     t_true(mss->contains_key(s));
     t_true(mss->contains_key(a));
-    Object * q = mss->remove(s);
+    Object * q = mss->remove(s); // deletes s, returns t. removes pair from map
     t_true(t->equals(q));
-    t_false(mss->contains_key(s));
+    t_false(mss->contains_key(sc));
     t_true(mss->size() == 1);
+	delete sc;
+	delete q;
     delete mss;
     OK("test_remove_0");
   }
 
   void test_remove_1() {
     String* s = new String("Hello");
+	String* sc = s->clone();
     String* t = new String("World");
     Object * u = new String("hi");
     String * w = new String("w");
@@ -98,10 +105,12 @@ public:
     t_true(mss->size() == 2);
     t_true(mss->contains_key(s));
     t_true(mss->contains_key(w));
-    Object * q = mss->remove(s);
+    Object * q = mss->remove(s); // deletes s, returns t. removes pair from map
     t_true(t->equals(q));
-    t_false(mss->contains_key(s));
+    t_false(mss->contains_key(sc));
     t_true(mss->size() == 1);
+	delete q;
+	delete sc;
     delete mss;
     OK("test_remove_1");
   }
@@ -113,6 +122,7 @@ public:
     Object * b = new Object();
     Map * mss = new Map();
     mss->put(a, b);
+	mss->put(s, t);
 
     Object** keys = mss->get_keys();
     Object** values = mss->get_values();
@@ -121,6 +131,8 @@ public:
     t_true(values != nullptr);
     t_true(keys[0]->equals(a));
     t_true(values[0]->equals(b));
+	t_true(keys[1]->equals(s));
+    t_true(values[1]->equals(t));
 
     delete mss;
     delete[] keys;
@@ -155,9 +167,10 @@ public:
     t_true(keys[0]->equals(s));
     t_true(values[0]->equals(t));
 
-    mss->remove(s);
+    delete mss->remove(s); // deletes s internally, returns t
     t_true(keys != nullptr);
     t_true(values != nullptr);
+	t_true(mss->size() == 0);
 
     delete mss;
     delete[] keys;
@@ -232,16 +245,12 @@ public:
   }*/
   
   void test_big() {
-    String* s = new String("Hello");
-    String* t = new String("World");
 	String* a = new String("ABC");
 	String* a1 = new String("ABC-1");
 	String* b = new String("CCC");
 	String* b1 = new String("CCC-1");
-
 	String* c = new String("WCA");
 	String* c1 = new String("WCA-1");
-
 	String* d = new String("WCB");
 	String* d1 = new String("WCB-1");
 
