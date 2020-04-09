@@ -286,6 +286,7 @@ public:
         return size_;
     }
 
+    /** Get double from column at certain index */
     double get_double(size_t idx)
     {
         if (!properType(ColType::Double))
@@ -299,10 +300,11 @@ public:
 
         Key *k = genKey_(chunk); //Key to look up data
         double out = blocks_->getDouble(k, idxInChunk);
-        //delete k;
+        delete k;
         return out;
     }
 
+    /** Get boolean from column at certain index */
     bool get_bool(size_t idx)
     {
         if (!properType(ColType::Boolean))
@@ -316,10 +318,11 @@ public:
 
         Key *k = genKey_(chunk); //Key to look up data
         bool out = blocks_->getBool(k, idxInChunk);
-        //delete k;
+        delete k;
         return out;
     }
 
+    /** Get string from column at certain index */
     String *get_string(size_t idx)
     {
         if (!properType(ColType::Str))
@@ -333,7 +336,7 @@ public:
 
         Key *k = genKey_(chunk); //Key to look up data
         String *out = blocks_->getString(k, idxInChunk);
-        //delete k;
+        delete k;
         return out;
     }
 
@@ -351,7 +354,7 @@ public:
 
         Key *k = genKey_(chunk); //Key to look up data
         int out = blocks_->getInt(k, idxInChunk);
-        //delete k;
+        delete k;
         return out;
     }
 

@@ -53,7 +53,13 @@ void columnTests()
   String *stringA = new String("Good");
   String *stringB = new String("Morning");
   String *stringC = new String("Graduation");
-  String* valsS[] = {stringA, stringC, stringA, stringB};
+  //String* valsS[] = {stringA, stringC, stringA, stringB};
+  String** valsS = new String*[4];
+  valsS[0] = stringA;
+  valsS[1] = stringC;
+  valsS[2] = stringA;
+  valsS[3] = stringB;
+
   Column* sc = new Column(store, baseKeyS, ColType::Str);
   sc->add_all(4, valsS);
  
@@ -63,8 +69,12 @@ void columnTests()
   assert(sc->get_string(2)->equals(valsS[2]));
   assert(sc->get_string(3)->equals(valsS[3]));
   delete sc;
-
+  
   delete store;
+  delete stringA;
+  delete stringB;
+  delete stringC;
+  delete[] valsS;
 }
 
 int main()

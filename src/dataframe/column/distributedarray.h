@@ -74,7 +74,7 @@ public:
     }
 	
 	/**
-	 * Get specific double from a value stored with key k
+	 * Get specific double from a value stored with key k. Caller responsible for deleting key
 	 */
     double getDouble(Key *k, size_t itemIdx)
     {
@@ -84,7 +84,7 @@ public:
             //get data from store and cache
 			DoubleBlock* val = getDoubleBlockFromStore_(k);
 			if (val != nullptr) {
-				cache_->put(k, val);
+				cache_->put(k->clone(), val);
 			}
         }
 		doubleData = dynamic_cast<DoubleBlock*>(cache_->getBlock(k));
@@ -96,7 +96,7 @@ public:
     }
 
 	/**
-	 * Get specific boolean from a value stored with key k
+	 * Get specific boolean from a value stored with key k. Caller responsible for deleting key
 	 */
     bool getBool(Key *k, size_t itemIdx)
     {
@@ -106,7 +106,7 @@ public:
             //get data from store and cache
 			BoolBlock* val = getBoolBlockFromStore_(k);
 			if (val != nullptr) {
-				cache_->put(k, val);
+				cache_->put(k->clone(), val);
 			}
         }
 		boolData = dynamic_cast<BoolBlock*>(cache_->getBlock(k));
@@ -118,7 +118,7 @@ public:
     }
 
 	/**
-	 * Get specific integer from a value stored with key k
+	 * Get specific integer from a value stored with key k. Caller responsible for deleting key
 	 */
     int getInt(Key *k, size_t itemIdx)
     {
@@ -128,7 +128,7 @@ public:
             //get data from store and cache
 			IntBlock* val = getIntBlockFromStore_(k);
 			if (val != nullptr) {
-				cache_->put(k, val);
+				cache_->put(k->clone(), val);
 			}
         }
 		intData = dynamic_cast<IntBlock*>(cache_->getBlock(k));
@@ -141,7 +141,7 @@ public:
 
 	/**
 	 * Get specific string from a value stored with key k.
-	 * Caller is responsible for deleting the String returned
+	 * Caller is responsible for deleting the String returned and the key passed in
 	 */
     String* getString(Key *k, size_t itemIdx)
     {
@@ -151,7 +151,7 @@ public:
             //get data from store and cache
 			StringBlock* val = getStrBlockFromStore_(k);
 			if (val != nullptr) {
-				cache_->put(k, val);
+				cache_->put(k->clone(), val);
 			}
         }
 		strData = dynamic_cast<StringBlock*>(cache_->getBlock(k));
