@@ -27,9 +27,9 @@ void basicSingle() {
     printf("KVStore basic-single test passed!\n");
 }
 
-// Simple example of 2 KVStores working with eachother
-void doubleTest() {
-    printf("KVStore double test starting...\n");
+// Simple example of 2 KVStores working with eachother - WaitAndGet
+void doubleTestWag() {
+    printf("KVStore WaitAndGet double test starting...\n");
     MsgQueueArr* mqa = new MsgQueueArr(2);
 	PseudoNetwork* pNet0 = new PseudoNetwork(mqa, 0);
 	PseudoNetwork* pNet1 = new PseudoNetwork(mqa, 1);
@@ -59,13 +59,49 @@ void doubleTest() {
 	delete kv0; delete kv1;
 	delete pNet0; delete pNet1;
 	delete mqa;	
-    printf("KVStore double test passed!\n");
+    printf("KVStore WaitAndGet double test passed!\n");
+}
+
+
+// Simple example of 2 KVStores working with eachother - Put
+void doubleTestPut() {
+    printf("KVStore Put double test starting...\n");
+    MsgQueueArr* mqa = new MsgQueueArr(2);
+	PseudoNetwork* pNet0 = new PseudoNetwork(mqa, 0);
+	PseudoNetwork* pNet1 = new PseudoNetwork(mqa, 1);
+	KVStore* kv0 = new KVStore(0, pNet0);
+	KVStore* kv1 = new KVStore(1, pNet1);
+
+	Key k1("key1", 0);
+	Value v1("val1", 4);
+	Key k2("key2-0", 1);
+	Value v2("another value", 13);
+
+	kv0->put(&k1, &v1); // k1 belongs in kv0
+	assert(mqa->get(0)->size() == 0);
+	assert(mqa->get(1)->size() == 0);
+	kv0->put(&k2, &v2); // k2 belongs in kv1
+	assert(mqa->get(0)->size() == 0);
+	assert(mqa->get(1)->size() == 1);
+	PutMsg* actualPut = dynamic_cast<PutMsg*>(mqa->get(1)->pop());
+	assert(actualPut);
+	assert(actualPut->getKind() == MsgKind::Put);
+	assert(actualPut->getSender() == 0);
+	assert(actualPut->getTarget() == 1);
+	assert(actualPut->getKey()->equals(&k2));
+
+	delete actualPut;
+	delete kv0; delete kv1;
+	delete pNet0; delete pNet1;
+	delete mqa;
+    printf("KVStore Put double test passed!\n");
 }
 
 int main()
 {
     printf("KVStore tests starting...\n");
 	basicSingle();
-	doubleTest();
+	doubleTestWag();
+	doubleTestPut();
     printf("KVStore tests passed!\n");
 }

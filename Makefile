@@ -8,6 +8,7 @@ build: buildTrivial buildDemo
 	g++ --std=c++11 -g tests/messageTest.cpp -o tests/testMessage
 	g++ --std=c++11 -g tests/blockTest.cpp -o tests/testBlock
 	g++ --std=c++11 -g tests/storeTest.cpp -o tests/testStore
+	g++ --std=c++11 -g tests/storeIntegrationTests.cpp -o tests/storeIntegrationTests
 	#g++ --std=c++11 -g tests/memTest.cpp -o tests/testMemory
 	#g++ --std=c++11 -g tests/sorerTest.cpp -o tests/testSorer
 
@@ -43,7 +44,7 @@ testDemo:
 	./tests/testDemo
 
 buildGeneral:
-	g++ --std=c++11 -g tests/blockTest.cpp -o tests/testGeneral
+	g++ --std=c++11 -g tests/generalTests.cpp -o tests/testGeneral
 
 buildColumnArray:
 	g++ --std=c++11 -g tests/columnArrayTest.cpp -o tests/testColumnArray
@@ -55,4 +56,4 @@ testColumnArray:
 clean:
 	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray \
 	tests/testQueue tests/testSerial tests/testTrivial tests/testCache tests/testDemo tests/testMessage \
-	tests/testBlock tests/testColumnArray tests/testStore
+	tests/testBlock tests/testColumnArray tests/testStore tests/storeIntegrationTests
