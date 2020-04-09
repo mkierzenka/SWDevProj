@@ -29,7 +29,8 @@ public:
 
     void run()
     {
-        while (true)
+        bool isDone = false; //listens for messages as long as still true
+        while (!isDone)
         {
 			Message *m = network_->receiveMsg(); // blocks until new message arrives
             MsgKind kind = m->getKind();
@@ -89,12 +90,22 @@ public:
                 network_->handleDirectoryMsg(dirMsg);
                 break;
             }
+            case (MsgKind::Done):
+            {
+                DoneMsg* doneMsg = dynamic_cast<DoneMsg*>(m);
+                network_->handleDoneMsg(doneMsg);
+                break;
+            }
+            case (MsgKind::Teardown):
+            {
+                isDone = true;
+                break;
+            }
             default:
                 pln("Weird msg type...");
             }
 			
         }
-        
         printf("End of receive thread run\n");
     }
 };

@@ -60,5 +60,3 @@ It sends the responses if available
 * Add underscore to all private fields (KVStore)
 
 * Distribute data across nodes
-
-* Implement status and kill messages for graceful exit

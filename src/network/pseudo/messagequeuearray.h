@@ -30,14 +30,6 @@ class MsgQueueArr : public Object {
         }
 
         /**
-         * Add queue to end of the array
-         */
-        // void push_back(MessageQueue* mq)
-        // {
-        //     arr_->add(mq);
-        // }
-
-        /**
          * Get queue from the array at given index
          */
         MessageQueue* get(size_t idx)
@@ -46,4 +38,12 @@ class MsgQueueArr : public Object {
             return dynamic_cast<MessageQueue*>(arr_->get(idx));
         }
 
+        /**
+         * Get the number of MessageQueues in this array.
+         * ie. the number of pseudo-nodes on this "network"
+         */
+        size_t size()
+        {
+            return arr_->length();
+        }
 };

@@ -18,6 +18,7 @@ class PseudoNetwork : public INetwork
 public:
     MsgQueueArr *mqa_;   //Not Owned! Holds message arrays for each node
     size_t nodeId_;
+    bool* isNodeDone_; //keep of track of if all the nodes are done
 
    /**
    * Pass in number of nodes and a shared Message Queue Array.
@@ -27,6 +28,7 @@ public:
     {
         mqa_ = mqa;
         nodeId_ = ourNode;
+        isNodeDone_ = new bool[mqa->size()];
     }
 
     ~PseudoNetwork() {}
@@ -40,5 +42,29 @@ public:
     Message *receiveMsg()
     {
         return mqa_->get(nodeId_)->pop();
+    }
+
+    /** Handle done message. Only for the server */
+    void handleDoneMsg(DoneMsg* m)
+    {
+        assert(m && nodeId_ == 0);
+        isNodeDone_[m->getSender()] = true;
+        for (size_t i = 0; i < mqa_->size(); i++) {
+            if (!isNodeDone_[i]) {
+                return; // Not all the nodes are done yet
+            }
+        }
+        fprintf(stderr, "Server heard that all nodes are done\n");
+        sendTeardownMsgs_();
+    }
+
+    /**
+     * A helper to send teardown messages to all the nodes (including its own ReceiverThread)
+     * Only the Server should call this method
+     */
+    void sendTeardownMsgs_() {
+        for (size_t i = 0; i < mqa_->size(); i++) {
+            sendMsg(new TeardownMsg(nodeId_, i, 0));
+        }
     }
 };

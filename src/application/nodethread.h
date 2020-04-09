@@ -41,5 +41,9 @@ class NodeThread : public Thread
         ReceiverThread* rt = new ReceiverThread(app_->this_node(), net_, app_->getStore());
         rt->start();
         app_->run_();
+
+        // Let server know that done executing
+        net_->sendMsg(new DoneMsg(app_->this_node(), 0, 0));
+        rt->join();
     }
   };

@@ -437,6 +437,18 @@ public:
 	}
 };
 
+/** Message informing the receiver that the sender is ready for shutdown */
+class DoneMsg : public Message
+{
+public:
+	DoneMsg() : Message() {}
+
+	DoneMsg(size_t sender, size_t target, size_t id) : Message(Done, sender, target, id) {}
+
+	~DoneMsg() {}
+};
+
+
 /** Message acknowledges that a message was received */
 class AckMsg : public Message
 {
@@ -446,4 +458,15 @@ public:
 	AckMsg(size_t sender, size_t target, size_t id) : Message(Ack, sender, target, id) {}
 
 	~AckMsg() {}
+};
+
+/** Message sent by server to initiate teardown of nodes */
+class TeardownMsg : public Message
+{
+	public:
+	TeardownMsg() : Message() {}
+
+	TeardownMsg(size_t sender, size_t target, size_t id) : Message(Teardown, sender, target, id) {}
+
+	~TeardownMsg() {}
 };

@@ -18,7 +18,7 @@
 
 const char* SERVER_IP = "127.0.0.1"; //hardcoded server IP (for now)
 const size_t SERVER_NODE_NUM = 0;
-const size_t NUM_NODES = 3;
+const size_t NUM_NODES = 1;
 
 /** This class wraps the basic functionality of the POSIX libraries.
  * It is used to make connections between clients and the server. */
@@ -36,7 +36,8 @@ public:
     int addresslen = sizeof(address);
     int PORT = 8080;
     String* ipAddress_;
-
+    bool* isNodeDone_; //array to keep track of which nodes have completed their work
+    
     /**
      * Network constructor. Will take string IP of the client/server
      * that it was initialized by.
@@ -59,6 +60,12 @@ public:
         address.sin_port = htons(8080);
         bindSocket_();
         listenForConnections();
+
+        isNodeDone_ = new bool[NUM_NODES];
+        String* servIp = new String(SERVER_IP);
+        //add the server info to this network's directory (even if we are server)
+        dir->addIp(SERVER_NODE_NUM, servIp);
+        delete servIp;
     }
 
     ~Network()
@@ -66,6 +73,7 @@ public:
         delete s;
         delete dir;
         delete ipAddress_;
+        delete[] isNodeDone_;
         close(fd); //close socket
     }
 
@@ -89,11 +97,11 @@ public:
     }
 
     void client_init() {
-        String* servIp = new String(SERVER_IP);
-        dir->addIp(0, servIp);
+   //     String* servIp = new String(SERVER_IP);
+   //    dir->addIp(0, servIp);
         RegisterMsg* rMsg = new RegisterMsg(ipAddress_, 8080, nodeId_, SERVER_NODE_NUM, 0);
         sendMsg(rMsg);
-        delete servIp;
+   //     delete servIp;
         fprintf(stderr, "Node %zu Registered\n", nodeId_);
 
 		Message* m = receiveMsg();
@@ -227,6 +235,8 @@ public:
             case WaitAndGet: tmp = new WaitAndGetMsg(); break;
             case Register: tmp = new RegisterMsg(); break;
             case Dir: tmp = new DirectoryMsg(); break;
+            case Done: tmp = new DoneMsg(); break;
+            case Teardown: tmp = new TeardownMsg(); break;
             default:
             {
                 fprintf(stderr, "Unknown message type\n");
@@ -234,8 +244,6 @@ public:
             }
         }
         assert(tmp);
-        //delete tmpSer;
-        // ?? delete[] msgTypeBuff;
 
         lock_.lock();
         Serializer* myS = new Serializer(buff->size(), buffStr->c_str());
@@ -273,21 +281,7 @@ public:
         size_t tmpS = dir->size();
         dir->addIp(m->getSender(), m->getClient());
         assert(dir->size() == tmpS + 1);
-
         fprintf(stderr, "Current Directory size = %zu\n", dir->size());
-
-        //send out directory message to all nodes
-        /*SizeTWrapper** nodes = dir->getNodes();
-        for (size_t i = 0; i < dir->size(); i++)
-        {
-            DirectoryMsg* dm = new DirectoryMsg(dir, 8080, nodeId_, nodes[i]->asSizeT(), 0);
-            fprintf(stderr, "About to send directory message from %zu to %zu\n", nodeId_, nodes[i]->asSizeT());
-            sendMsg(dm);
-            fprintf(stderr, "Server sent DirectoryMessage to node %zu\n", nodes[i]->asSizeT());
-            delete dm;
-            //delete nodes[i];
-        }*/
-        //delete[] nodes;   
     }
 
     /** Handle directory message */
@@ -296,6 +290,30 @@ public:
         //current directories call new directory
         dir->mergeIn(m->getDirectory());
         fprintf(stderr, "Node %zu: directory merged in\n", nodeId_);
+    }
+
+    /** Handle done message. Only for the server */
+    void handleDoneMsg(DoneMsg* m)
+    {
+        assert(m && nodeId_ == SERVER_NODE_NUM);
+        isNodeDone_[m->getSender()] = true;
+        for (size_t i = 0; i < NUM_NODES; i++) {
+            if (!isNodeDone_[i]) {
+                return; // Not all the nodes are done yet
+            }
+        }
+        fprintf(stderr, "Server heard that all nodes are done\n");
+        sendTeardownMsgs_();
+    }
+
+    /**
+     * A helper to send teardown messages to all the nodes (including its own ReceiverThread)
+     * Only the Server should call this method
+     */
+    void sendTeardownMsgs_() {
+        for (size_t i = 0; i < NUM_NODES; i++) {
+            sendMsg(new TeardownMsg(nodeId_, i, 0));
+        }
     }
 
     /** Binds bock to address and corresponding port number.

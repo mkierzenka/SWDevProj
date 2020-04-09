@@ -72,14 +72,17 @@ public:
 		case Status:
 			out[0] = '5';
 			break;
-		case Kill:
+		case Register:
 			out[0] = '6';
 			break;
-		case Register:
+		case Dir:
 			out[0] = '7';
 			break;
-		case Dir:
+		case Done:
 			out[0] = '8';
+			break;
+		case Teardown:
+			out[0] = '9';
 			break;
 		default:
 			out[0] = 0;
@@ -245,29 +248,33 @@ public:
 			return ReplyData;
 		}
 		else if (strcmp(sMsgKind, "4") == 0)
-			{
-				return WaitAndGet;
-			}
-			else if (strcmp(sMsgKind, "5") == 0)
-			{
-				return Status;
-			}
-			else if (strcmp(sMsgKind, "6") == 0)
-			{
-				return Kill;
-			}
-			else if (strcmp(sMsgKind, "7") == 0)
-			{
-				return Register;
-			}
-			else if (strcmp(sMsgKind, "8") == 0)
-			{
-				return Dir;
-			}
-			else
-			{
-				return GetData;
-			}
+		{
+			return WaitAndGet;
+		}
+		else if (strcmp(sMsgKind, "5") == 0)
+		{
+			return Status;
+		}
+		else if (strcmp(sMsgKind, "6") == 0)
+		{
+			return Register;
+		}
+		else if (strcmp(sMsgKind, "7") == 0)
+		{
+			return Dir;
+		}
+		else if (strcmp(sMsgKind, "8") == 0)
+		{
+			return Done;
+		}
+		else if (strcmp(sMsgKind, "9") == 0)
+		{
+			return Teardown;
+		}
+		else
+		{
+			return GetData;
+		}
 		}
 
 		size_t readSizeT()
