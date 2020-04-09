@@ -11,6 +11,7 @@
 #include "incwriter.h"
 
 Sys *SYSTEM = new Sys();
+//Sys* SYSTEM();
 
 /*
 void basicTest2()
@@ -141,7 +142,13 @@ void columnTests()
   String *stringA = new String("Good");
   String *stringB = new String("Morning");
   String *stringC = new String("Graduation");
-  String* valsS[] = {stringA, stringC, stringA, stringB};
+  //String* valsS[] = {stringA, stringC, stringA, stringB};
+  String** valsS = new String*[4];
+  valsS[0] = stringA;
+  valsS[1] = stringC;
+  valsS[2] = stringA;
+  valsS[3] = stringB;
+
   Column* sc = new Column(store, baseKeyS, ColType::Str);
   sc->add_all(4, valsS);
  
@@ -153,6 +160,11 @@ void columnTests()
   delete sc;
   
   delete store;
+  delete stringA;
+  delete stringB;
+  delete stringC;
+  delete[] valsS;
+  //delete valsS;
 
   SYSTEM->pln("Columns test passed!");
 }
@@ -378,5 +390,7 @@ int main()
   dataFrameFromWriter();
   keyTest();
   valueTest();
+
+  delete SYSTEM;
   return 0;
 }

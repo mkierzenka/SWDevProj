@@ -543,7 +543,8 @@ class MapStrObj : public Map {
 
 		/**
 		 * Adds a mapping from key to val to the map. A key must be unique, if there is already a key
-		 * of the same value in the map, the value will be overwritten by the new value.
+		 * of the same value in the map, the value will be overwritten by the new value. Map takes 
+		 * ownership of this key and value
 		 * 
 		 * NOTE: This function will mutate the Map
 		 * 
