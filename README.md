@@ -53,10 +53,12 @@ It sends the responses if available
 
 * Methods w/o an implementation: add assert(false) and comment
 
-* Add unit tests: KVStore, column array, distributed array
+* Add unit tests: distributed array
 
 * doc.md: create diagram for architecture section
 
 * Add underscore to all private fields (KVStore)
 
 * Distribute data across nodes
+
+* Implement status and kill messages for graceful exit
