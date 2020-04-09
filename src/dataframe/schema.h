@@ -7,8 +7,7 @@
 /*************************************************************************
  * Schema::
  * A schema is a description of the contents of a data frame, the schema
- * knows the number of columns and number of rows, the type of each column,
- * optionally columns and rows can be named by strings.
+ * knows the number of columns, the number of rows, and the type of each column.
  * The valid types are represented by the chars 'S', 'B', 'I' and 'F'.
  */
 class Schema : public Object
@@ -36,7 +35,7 @@ public:
 	/** Create a schema from a string of types. A string that contains
     * characters other than those identifying the four type results in
     * undefined behavior. The argument is external, a nullptr argument is
-    * undefined. **/
+    * undefined. Caller is responsible for deleting types. **/
 	Schema(const char *types)
 	{
 		size_t typesLen = strlen(types);
@@ -51,7 +50,7 @@ public:
 	}
 
 	/** Constructor that copies over values from passed in schema. If passed in
-   * boolean is true, copy over row information as well */
+    * boolean is true, copy over row information as well */
 	Schema(Schema &from, bool copyRows)
 	{
 		capCols_ = (from.width() == 0 ? 2 : from.width()); // from.width != from.capacity
@@ -85,14 +84,12 @@ public:
 		}
 	}
 
-	/** Deserialize this schema and mutate it */
+	/** Deserialize a schema from s into this one (mutate) */
 	void deserialize(Serializer *s)
 	{
 		capCols_ = s->readSizeT();
 		numCols_ = s->readSizeT();
 		numRows_ = s->readSizeT();
-
-		//delete and reset types array
 		delete[] types_;
 		types_ = new char[capCols_];
 		for (size_t i = 0; i < numCols_; i++)
@@ -101,9 +98,7 @@ public:
 		}
 	}
 
-	/** Add a column of the given type and name (can be nullptr), name
-    * is external. Names are expectd to be unique, duplicates result
-    * in undefined behavior. */
+	/** Add a column of the given type */
 	void add_column(char typ)
 	{
 		if (numCols_ >= capCols_)
@@ -166,37 +161,10 @@ public:
 		}
 	}
 
+	/** Hash this schema - do not use! */
 	size_t hash_me_()
 	{
-		size_t hash_ = 0;
-		hash_ += numCols_;
-		hash_ += capCols_;
-		hash_ += numRows_;
-
-		for (int i = 0; i < numCols_; i++)
-		{
-			char typ = types_[i];
-			switch (typ)
-			{
-				case 'B':
-					hash_ += 1;
-					break;
-				case 'I':
-					hash_ += 2;
-					break;
-				case 'D':
-					hash_ += 3;
-					break;
-				case 'S':
-					hash_ += 4;
-					break;
-				default:
-					//shouldn't reach here
-					break;
-			}
-		}
-
-		return hash_;
+		assert(false);
 	}
 
 	void growColList_()
@@ -207,7 +175,6 @@ public:
 		{
 			newTypesArr[i] = types_[i];
 		}
-
 		delete[] types_;
 		types_ = newTypesArr;
 	}
