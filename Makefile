@@ -8,7 +8,11 @@ build: buildTrivial buildDemo
 	g++ --std=c++11 -g tests/messageTest.cpp -o tests/testMessage
 	g++ --std=c++11 -g tests/blockTest.cpp -o tests/testBlock
 	g++ --std=c++11 -g tests/storeTest.cpp -o tests/testStore
-	g++ --std=c++11 -g tests/storeIntegrationTests.cpp -o tests/storeIntegrationTests
+	g++ --std=c++11 -g tests/storeIntegrationTests.cpp -o tests/testIntegrationStore
+	g++ --std=c++11 -g tests/schemaTest.cpp -o tests/testSchema
+	g++ --std=c++11 -g tests/keyTest.cpp -o tests/testKey
+	g++ --std=c++11 -g tests/valueTest.cpp -o tests/testValue
+	g++ --std=c++11 -g tests/columnTest.cpp -o tests/testColumn
 	#g++ --std=c++11 -g tests/memTest.cpp -o tests/testMemory
 	#g++ --std=c++11 -g tests/sorerTest.cpp -o tests/testSorer
 
@@ -16,7 +20,6 @@ test: testTrivial testDemo
 
 ourTests:
 	./tests/testSerial
-	./tests/testGeneral
 	./tests/testMap
 	./tests/testArray
 	./tests/testQueue
@@ -24,13 +27,18 @@ ourTests:
 	./tests/testMessage
 	./tests/testBlock
 	./tests/testStore
+	./tests/testIntegrationStore
+	./tests/testSchema
+	./tests/testKey
+	./tests/testValue
+	./tests/testColumn
+	./tests/testGeneral
 	#./tests/testMemory
 	#./tests/testSorer data/datafile.sor
 	
 memory:
-	#valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testTrivial
-	#valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testDemo
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testColumnArray
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testTrivial
+
 
 buildTrivial:
 	g++ --std=c++11 -g -pthread tests/trivialTest.cpp -o tests/testTrivial
@@ -60,4 +68,5 @@ testColumnArray:
 clean:
 	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray \
 	tests/testQueue tests/testSerial tests/testTrivial tests/testCache tests/testDemo tests/testMessage \
-	tests/testBlock tests/testColumnArray tests/testStore tests/storeIntegrationTests
+	tests/testBlock tests/testColumnArray tests/testStore tests/testIntegrationStore tests/testSchema \
+	tests/testKey tests/testValue tests/testColumn
