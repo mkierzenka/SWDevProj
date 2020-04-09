@@ -20,13 +20,17 @@ class DataFrame;
 class KVStore : public Object
 {
 public:
-    MapStrObj *kvMap;              //holds all key-value pairings
-    INetwork* node_;        //fake network for demo
-    size_t storeId;                //node id that this store belongs to
-    Map* msgCache_;                //WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
-    Lock msgCacheLock_;
+    MapStrObj *kvMap;       // Owned, holds all key-value pairings
+    INetwork* node_;        // Not owned, object used for Network communication
+    size_t storeId;         // Node id that this store belongs to
+    Map* msgCache_;         // WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
+    Lock msgCacheLock_;     // Owned, controls access to msgCache
 
 
+	/**
+	 * Sets up a new KVStore with given node number and Network object
+	 * Network object is external, caller responsible for deleting it.
+	 */
     KVStore(size_t id, INetwork* net)
     {
         kvMap = new MapStrObj();
@@ -42,24 +46,20 @@ public:
         delete msgCache_;
     }
 
-    /** Puts key-value pair into distributed KV store. Clone key and data in put msg, clone before we 
-     * put into map
+    /**
+     * Puts this key-value pair into the KV store.
+     * Clones the args before working with them. Caller responsible
+	 * for deleting k and data.
      */
     void put(Key *k, Value *data)
     {
 		if (k->getNode() != storeId) {
 			PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
-
-            //sendMsg should not take in fd: add map of node id to fd in network
 			node_->sendMsg(msg);
 			return;
 		}
-		
-		// Add to this store's map
         kvMap->put(k->getKeyStr()->clone(), data->clone());
-
-		// Try to respond to messages in the receivedMsgs_ queue
-		tryToHandleQueue_(k);
+		tryToHandleCache_(k);
     }
 
     DataFrame *get(Key *k);
@@ -67,7 +67,7 @@ public:
     DataFrame* waitAndGet(Key* k);
 
     /**
-     * Get the actual Value that the given key maps to.
+     * Get the actual Value that the given key maps to (no clone).
      * Blocking - will call to network as needed.
      */
     Value *getValue(Key *k)
@@ -83,17 +83,19 @@ public:
     }
 
     /**
-     * Add a message another KVStore is waiting on us to reply to
+     * Adds a message another KVStore is waiting on us to reply to
+	 * Does not clone, steals ownership.
      */
     void addMsgWaitingOn(WaitAndGetMsg* msg) {
-        addToCache_(msg->getKey(), msg);
+        addToCache_(msg->getKey()->clone(), msg);
     }
 	
     /**
      * Our ReceiverThread got a response for a key we requested.
+	 * Does not clone, steals ownership.
      */
     void addReply(ReplyDataMsg* msg) {
-        addToCache_(msg->getKey(), msg);
+        addToCache_(msg->getKey()->clone(), msg);
     }
 
     /** Check if two distributed arrats equal - do not use */
@@ -108,6 +110,8 @@ public:
         assert(false);
     }
 
+    /* Waits on ReceiverThread (external to this store) to get the response. */
+	// blocking
     Value* getFromNetwork_(Key* k) {
         WaitAndGetMsg *dm = new WaitAndGetMsg(k, storeId, k->getNode());
         node_->sendMsg(dm);
@@ -128,7 +132,7 @@ public:
 	 * Given that we just added the k-v pair to the store, see if we can deal
 	 *   with any messages.
 	 */
-	void tryToHandleQueue_(Key* k) {
+	void tryToHandleCache_(Key* k) {
 		msgCacheLock_.lock();
 		if (msgCache_->contains_key(k)) {
 			Object* res = msgCache_->remove(k);
