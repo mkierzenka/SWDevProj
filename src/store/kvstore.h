@@ -58,8 +58,6 @@ public:
 			node_->sendMsg(msg);
 			return;
 		}
-
-        printf("PUTTING IN KEY: %s\n", k->getKeyStr()->c_str());
         
         Object* putRes = kvMap->put(k->getKeyStr()->clone(), data->clone());
         if (putRes) delete putRes;
