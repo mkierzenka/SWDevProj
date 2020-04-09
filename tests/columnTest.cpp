@@ -53,7 +53,6 @@ void columnTests()
   String *stringA = new String("Good");
   String *stringB = new String("Morning");
   String *stringC = new String("Graduation");
-  //String* valsS[] = {stringA, stringC, stringA, stringB};
   String** valsS = new String*[4];
   valsS[0] = stringA;
   valsS[1] = stringC;
