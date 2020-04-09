@@ -18,7 +18,7 @@
 
 const char* SERVER_IP = "127.0.0.1"; //hardcoded server IP (for now)
 const size_t SERVER_NODE_NUM = 0;
-const size_t NUM_NODES = 1;
+const size_t NUM_NODES = 3;
 
 /** This class wraps the basic functionality of the POSIX libraries.
  * It is used to make connections between clients and the server. */
@@ -130,7 +130,9 @@ public:
         assert(connection >= 0);
     }
 
-    /** Send a message to the given IP with the given contents. */
+    /** Send a message to the given IP with the given contents. This method deletes the message
+     * passed in once it's done sending.
+    */
     void sendMsg(Message* msg)
     {
         lock_.lock();
@@ -176,6 +178,7 @@ public:
 		delete myS;
         
         close(targetFd);
+        delete msg;
         lock_.unlock();
     }
 
