@@ -28,8 +28,8 @@ int main()
   for (size_t i = 0; i < numNodes; i++)
   {
     //here, you decide whether you want your nodes to have a real or fake network
-    demos[i] = new Trivial(i, new Network(generateIp_(i), i));
-    //Trivial* t = new Trivial(i, new PseudoNetwork(sharedMQA, i));
+    //demos[i] = new Trivial(i, new Network(generateIp_(i), i));
+    demos[i] = new Trivial(i, new PseudoNetwork(sharedMQA, i));
     nodes[i] = new NodeThread(demos[i]);
     nodes[i]->start();
   }
@@ -44,7 +44,10 @@ int main()
 
   delete[] nodes;
   delete[] demos;
+  //printf("About to delete mqa\n");
   delete sharedMQA;
+  //printf("Deleted mqa\n");
 
-  exit(0);
+  //exit(0);
+  return 0;
 }
