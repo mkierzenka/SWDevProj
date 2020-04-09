@@ -56,9 +56,14 @@ public:
 		if (k->getNode() != storeId) {
 			PutMsg* msg = new PutMsg(k, data, storeId, k->getNode());
 			node_->sendMsg(msg);
+            delete msg;
 			return;
 		}
-        kvMap->put(k->getKeyStr()->clone(), data->clone());
+
+        printf("PUTTING IN KEY: %s\n", k->getKeyStr()->c_str());
+        
+        Object* putRes = kvMap->put(k->getKeyStr()->clone(), data->clone());
+        delete putRes;
 		tryToHandleCache_(k);
     }
 

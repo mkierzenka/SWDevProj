@@ -6,8 +6,6 @@
 * Test files without memory leaks: array, queue, map, message, cache, blocks, serial, store
 * Tests with memory leaks/unchecked
   * Distributed array (test not developed)
-  * Schema
-  * Column
   * Network
   * Trivial
   * Demo

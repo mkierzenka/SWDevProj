@@ -271,9 +271,10 @@ class Map : public Object {
 			return capacity_;
 		}
 		
-		// A helper method to insert a <K, V> pair into a specific bucket
-		// Returns nullptr if there was no entry for that key previously, else
-		//   overwrites the old value with val and returns the old value
+		/** A helper method to insert a <K, V> pair into a specific bucket
+		* Returns nullptr if there was no entry for that key previously, else
+		* overwrites the old value with val and returns the old value 
+		*/
 		Object* insertIntoBucket_(size_t index, Object* key, Object* val) {
 			Entry* bucket = this->buckets_[index];
 			if (!bucket) {
@@ -288,6 +289,8 @@ class Map : public Object {
 				if (curEntry->getKey()->equals(key)) {
 					// already seen this key, replace the value
 					Object* oldVal = curEntry->getValue();
+					//key passed in will not be used
+					delete key;
 					curEntry->setValue(val);
 					return oldVal;
 				}
