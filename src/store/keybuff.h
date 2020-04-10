@@ -14,7 +14,7 @@ class KeyBuff : public Object {
   Key* orig_; // external                                                        
   StrBuff buf_;                                                                  
                                                                                  
-  KeyBuff(Key* orig) : orig_(orig), buf_(*orig) {}                               
+  KeyBuff(Key* orig) : orig_(orig), buf_(orig->getKeyStr()) {}                               
                  
   // Methods that append to the key.				 
   KeyBuff& c(String &s) { buf_.c(s); return *this;  }                            
@@ -25,7 +25,7 @@ class KeyBuff : public Object {
   Key* get() {                                                                   
     String* s = buf_.get();                                                      
     buf_.c(orig_->c_str());                                                      
-    Key* k = new Key(s->steal(), orig_->home());                                 
+    Key* k = new Key(s->steal(), orig_->getNode());                                 
     delete s;                                                                    
     return k;                                                                    
   }                                                                              

@@ -30,9 +30,9 @@ public:
  
   /** The master nodes reads the input, then all of the nodes count. */
   void run_() override {
-    if (index == 0) {
+    if (idx_ == 0) {
       FileReader fr;
-      delete DataFrame::fromVisitor(&in, &kv, "S", fr);
+      delete DataFrame::fromVisitor(&in, kv_, "S", &fr);
     }
     local_count();
     reduce();
@@ -42,32 +42,33 @@ public:
    *  which then joins them one by one. */
   Key* mk_key(size_t idx) {
       Key * k = kbuf.c(idx).get();
-      LOG("Created key " << k->c_str());
+      p("Created key ").pln(k->c_str());
+      //LOG("Created key " << k->c_str());
       return k;
   }
  
   /** Compute word counts on the local node and build a data frame. */
   void local_count() {
-    DataFrame* words = (kv.waitAndGet(in));
-    p("Node ").p(index).pln(": starting local count...");
+    DataFrame* words = (kv_->waitAndGet(&in));
+    p("Node ").p(idx_).pln(": starting local count...");
     SIMap map;
     Adder add(map);
     words->local_map(add);
     delete words;
     Summer cnt(map);
-    delete DataFrame::fromVisitor(mk_key(index), &kv, "SI", cnt);
+    delete DataFrame::fromVisitor(mk_key(idx_), kv_, "SI", &cnt);
   }
  
   /** Merge the data frames of all nodes */
   void reduce() {
-    if (index != 0) return;
+    if (idx_ != 0) return;
     pln("Node 0: reducing counts...");
     SIMap map;
     Key* own = mk_key(0);
-    merge(kv.get(*own), map);
+    merge(kv_->get(own), map);
     for (size_t i = 1; i < arg.num_nodes; ++i) { // merge other nodes
       Key* ok = mk_key(i);
-      merge(kv.waitAndGet(*ok), map);
+      merge(kv_->waitAndGet(ok), map);
       delete ok;
     }
     p("Different words: ").pln(map.size());
