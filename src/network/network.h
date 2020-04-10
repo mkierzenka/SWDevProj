@@ -18,7 +18,7 @@
 
 const char* SERVER_IP = "127.0.0.1"; //hardcoded server IP (for now)
 const size_t SERVER_NODE_NUM = 0;
-const size_t NUM_NODES = 1;
+const size_t NUM_NODES = 3;
 
 /** This class wraps the basic functionality of the POSIX libraries.
  * It is used to make connections between clients and the server. */
@@ -62,6 +62,9 @@ public:
         listenForConnections();
 
         isNodeDone_ = new bool[NUM_NODES];
+        for (size_t i = 0; i < NUM_NODES; i++) {
+            isNodeDone_[i] = false;
+        }
         String* servIp = new String(SERVER_IP);
         //add the server info to this network's directory (even if we are server)
         dir->addIp(SERVER_NODE_NUM, servIp);
@@ -97,11 +100,8 @@ public:
     }
 
     void client_init() {
-   //     String* servIp = new String(SERVER_IP);
-   //    dir->addIp(0, servIp);
         RegisterMsg* rMsg = new RegisterMsg(ipAddress_, 8080, nodeId_, SERVER_NODE_NUM, 0);
         sendMsg(rMsg);
-   //     delete servIp;
         fprintf(stderr, "Node %zu Registered\n", nodeId_);
 
 		Message* m = receiveMsg();
@@ -144,7 +144,6 @@ public:
     void sendMsg(Message* msg)
     {
         lock_.lock();
-        //serialize message
         fprintf(stderr, "Node %zu called sendMsg\n", nodeId_);
         int targetFd = socket(AF_INET, SOCK_STREAM, 0);
         if (targetFd < 0)
@@ -220,13 +219,16 @@ public:
 
         assert(valread == 0);
         assert(buffer != nullptr);
+        delete[] buffer;
         close(tmpFd);
 
         fprintf(stderr, "Node %zu received message\n", nodeId_);
-        char* msgTypeBuff = new char[buffLen];
-        memcpy(msgTypeBuff, buffer, buffLen);
-        String* buffStr = buff->get();
-        Serializer* tmpSer = new Serializer(buff->size(), buffStr->c_str());
+        String* buffStr = buff->get(); //will be used to deserialize into proper msg obj
+        delete buff;
+        String* typeBuffStr = buffStr->clone(); //just for figuring out msg type
+        Serializer* tmpSer = new Serializer(typeBuffStr->size(), typeBuffStr->c_str());
+        delete typeBuffStr;
+        // WARNING: Tightly coupled to how we serialize messages!!
         MsgKind type = tmpSer->readMsgKind();
         switch (type) {
             case GetData: tmp = new GetDataMsg(); break;
@@ -244,13 +246,13 @@ public:
             }
         }
         assert(tmp);
+        delete tmpSer;
 
         lock_.lock();
-        Serializer* myS = new Serializer(buff->size(), buffStr->c_str());
+        Serializer* myS = new Serializer(buffStr->size(), buffStr->c_str());
         tmp->deserialize(myS);
+		delete myS;
         delete buffStr;
-        delete[] buffer;
-        delete buff;
         lock_.unlock();
 
         return tmp;
