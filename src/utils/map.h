@@ -105,6 +105,47 @@ class Entry : public Object {
 			}
 			return next_->addValuesToArr(valuesArr, nextIdx);
 		}
+
+		/** Get the number of Entries connected to this one (including this) */
+		size_t length() {
+			if (!next_) {
+				return 1;
+			}
+			
+			return 1 + next_->length();
+		}
+
+		/**
+		 * Return the key of the idx-th entry in this Entry list. Even if nullptr.
+		 * Will also return nullptr if list isn't long enough
+		 */
+		Object* getKey(size_t idx) {
+			if (idx == 0) {
+				return key_;
+			}
+			if (!next_) {
+				fprintf(stderr, "Cannot get key from entry list: out-of-bounds\n");
+				exit(-1);
+			}
+			return next_->getKey(idx - 1);
+		}
+
+		/**
+		 * Return the value of the idx-th entry in this Entry list. Even if nullptr.
+		 * Will also return nullptr if list isn't long enough
+		 */
+		Object* getValue(size_t idx) {
+			if (idx == 0) {
+				return value_;
+			}
+			if (!next_) {
+				fprintf(stderr, "Cannot get value from entry list: out-of-bounds\n");
+				exit(-1);
+			}
+			return next_->getValue(idx - 1);
+		}
+
+
 };
 
 /**
@@ -668,6 +709,16 @@ class MapStrObj : public Map {
 class SIMap : public Map {
 public:
   SIMap () {}
+  SIMap (SIMap &other) {
+	  Object** keys = other.get_keys();   //do not delete, this is what's going into map
+	  Object** vals = other.get_values(); //do not delete, this is what's going into map
+	  size_t lenOther = other.size();
+	  for (size_t i = 0; i < lenOther; i++) {
+		  String* k = (dynamic_cast<String*>(keys[i]))->clone();
+		  Num* n = (dynamic_cast<Num*>(vals[i]))->clone();
+		  set(*k, n);
+	  }
+  }
   Num* get(String& key) { return dynamic_cast<Num*>(Map::get(&key)); }
   void set(String& k, Num* v) { assert(v); Map::put(&k, v); }
 };
