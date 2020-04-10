@@ -3,6 +3,7 @@
 #include "object.h"
 #include "string.h"
 #include "helper.h"
+#include "num.h"
 #include <cstdio>
 
 // some inspiration from https://dzone.com/articles/custom-hashmap-implementation-in-java
@@ -661,4 +662,12 @@ class MapStrObj : public Map {
 		size_t hash() {
 			return this->helper_->hash();
 		}
+};
+
+/** Provided with Milestone 4 */
+class SIMap : public Map {
+public:
+  SIMap () {}
+  Num* get(String& key) { return dynamic_cast<Num*>(Map::get(&key)); }
+  void set(String& k, Num* v) { assert(v); Map::put(&k, v); }
 };

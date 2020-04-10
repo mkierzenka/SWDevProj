@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../utils/object.h"
+#include "object.h"
 
 /** this class wraps an integer *
  * 

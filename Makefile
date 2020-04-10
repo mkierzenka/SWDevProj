@@ -37,7 +37,7 @@ ourTests:
 	#./tests/testSorer data/datafile.sor
 	
 memory:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testTrivial
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testDemo
 
 
 buildTrivial:
@@ -51,6 +51,12 @@ buildDemo:
 
 testDemo:
 	./tests/testDemo
+
+buildWordcount:
+	g++ --std=c++11 -g -pthread tests/wordcountTest.cpp -o tests/testWordcount
+
+testWordcount:
+	./tests/testWordcount
 
 buildGeneral:
 	g++ --std=c++11 -g tests/generalTests.cpp -o tests/testGeneral

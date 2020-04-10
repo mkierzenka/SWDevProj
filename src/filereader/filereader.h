@@ -2,6 +2,9 @@
 
 #include "writer.h"
 
+
+const char* FILE_NAME = "test.txt"
+
 /** Class for reading the files given to us in M4 */
 class FileReader : public Writer {
 public:
@@ -35,8 +38,12 @@ public:
  
     /** Creates the reader and opens the file for reading.  */
     FileReader() : Writer() {
-        file_ = fopen(arg.file, "r");
-        if (file_ == nullptr) FATAL_ERROR("Cannot open file " << arg.file);
+        file_ = fopen(FILE_NAME, "r");
+        if (file_ == nullptr) {
+			fprintf(stderr, "Cannot open file %s\n", FILE_NAME);
+			exit(1);
+			//FATAL_ERROR("Cannot open file " << FILE_NAME);
+		}
         buf_ = new char[BUFSIZE + 1]; //  null terminator
         fillBuffer_();
         skipWhitespace_();
