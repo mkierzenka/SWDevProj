@@ -136,7 +136,7 @@ public:
 
 	void add_(const void *d, size_t s)
 	{
-		if ((numBytesWritten_ + s) > capacity_)
+		while ((numBytesWritten_ + s) > capacity_)
 		{
 			grow_();
 		}
