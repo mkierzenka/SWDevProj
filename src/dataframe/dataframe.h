@@ -9,6 +9,8 @@
 #include "../store/key.h"
 #include "../serial/serial.h"
 #include "../filereader/writer.h"
+#include "../filereader/adder.h"
+#include "../filereader/reader.h"
 #include "column/columnarray.h"
 #include "schema.h"
 #include "row/rower.h"
@@ -355,13 +357,13 @@ public:
   }
 
   /** Visit rows in order */
-  void map(Rower &r)
+  void map(Reader &r)
   {
     map(r, 0, schema_->length());
   }
 
   /** Visit subset of rows in order */
-  void map(Rower &r, size_t startIdx, size_t endIdx)
+  void map(Reader &r, size_t startIdx, size_t endIdx)
   {
     Row *row = new Row(*schema_);
 
@@ -374,8 +376,34 @@ public:
         setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type(colIdx));
       }
 
-      r.accept(*row);
+      r.visit(*row);
       row->clear();
+    }
+
+    delete row;
+  }
+
+  /** Visit subset of rows in order */
+  void local_map(Reader &r)
+  {
+    Row *row = new Row(*schema_);
+
+    for (size_t rowIdx = 0; rowIdx < schema_->length(); rowIdx++)
+    {
+      if ((rowIdx / BLOCK_SIZE) % NUM_NODES == store_->storeId) {
+        row->set_idx(rowIdx);
+        //iterate through each column to get value
+        for (int colIdx = 0; colIdx < row->width(); colIdx++)
+        {
+          setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type(colIdx));
+        }
+
+        r.visit(*row);
+        row->clear();
+      } else {
+        // skip this block
+        rowIdx += BLOCK_SIZE;
+      }
     }
 
     delete row;

@@ -24,6 +24,7 @@ public:
   Key in;
   KeyBuff kbuf;
   SIMap all;
+  size_t NUM_NODES = 3;
  
   WordCount(size_t idx, INetwork* net):
     Application(idx, net), in("data", 0), kbuf(new Key("wc-map-", 0)) { }
@@ -66,7 +67,7 @@ public:
     SIMap map;
     Key* own = mk_key(0);
     merge(kv_->get(own), map);
-    for (size_t i = 1; i < arg.num_nodes; ++i) { // merge other nodes
+    for (size_t i = 1; i < NUM_NODES; ++i) { // merge other nodes
       Key* ok = mk_key(i);
       merge(kv_->waitAndGet(ok), map);
       delete ok;

@@ -25,4 +25,9 @@ class Num : public Object {
     {
         return val_;
     }
+
+    /** Returns a new Num with the same value */
+    Num* clone() {
+        return new Num(val_);
+    }
 }; 

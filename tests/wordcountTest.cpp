@@ -1,8 +1,8 @@
 //lang:Cpp
 #include "../src/application/nodethread.h"
-#include "../src/application/wordcount.h"
 #include "../src/network/message.h"
 #include "../src/network/network.h"
+#include "../src/application/wordcount.h"
 #include "../src/store/getImpls.h"
 #include "../src/network/pseudo/pseudonetwork.h"
 #include "../src/network/pseudo/messagequeuearray.h"
