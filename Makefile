@@ -70,7 +70,7 @@ buildColumnArray:
 testColumnArray:
 	./tests/testColumnArray
 
-#./eau2 -app (appname) -num_nodes N -i (mynodenum) -ip (myipaddr) -port N -serverIp (addr) -serverPort N
+#./eau2 -app (appname) -num_nodes N -i (mynodenum) -ip (myipaddr) -port N -serverIp (addr) -serverPort N -pseudo
 buildeau2:
 	g++ --std=c++11 -g -pthread entry.cpp -o eau2
 

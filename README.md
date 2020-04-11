@@ -60,3 +60,5 @@ It sends the responses if available
 * Add underscore to all private fields (KVStore)
 
 * Distribute data across nodes
+
+* Figure out how to use port numbers

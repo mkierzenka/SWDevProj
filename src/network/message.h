@@ -305,6 +305,12 @@ public:
 		port_ = port;
 	}
 
+	RegisterMsg(char* client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
+	{
+		client_ = new String(client);
+		port_ = port;
+	}
+
 	~RegisterMsg()
 	{
 		delete client_;

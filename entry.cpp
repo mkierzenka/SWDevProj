@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     if (args.usePseudoNet) {
         runPseudo();
     } else {
-        INetwork* net = new Network(args.ip, args.index);
+        INetwork* net = new Network();
         Application* a = initializeApplication(net, args.index);
         a->run_();
     }
