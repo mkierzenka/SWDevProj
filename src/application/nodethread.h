@@ -6,6 +6,7 @@
 #include "application.h"
 #include "demo.h"
 #include "receiverthread.h"
+#include "../utils/args.h"
 
 
 /**
@@ -31,7 +32,7 @@ class NodeThread : public Thread
     {
         printf("Starting NodeThread %zu\n", app_->this_node());
 
-        if (app_->this_node() == 0) {
+        if (app_->this_node() == args.serverIndex) {
           net_->server_init();
         } else {
           net_->client_init();
@@ -43,7 +44,7 @@ class NodeThread : public Thread
         app_->run_();
 
         // Let server know that done executing
-        net_->sendMsg(new DoneMsg(app_->this_node(), 0, 0));
+        net_->sendMsg(new DoneMsg(app_->this_node(), args.serverIndex, 0));
         rt->join();
     }
   };
