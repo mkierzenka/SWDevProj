@@ -44,13 +44,13 @@ void runPseudo() {
         nodes[i]->start();
     }
 
-     for (size_t j = 0; j < args.numNodes; j++)
-     {
-         nodes[j]->join();
-         printf("Thread %zu ended\n", j);
-         delete nodes[j];
-         delete apps[j];
-     }
+    for (size_t j = 0; j < args.numNodes; j++)
+    {
+        nodes[j]->join();
+        printf("Thread %zu ended\n", j);
+        delete nodes[j];
+        delete apps[j];
+    }
 
     delete[] nodes;
     delete[] apps;
@@ -69,9 +69,12 @@ int main(int argc, char** argv) {
     } else {
         INetwork* net = new Network();
         Application* a = initializeApplication(net, args.index);
-        a->run_();
+        NodeThread* node = new NodeThread(a);
+        node->start();
+		// Node runs the application. Waits for server to send Teardown msg
+        node->join();
+        printf("Thread %zu ended\n", args.index);
     }
-
     return 0;
 }
 

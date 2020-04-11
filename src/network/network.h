@@ -50,7 +50,7 @@ public:
         address.sin_family = AF_INET;
         int inet = inet_pton(AF_INET, args.ip, &address.sin_addr);
         assert(inet > 0);
-        address.sin_port = htons(8080);
+        address.sin_port = htons(args.port);
         bindSocket_();
         listenForConnections();
 
@@ -60,7 +60,7 @@ public:
         }
         String* servIp = new String(args.serverIp);
         //add the server info to this network's directory (even if we are server)
-        dir->addIp(args.index, servIp);
+        dir->addIp(args.serverIndex, servIp);
         delete servIp;
     }
 
@@ -115,8 +115,11 @@ public:
     {
         int newSock = accept(fd, (struct sockaddr *)&address,
                       (socklen_t *)&addresslen);
-                      
-        assert(newSock >= 0);
+        if (newSock < 0)
+        {
+            fprintf(stderr, "ACCEPT ERRNO: %d\n", errno);
+            assert(false);
+        }
         fprintf(stderr, "Node %zu accepted connection!\n", args.index);
         return newSock;
     }
@@ -150,7 +153,6 @@ public:
             assert(false);
         }
         assert(rc >= 0);
-
         struct sockaddr_in targetAddr;
         targetAddr.sin_family = AF_INET;
         String* targetIp = dir->getAddress(msg->getTarget());
