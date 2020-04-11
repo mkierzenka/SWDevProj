@@ -15,7 +15,7 @@ public:
 
 	DoubleBlock()
 	{
-		capacity_ = BLOCK_SIZE;
+		capacity_ = args.blockSize;
 		size_ = 0;
 		vals_ = new double[capacity_];
 		memset(vals_, 0, capacity_ * sizeof(double));

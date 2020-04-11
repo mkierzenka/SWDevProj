@@ -10,6 +10,7 @@
 #include "../store/keybuff.h"
 #include "../network/inetwork.h"
 #include "../utils/map.h"
+#include "../utils/args.h"
 
 
 /****************************************************************************
@@ -67,7 +68,7 @@ public:
     SIMap map;
     Key* own = mk_key(0);
     merge(kv_->get(own), map);
-    for (size_t i = 1; i < NUM_NODES; ++i) { // merge other nodes
+    for (size_t i = 1; i < args.blockSize; ++i) { // merge other nodes
       Key* ok = mk_key(i);
       merge(kv_->waitAndGet(ok), map);
       delete ok;

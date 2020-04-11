@@ -2,6 +2,7 @@
 
 #include "../../utils/object.h"
 #include "../../utils/string.h"
+#include "../../utils/args.h"
 #include "../../store/kvstore.h"
 
 #include "distributedarray.h"
@@ -176,7 +177,7 @@ public:
         size_t len_added = 0;
         while (len_added < len)
         {
-            size_t amount_to_add = std::min((len - len_added), BLOCK_SIZE);
+            size_t amount_to_add = std::min((len - len_added), args.blockSize);
             //IntBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
             for (size_t i = len_added; i < len_added + amount_to_add; i++)
             {
@@ -184,7 +185,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / BLOCK_SIZE);
+            addBlockToStore_(s, len_added / args.blockSize);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -205,7 +206,7 @@ public:
         size_t len_added = 0;
         while (len_added < len)
         {
-            size_t amount_to_add = std::min((len - len_added), BLOCK_SIZE);
+            size_t amount_to_add = std::min((len - len_added), args.blockSize);
             //BoolBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
             for (size_t i = len_added; i < len_added + amount_to_add; i++)
             {
@@ -213,7 +214,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / BLOCK_SIZE);
+            addBlockToStore_(s, len_added / args.blockSize);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -234,7 +235,7 @@ public:
         size_t len_added = 0;
         while (len_added < len)
         {
-            size_t amount_to_add = std::min((len - len_added), BLOCK_SIZE);
+            size_t amount_to_add = std::min((len - len_added), args.blockSize);
             //DoubleBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
             for (size_t i = len_added; i < len_added + amount_to_add; i++)
             {
@@ -242,7 +243,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / BLOCK_SIZE);
+            addBlockToStore_(s, len_added / args.blockSize);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -263,7 +264,7 @@ public:
         size_t len_added = 0;
         while (len_added < len)
         {
-            size_t amount_to_add = std::min((len - len_added), BLOCK_SIZE);
+            size_t amount_to_add = std::min((len - len_added), args.blockSize);
             //StringBlock gets ints from vals[len_added] : vals[len_added + amount_to_add]
             for (size_t i = len_added; i < len_added + amount_to_add; i++)
             {
@@ -271,7 +272,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / BLOCK_SIZE);
+            addBlockToStore_(s, len_added / args.blockSize);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -295,8 +296,8 @@ public:
             return -1;
         }
 
-        size_t chunk = idx / BLOCK_SIZE;
-        size_t idxInChunk = idx % BLOCK_SIZE;
+        size_t chunk = idx / args.blockSize;
+        size_t idxInChunk = idx % args.blockSize;
 
         Key *k = genKey_(chunk); //Key to look up data
         double out = blocks_->getDouble(k, idxInChunk);
@@ -313,8 +314,8 @@ public:
             return -1;
         }
 
-        size_t chunk = idx / BLOCK_SIZE;
-        size_t idxInChunk = idx % BLOCK_SIZE;
+        size_t chunk = idx / args.blockSize;
+        size_t idxInChunk = idx % args.blockSize;
 
         Key *k = genKey_(chunk); //Key to look up data
         bool out = blocks_->getBool(k, idxInChunk);
@@ -331,8 +332,8 @@ public:
             exit(1);
         }
 
-        size_t chunk = idx / BLOCK_SIZE;
-        size_t idxInChunk = idx % BLOCK_SIZE;
+        size_t chunk = idx / args.blockSize;
+        size_t idxInChunk = idx % args.blockSize;
 
         Key *k = genKey_(chunk); //Key to look up data
         String *out = blocks_->getString(k, idxInChunk);
@@ -349,8 +350,8 @@ public:
             return -1;
         }
 
-        size_t chunk = idx / BLOCK_SIZE;
-        size_t idxInChunk = idx % BLOCK_SIZE;
+        size_t chunk = idx / args.blockSize;
+        size_t idxInChunk = idx % args.blockSize;
 
         Key *k = genKey_(chunk); //Key to look up data
         int out = blocks_->getInt(k, idxInChunk);

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../../utils/object.h"
-
-static const size_t BLOCK_SIZE = 1024;//2048;
+#include "../../utils/args.h"
+//static const size_t BLOCK_SIZE = 1024;//2048;
 
 /**
 * Block - to represent a block of one type of data.

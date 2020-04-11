@@ -5,6 +5,7 @@
 #include "../utils/helper.h"
 #include "../utils/array.h"
 #include "../utils/thread.h"
+#include "../utils/args.h"
 #include "../store/kvstore.h"
 #include "../store/key.h"
 #include "../serial/serial.h"
@@ -15,6 +16,8 @@
 #include "schema.h"
 #include "row/rower.h"
 #include "row/row.h"
+
+//Arguments args;
 
 /****************************************************************************
  * DataFrame::
@@ -324,7 +327,7 @@ public:
   /** Add rows to this DataFrame built by Writer. Until wr->done() */
   void visit(Writer *wr)
   {
-    size_t block_size = 1024; // Should match BLOCK_SIZE in block.h
+    size_t block_size = args.blockSize;
     Array *rowChunk = new Array(block_size);
     for (size_t i = 0; i < block_size; i++)
     {
@@ -390,7 +393,7 @@ public:
 
     for (size_t rowIdx = 0; rowIdx < schema_->length(); rowIdx++)
     {
-      if ((rowIdx / BLOCK_SIZE) % NUM_NODES == store_->storeId) {
+      if ((rowIdx / args.blockSize) % args.numNodes == store_->storeId) {
         row->set_idx(rowIdx);
         //iterate through each column to get value
         for (int colIdx = 0; colIdx < row->width(); colIdx++)
@@ -402,7 +405,7 @@ public:
         row->clear();
       } else {
         // skip this block
-        rowIdx += BLOCK_SIZE;
+        rowIdx += args.blockSize;
       }
     }
 
@@ -413,32 +416,32 @@ public:
 	 *    subset of rows of a DataFrame.
 	 *  
 	 *  author: kierzenka.m@husky.neu.edu */
-  class DataFrameThread : public Thread
+  /*class DataFrameThread : public Thread
   {
   public:
     size_t startRowIdx_; // inclusive
     size_t endRowIdx_;   // exclusive
     DataFrame *df_;
-    Rower &r_;
+    Reader &r_;
 
-    DataFrameThread(DataFrame *df, Rower &r, size_t startRowIdx, size_t endRowIdx) : df_(df), r_(r), startRowIdx_(startRowIdx), endRowIdx_(endRowIdx) {}
+    DataFrameThread(DataFrame *df, Reader &r, size_t startRowIdx, size_t endRowIdx) : df_(df), r_(r), startRowIdx_(startRowIdx), endRowIdx_(endRowIdx) {}
 
     void run()
     {
       df_->map(r_, startRowIdx_, endRowIdx_);
     }
 
-    Rower &getRower()
+    Reader &getReader()
     {
       return r_;
     }
-  };
+  };*/
 
   /**
    * This method clones the Rower and executes the map in parallel over
    * the specified number of threads.
    */
-  void pmap(Rower &r, size_t numThreads)
+  /*void pmap(Rower &r, size_t numThreads)
   {
     if (numThreads == 0)
     {
@@ -470,19 +473,19 @@ public:
     }
 
     delete[] threads;
-  }
+  }*/
 
   /** This method clones the Rower and executes the map in parallel. Join is
 	* used at the end to merge the results. Creates (number of threads / 2) + 1
 	* parallel worker threads. This means that for Intel CPUs with hyperthreading,
 	* this will run 1 thread per physical CPU core + 1 extra
 	*/
-  void pmap(Rower &r)
+  /*void pmap(Rower &r)
   {
     size_t numThreads = (std::thread::hardware_concurrency() / 2) + 1;
     p("Number of threads in pmap: ").pln(numThreads);
     pmap(r, numThreads);
-  }
+  }*/
 
   /** Create a new dataframe, constructed from rows for which the given Rower
     * returned true from its accept method. */
@@ -611,7 +614,7 @@ public:
   /**
    * Appends a set of rows to this DataFrame, in order. Does it by making temporary arrays
    *   and adding them to specific columns in one shot. The length of rowChunk nor numRowsInChunk
-   *   should not exceed the BLOCK_SIZE defined in block.h
+   *   should not exceed args.blockSize
    * 
    * Approach: For each column in the schema, get the type and make a temporary (c-style) array of those values
    *            Iterate through each of the rows in the array, pulling a copy of the value into the c-style arr

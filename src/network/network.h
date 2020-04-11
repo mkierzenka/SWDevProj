@@ -4,6 +4,7 @@
 #include "../utils/string.h"
 #include "../serial/serial.h"
 #include "../utils/thread.h"
+#include "../utils/args.h"
 #include "message.h"
 #include "msgkind.h"
 #include "inetwork.h"
@@ -15,10 +16,6 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <assert.h>
-
-const char* SERVER_IP = "127.0.0.1"; //hardcoded server IP (for now)
-const size_t SERVER_NODE_NUM = 0;
-const size_t NUM_NODES = 3;
 
 /** This class wraps the basic functionality of the POSIX libraries.
  * It is used to make connections between clients and the server. */
@@ -42,7 +39,7 @@ public:
      * Network constructor. Will take string IP of the client/server
      * that it was initialized by.
 	 */
-    Network(const char* addr, size_t nodeId)
+    Network(const char* addr, size_t nodeId) : INetwork()
     {
         s = new Serializer();
         dir = new Directory();
@@ -61,13 +58,13 @@ public:
         bindSocket_();
         listenForConnections();
 
-        isNodeDone_ = new bool[NUM_NODES];
-        for (size_t i = 0; i < NUM_NODES; i++) {
+        isNodeDone_ = new bool[args.numNodes];
+        for (size_t i = 0; i < args.numNodes; i++) {
             isNodeDone_[i] = false;
         }
-        String* servIp = new String(SERVER_IP);
+        String* servIp = new String(args.serverIp);
         //add the server info to this network's directory (even if we are server)
-        dir->addIp(SERVER_NODE_NUM, servIp);
+        dir->addIp(args.index, servIp);
         delete servIp;
     }
 
@@ -83,24 +80,22 @@ public:
     void server_init() {
         listenForConnections();
         // Build a Directory from the msgs each node sends
-        for (int i = 1; i < NUM_NODES; i++) {
+        for (int i = 1; i < args.numNodes; i++) {
             RegisterMsg* rMsg = dynamic_cast<RegisterMsg*>(receiveMsg()); //blocking
             assert(rMsg);
             handleRegisterMsg(rMsg);
         }
         fprintf(stderr, "Server got all the nodes\n");
         // When all nodes (expected number) have registered, send directory to everyone
-        for (int i = 1; i < NUM_NODES; i++) {
+        for (int i = 1; i < args.numNodes; i++) {
             DirectoryMsg* dMsg = new DirectoryMsg(dir, 8080, nodeId_, i, 0);
             fprintf(stderr, "Server sending Directory Message to Node %d\n", i);
             sendMsg(dMsg);
         }
-
-        // ??Figure out when to send terminate msgs??
     }
 
     void client_init() {
-        RegisterMsg* rMsg = new RegisterMsg(ipAddress_, 8080, nodeId_, SERVER_NODE_NUM, 0);
+        RegisterMsg* rMsg = new RegisterMsg(ipAddress_, args.serverPort, nodeId_, args.serverIndex, 0);
         sendMsg(rMsg);
         fprintf(stderr, "Node %zu Registered\n", nodeId_);
 
@@ -297,9 +292,9 @@ public:
     /** Handle done message. Only for the server */
     void handleDoneMsg(DoneMsg* m)
     {
-        assert(m && nodeId_ == SERVER_NODE_NUM);
+        assert(m && nodeId_ == args.serverIndex);
         isNodeDone_[m->getSender()] = true;
-        for (size_t i = 0; i < NUM_NODES; i++) {
+        for (size_t i = 0; i < args.numNodes; i++) {
             if (!isNodeDone_[i]) {
                 return; // Not all the nodes are done yet
             }
@@ -313,7 +308,7 @@ public:
      * Only the Server should call this method
      */
     void sendTeardownMsgs_() {
-        for (size_t i = 0; i < NUM_NODES; i++) {
+        for (size_t i = 0; i < args.numNodes; i++) {
             sendMsg(new TeardownMsg(nodeId_, i, 0));
         }
     }
