@@ -47,12 +47,17 @@ runeau2:
 	./eau2 -app demo -num_nodes 3 -pseudo
 
 testTrivial:
-	./eau2 -app trivial -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	#./eau2 -app trivial -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	./eau2 -app trivial -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 -pseudo
 
 testDemo:
-	./eau2 -app demo -num_nodes 3 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
-	./eau2 -app demo -num_nodes 3 -i 1 -ip 127.0.0.2 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
-	./eau2 -app demo -num_nodes 3 -i 2 -ip 127.0.0.3 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	# ./eau2 -app demo -num_nodes 3 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
+	# ./eau2 -app demo -num_nodes 3 -i 1 -ip 127.0.0.2 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
+	# ./eau2 -app demo -num_nodes 3 -i 2 -ip 127.0.0.3 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+
+	./eau2 -app demo -num_nodes 3 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 -pseudo &
+	./eau2 -app demo -num_nodes 3 -i 1 -ip 127.0.0.2 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 -pseudo &
+	./eau2 -app demo -num_nodes 3 -i 2 -ip 127.0.0.3 -port 8080 -serverIp 127.0.0.1 -serverPort -pseudo 8080
 
 testWordcount:
 	./eau2 -app wordcount -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080

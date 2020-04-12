@@ -6,6 +6,9 @@
 #include "../src/store/key.h"
 #include "../src/store/value.h"
 #include "../src/serial/serial.h"
+#include "../src/utils/args.h"
+
+Arguments args;
 
 /**
  * Check that reply message serialization and deserialization works
@@ -59,8 +62,11 @@ void replyDataMsgTest()
 /**
  * Will check that all messages behave as expected (particularly with serialization and deserialization)
  */
-int main()
+int main(int argc, char** argv)
 {
+    args.parse(argc, argv);
+    args.print();
+    
     replyDataMsgTest();
 
 

@@ -6,11 +6,17 @@
 #include "../src/dataframe/block/doubleblock.h"
 #include "../src/dataframe/block/boolblock.h"
 #include "../src/dataframe/block/stringblock.h"
+#include "../src/utils/args.h"
 
 #include <assert.h>
 
-int main()
+Arguments args;
+
+int main(int argc, char** argv)
 {
+    args.parse(argc, argv);
+    args.print();
+    
     printf("Cache test starting...\n");
     //create cache and some elements to put into the cache
     Cache* myCache = new Cache(3);

@@ -5,8 +5,10 @@
 #include "../src/dataframe/dataframe.h"
 #include "../src/network/pseudo/messagequeuearray.h"
 #include "../src/network/pseudo/pseudonetwork.h"
+#include "../src/utils/args.h"
 #include <assert.h>
 
+Arguments args;
 
 /**
  * Integration Tests for KVStore, DataFrame, Network.
@@ -112,8 +114,11 @@ void doubleTest() {
     printf("KVStore double test passed!\n");
 }*/
 
-int main()
+int main(int argc, char** argv)
 {
+	args.parse(argc, argv);
+    args.print();
+	
     printf("KVStore integration tests starting...\n");
 	checkGetSingle();
     printf("KVStore integration tests passed!\n");

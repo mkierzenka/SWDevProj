@@ -4,9 +4,12 @@
 #include "../src/store/key.h"
 #include "../src/store/value.h"
 #include "../src/utils/string.h"
+#include "../src/utils/args.h"
 #include "incwriter.h"
 
 Sys SYSTEM;
+
+Arguments args;
 
 /*void basicTest2()
 {
@@ -132,8 +135,11 @@ void dataFrameFromWriter() {
   SYSTEM.pln("Data frame from writer test passed!");
 }
 
-int main()
+int main(int argc, char** argv)
 {
+  args.parse(argc, argv);
+    args.print();
+
   SYSTEM.pln("General tests starting...");
   //basicTest2();
   dataFrameTest();

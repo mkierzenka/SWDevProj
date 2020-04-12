@@ -7,6 +7,7 @@
 #include "../src/store/value.h"
 #include "../src/store/kvstore.h"
 #include "../src/utils/string.h"
+#include "../src/utils/args.h"
 #include "../src/dataframe/block/boolblock.h"
 #include "../src/dataframe/block/doubleblock.h"
 #include "../src/dataframe/block/stringblock.h"
@@ -16,16 +17,18 @@
 #include "../src/dataframe/schema.h"
 #include "../src/dataframe/column/column.h"
 
+Arguments args;
+
 void serializeKeyTest()
 {
     printf("Serialize key test started\n");
 
-    String* keyStr = new String("hello");
-    Key* k = new Key(keyStr, 0);
+    String *keyStr = new String("hello");
+    Key *k = new Key(keyStr, 0);
     Serializer *s = new Serializer();
     k->serialize(s);
 
-    Key* newK = new Key();
+    Key *newK = new Key();
     newK->deserialize(s);
 
     assert(k->equals(newK));
@@ -42,17 +45,17 @@ void serializeStringBlockTest()
 {
     printf("Serialize String block test started\n");
 
-    StringBlock* b = new StringBlock();
+    StringBlock *b = new StringBlock();
     b->add(new String("ABC"));
     b->add(new String("DDDD$"));
     b->add(new String("fdsafdsaf"));
     b->add(new String("2122222"));
     b->add(new String("apple"));
 
-    Serializer* s = new Serializer();
+    Serializer *s = new Serializer();
     b->serialize(s);
 
-    StringBlock* newB = new StringBlock();
+    StringBlock *newB = new StringBlock();
     newB->deserialize(s);
 
     assert(b->equals(newB));
@@ -68,15 +71,15 @@ void serializeBoolBlockTest()
 {
     printf("Serialize bool block test started\n");
 
-    BoolBlock* b = new BoolBlock();
+    BoolBlock *b = new BoolBlock();
     b->add(true);
     b->add(true);
     b->add(false);
 
-    Serializer* s = new Serializer();
+    Serializer *s = new Serializer();
     b->serialize(s);
 
-    BoolBlock* newB = new BoolBlock();
+    BoolBlock *newB = new BoolBlock();
     newB->deserialize(s);
 
     assert(b->equals(newB));
@@ -92,15 +95,15 @@ void serializeDoubleBlockTest()
 {
     printf("Serialize double block test started\n");
 
-    DoubleBlock* b = new DoubleBlock();
+    DoubleBlock *b = new DoubleBlock();
     b->add(0);
     b->add(3.9);
     b->add(57.92);
 
-    Serializer* s = new Serializer();
+    Serializer *s = new Serializer();
     b->serialize(s);
 
-    DoubleBlock* newB = new DoubleBlock();
+    DoubleBlock *newB = new DoubleBlock();
     newB->deserialize(s);
 
     assert(b->equals(newB));
@@ -116,15 +119,15 @@ void serializeIntBlockTest()
 {
     printf("Serialize int block test started\n");
 
-    IntBlock* ib = new IntBlock();
+    IntBlock *ib = new IntBlock();
     ib->add(0);
     ib->add(3);
     ib->add(5792);
 
-    Serializer* s = new Serializer();
+    Serializer *s = new Serializer();
     ib->serialize(s);
 
-    IntBlock* newIB = new IntBlock();
+    IntBlock *newIB = new IntBlock();
     newIB->deserialize(s);
 
     assert(ib->equals(newIB));
@@ -140,11 +143,11 @@ void serializeSchemaTest()
 {
     printf("Serialize schema test started\n");
 
-    Schema* schem = new Schema("IBFSSI");
-    Serializer* serial = new Serializer();
+    Schema *schem = new Schema("IBFSSI");
+    Serializer *serial = new Serializer();
     schem->serialize(serial);
 
-    Schema* newSchem = new Schema();
+    Schema *newSchem = new Schema();
     newSchem->deserialize(serial);
 
     assert(schem->equals(newSchem));
@@ -160,25 +163,25 @@ void serializeColumnTest()
 {
     printf("Column serialization test started\n");
 
-    KVStore* store = new KVStore(0, nullptr);
-    String* keyStr = new String("0-0");
-    Key* k = new Key(keyStr, 0);
+    KVStore *store = new KVStore(0, nullptr);
+    String *keyStr = new String("0-0");
+    Key *k = new Key(keyStr, 0);
     delete keyStr;
 
-    Column* c = new Column(store, k, ColType::Integer);
-    int* vals = new int[5];
+    Column *c = new Column(store, k, ColType::Integer);
+    int *vals = new int[5];
     for (int i = 0; i < 5; i++)
     {
-        vals[i] = 2*i + 3;
+        vals[i] = 2 * i + 3;
     }
 
     //add values to the column
     c->add_all(5, vals);
 
-    Serializer* s = new Serializer();
+    Serializer *s = new Serializer();
     c->serialize(s);
 
-    Column* newC = new Column();
+    Column *newC = new Column();
     newC->setStore(store);
     newC->deserialize(s);
 
@@ -193,73 +196,78 @@ void serializeColumnTest()
     printf("Column serialization test passed!\n");
 }
 
-void serializeDistArrTest() {
-	printf("Distributed Array serialization test started\n");
-	
-	KVStore* store = new KVStore(0, nullptr);
-    String* keyStr = new String("data-0-0");
-    Key* k = new Key(keyStr, 0);
-	
-	String* keyStr1 = new String("data-0-1");
-    Key* k1 = new Key(keyStr1, 0);
-	
-	String* keyStr2 = new String("data-0-2");
-    Key* k2 = new Key(keyStr2, 0);
-	
-	String* keyStr3 = new String("data-0-3");
-    Key* k3 = new Key(keyStr3, 0);
-	
+void serializeDistArrTest()
+{
+    printf("Distributed Array serialization test started\n");
 
-	DistributedArray* da = new DistributedArray(store);
-	da->addKey(k);
-	da->addKey(k1);
-	da->addKey(k2);
-	da->addKey(k3);
-	
-	Serializer* s = new Serializer();
+    KVStore *store = new KVStore(0, nullptr);
+    String *keyStr = new String("data-0-0");
+    Key *k = new Key(keyStr, 0);
+
+    String *keyStr1 = new String("data-0-1");
+    Key *k1 = new Key(keyStr1, 0);
+
+    String *keyStr2 = new String("data-0-2");
+    Key *k2 = new Key(keyStr2, 0);
+
+    String *keyStr3 = new String("data-0-3");
+    Key *k3 = new Key(keyStr3, 0);
+
+    DistributedArray *da = new DistributedArray(store);
+    da->addKey(k);
+    da->addKey(k1);
+    da->addKey(k2);
+    da->addKey(k3);
+
+    Serializer *s = new Serializer();
     da->serialize(s);
 
-    DistributedArray* da2 = new DistributedArray(store);
-	da2->deserialize(s);
+    DistributedArray *da2 = new DistributedArray(store);
+    da2->deserialize(s);
 
     assert(da->equals(da2));
-	
-	printf("Distributed Array serialization test passed!\n");
+
+    printf("Distributed Array serialization test passed!\n");
 }
 
-void serializeColumnArrTest() {
-	printf("Column Array serialization test started\n");
-	
-	KVStore* store = new KVStore(0, nullptr);
-    String* keyStr = new String("data-0");
-    Key* k = new Key(keyStr, 0);
-	
-	ColumnArray* ca = new ColumnArray(store, k);
-	size_t numElems = 7;
-	double* dbls = new double[numElems];
-	for (size_t i = 0; i < numElems; i++) {
-		dbls[i] = (i * 1.5f);
-	}
-	
-	ca->add_column_fromarray(7, dbls);
-	
-	Serializer* s = new Serializer();
+void serializeColumnArrTest()
+{
+    printf("Column Array serialization test started\n");
+
+    KVStore *store = new KVStore(0, nullptr);
+    String *keyStr = new String("data-0");
+    Key *k = new Key(keyStr, 0);
+
+    ColumnArray *ca = new ColumnArray(store, k);
+    size_t numElems = 7;
+    double *dbls = new double[numElems];
+    for (size_t i = 0; i < numElems; i++)
+    {
+        dbls[i] = (i * 1.5f);
+    }
+
+    ca->add_column_fromarray(7, dbls);
+
+    Serializer *s = new Serializer();
     ca->serialize(s);
 
-    ColumnArray* ca2 = new ColumnArray(store, k);
-	ca2->deserialize(s);
+    ColumnArray *ca2 = new ColumnArray(store, k);
+    ca2->deserialize(s);
 
     assert(ca->equals(ca2));
-	
-	printf("Column Array serialization test passed!\n");
+
+    printf("Column Array serialization test passed!\n");
 }
 
 /** 
  * Test serializing and deserializing on the different classes we may use it for (arrays, blocks, 
  * dataframes, etc.). Will create new object from deserialized result and make sure they equal
  */
-int main()
+int main(int argc, char** argv)
 {
+    args.parse(argc, argv);
+    args.print();
+
     serializeKeyTest();
     serializeBoolBlockTest();
     serializeDoubleBlockTest();
@@ -267,7 +275,7 @@ int main()
     serializeIntBlockTest();
     serializeSchemaTest();
     serializeColumnTest();
-	serializeDistArrTest();
-	serializeColumnArrTest();
-	printf("All Serialization Tests Passed!\n");
+    serializeDistArrTest();
+    serializeColumnArrTest();
+    printf("All Serialization Tests Passed!\n");
 }

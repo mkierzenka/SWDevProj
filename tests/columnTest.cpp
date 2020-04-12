@@ -4,15 +4,18 @@
 #include "../src/store/key.h"
 #include "../src/store/value.h"
 #include "../src/utils/string.h"
+#include "../src/utils/args.h"
 
 Sys SYSTEM;
 
+Arguments args;
+
 void columnTests()
 {
-  KVStore* store = new KVStore(0, nullptr);
-  Key* baseKeyI = new Key("baseInts", 0);
+  KVStore *store = new KVStore(0, nullptr);
+  Key *baseKeyI = new Key("baseInts", 0);
   int numsI[] = {1, 2, 3, 4};
-  Column* ic = new Column(store, baseKeyI, ColType::Integer);
+  Column *ic = new Column(store, baseKeyI, ColType::Integer);
   ic->add_all(4, numsI);
 
   assert(ic->size() == 4);
@@ -23,9 +26,9 @@ void columnTests()
   delete ic;
 
   //
-  Key* baseKeyD = new Key("baseDbls", 0);
+  Key *baseKeyD = new Key("baseDbls", 0);
   double numsD[] = {4.5, 2.1, 0.0, 0.004};
-  Column* dc = new Column(store, baseKeyD, ColType::Double);
+  Column *dc = new Column(store, baseKeyD, ColType::Double);
   dc->add_all(4, numsD);
 
   assert(dc->size() == 4);
@@ -36,9 +39,9 @@ void columnTests()
   delete dc;
 
   //
-  Key* baseKeyB = new Key("baseBools", 0);
+  Key *baseKeyB = new Key("baseBools", 0);
   bool valsB[] = {true, false, false, true};
-  Column* bc = new Column(store, baseKeyB, ColType::Boolean);
+  Column *bc = new Column(store, baseKeyB, ColType::Boolean);
   bc->add_all(4, valsB);
 
   assert(bc->size() == 4);
@@ -48,27 +51,26 @@ void columnTests()
   assert(bc->get_bool(3) == valsB[3]);
   delete bc;
 
-  //
-  Key* baseKeyS = new Key("baseStrs", 0);
+  Key *baseKeyS = new Key("baseStrs", 0);
   String *stringA = new String("Good");
   String *stringB = new String("Morning");
   String *stringC = new String("Graduation");
-  String** valsS = new String*[4];
+  String **valsS = new String *[4];
   valsS[0] = stringA;
   valsS[1] = stringC;
   valsS[2] = stringA;
   valsS[3] = stringB;
 
-  Column* sc = new Column(store, baseKeyS, ColType::Str);
+  Column *sc = new Column(store, baseKeyS, ColType::Str);
   sc->add_all(4, valsS);
- 
+
   assert(sc->size() == 4);
   assert(sc->get_string(0)->equals(valsS[0]));
   assert(sc->get_string(1)->equals(valsS[1]));
   assert(sc->get_string(2)->equals(valsS[2]));
   assert(sc->get_string(3)->equals(valsS[3]));
   delete sc;
-  
+
   delete store;
   delete stringA;
   delete stringB;
@@ -76,8 +78,11 @@ void columnTests()
   delete[] valsS;
 }
 
-int main()
+int main(int argc, char **argv)
 {
+  args.parse(argc, argv);
+  args.print();
+
   SYSTEM.pln("Column tests started...");
   columnTests();
   SYSTEM.pln("Column tests passed!");

@@ -5,9 +5,11 @@
 #include "../src/dataframe/block/doubleblock.h"
 #include "../src/dataframe/block/boolblock.h"
 #include "../src/dataframe/block/stringblock.h"
+#include "../src/utils/args.h"
 
 #include <assert.h>
 
+Arguments args;
 
 void intBlockTest() {
     printf("Int Block test starting...\n");
@@ -179,8 +181,11 @@ void boolBlockTest() {
 	printf("Bool Block test passed!\n");
 }
 
-int main()
+int main(int argc, char** argv)
 {
+	args.parse(argc, argv);
+    args.print();
+	
     printf("Block tests starting...\n");
 	intBlockTest();
 	stringBlockTest();
