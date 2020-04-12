@@ -70,6 +70,13 @@ public:
     }
 
     /**
+     * Returns a pointer to the char* of this key
+     */
+    char* c_str() override {
+        return kStr_->c_str();
+    }
+
+    /**
      * Return node that this key's data lives on
      */
     size_t getNode()
