@@ -372,6 +372,7 @@ public:
 
     for (size_t rowIdx = startIdx; rowIdx < endIdx; rowIdx++)
     {
+      fprintf(stderr, "map row %zu\n", rowIdx);
       row->set_idx(rowIdx);
       //iterate through each column to get value
       for (int colIdx = 0; colIdx < row->width(); colIdx++)
@@ -398,6 +399,7 @@ public:
         //iterate through each column to get value
         for (int colIdx = 0; colIdx < row->width(); colIdx++)
         {
+          fprintf(stderr, "local_map(%zu, %d) is %c\n", rowIdx, colIdx, schema_->col_type(colIdx));
           setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type(colIdx));
         }
 
@@ -604,7 +606,7 @@ public:
       r.set(colIdx, columns_->get_double(colIdx, rowIdx));
       break;
     case 'S':
-      r.set(colIdx, columns_->get_string(colIdx, rowIdx));
+      r.set(colIdx, columns_->get_string(colIdx, rowIdx)->clone());
       break;
     default:
       fprintf(stderr, "Invalid col type: %c", colType);

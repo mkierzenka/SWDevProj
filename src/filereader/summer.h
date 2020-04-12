@@ -13,13 +13,15 @@ public:
   size_t j = 0;
   size_t seen = 0;
  
-  Summer(SIMap& map) : map_(map) {
+   Summer(SIMap& map) : map_(map) {}
+
+/*  Summer(SIMap& map) : map_(map) {
       if (!k()) {
           next();
       }
   }
-
- void next()
+*/
+/* void next()
 {
     if (i == map_.capacity_) return;
     if (i < map_.size())
@@ -30,7 +32,20 @@ public:
 		i++;
 	  }
     }
-}
+}*/
+
+  void next() {
+      if (i == map_.capacity_ ) return;
+      if ( j < map_.buckets_[i]->length() ) {
+          j++;
+          ++seen;
+      } else {
+          ++i;
+          j = 0;
+          while( i < map_.capacity_ && !map_.buckets_[i] )  i++;
+          if (k()) ++seen;
+      }
+  }
  
   String* k() {
       if (i==map_.capacity_ || j == map_.buckets_[i]->length()) {
@@ -38,7 +53,7 @@ public:
       }
       return (String*) (map_.buckets_[i]->getKey(j));
   }
- 
+
   size_t v() {
       if (i == map_.capacity_ || j == map_.buckets_[i]->length()) {
           assert(false); return 0;
@@ -47,6 +62,7 @@ public:
   }
  
   void visit(Row& r) {
+      if (!k()) next();
       String & key = *k();
       size_t value = v();
       r.set(0, &key);

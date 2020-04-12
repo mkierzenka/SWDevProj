@@ -25,7 +25,6 @@ public:
   Key in;
   KeyBuff kbuf;
   SIMap all;
-  size_t NUM_NODES = 3;
  
   WordCount(size_t idx, INetwork* net):
     Application(idx, net), in("data", 0), kbuf(new Key("wc-map-", 0)) { }
@@ -34,7 +33,7 @@ public:
   void run_() override {
     if (idx_ == 0) {
       FileReader fr;
-      delete DataFrame::fromVisitor(&in, kv_, "S", &fr);
+      /*delete */DataFrame::fromVisitor(&in, kv_, "S", &fr);
     }
     local_count();
     reduce();
@@ -43,7 +42,7 @@ public:
   /** Returns a key for given node.  These keys are homed on master node
    *  which then joins them one by one. */
   Key* mk_key(size_t idx) {
-      Key * k = kbuf.c(idx).get();
+      Key * k = kbuf.c(idx).get()->clone();
       p("Created key ").pln(k->c_str());
       //LOG("Created key " << k->c_str());
       return k;
@@ -58,7 +57,7 @@ public:
     words->local_map(add);
     delete words;
     Summer cnt(map);
-    delete DataFrame::fromVisitor(mk_key(idx_), kv_, "SI", &cnt);
+    DataFrame::fromVisitor(mk_key(idx_), kv_, "SI", &cnt);
   }
  
   /** Merge the data frames of all nodes */
@@ -67,8 +66,11 @@ public:
     pln("Node 0: reducing counts...");
     SIMap map;
     Key* own = mk_key(0);
-    merge(kv_->get(own), map);
-    for (size_t i = 1; i < args.blockSize; ++i) { // merge other nodes
+	DataFrame* tmp = kv_->get(own);
+	String* a = tmp->get_string(0, 0);
+	String* a2 = tmp->get_string(0, 1);
+    merge(tmp, map);
+    for (size_t i = 1; i < args.numNodes; ++i) { // merge other nodes
       Key* ok = mk_key(i);
       merge(kv_->waitAndGet(ok), map);
       delete ok;

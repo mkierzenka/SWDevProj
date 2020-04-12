@@ -15,12 +15,12 @@ public:
   Adder(SIMap& map) : map_(map) {}
  
   bool visit(Row& r) override {
-    String* word = r.get_string(0);
+    String* word = r.get_string(0)->clone();
     assert(word != nullptr);
-    Num* num = map_.contains_key(word) ? dynamic_cast<Num*>(map_.get(*word)) : new Num();
+    Num* num = map_.contains_key(word) ? dynamic_cast<Num*>(map_.get(*word))->clone() : new Num();
     assert(num != nullptr);
     num->val_++;
-    map_.put(word, num);
+    map_.put(word->clone(), num->clone());
     return false;
   }
 };
