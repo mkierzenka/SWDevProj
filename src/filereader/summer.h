@@ -15,32 +15,8 @@ public:
  
    Summer(SIMap& map) : map_(map) {}
 
-/*  Summer(SIMap& map) : map_(map) {
-      if (!k()) {
-          next();
-      }
-  }
-*/
-/* void next()
-{
-    if (i == map_.capacity_) return;
-    if (i < map_.size())
-    {
-	  ++i; 
-	  j = 0; 
-	  while( i < map_.capacity_ && !map_.buckets_[i]) {
-		i++;
-	  }
-    }
-}*/
-
   void next() {
       if (i == map_.capacity_) return;
-    //   while (!map_.buckets_[i])
-    //   {
-    //       i++;
-    //       if (i == map_.capacity_ ) return;
-    //   }
 
       if (map_.buckets_[i] && j < map_.buckets_[i]->length()) {
           j++;

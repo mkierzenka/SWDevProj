@@ -34,7 +34,6 @@ public:
         {
 			Message *m = network_->receiveMsg(); // blocks until new message arrives
             MsgKind kind = m->getKind();
-            fprintf(stderr, "Node %zu received message of kind: %d\n", nodeNum_, kind);
             switch (kind)
             {
             case MsgKind::GetData:
