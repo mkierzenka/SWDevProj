@@ -91,7 +91,10 @@ public:
 		{
 			return entries_[col]->getInt();
 		}
+
+		exitIfNotSet_(col);
 	}
+	
 	bool get_bool(size_t col)
 	{
 		exitIfBadSet_(col, 'B');
