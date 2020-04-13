@@ -64,8 +64,14 @@ public:
 		tryToHandleCache_(k);
     }
 
+    /** Get data that's mapped to the given key in the KVStore and deserialize it into a
+     * dataframe. Not blocking: will return nullptr if key does not exist in the store. 
+     * Implemented in getImpls.h */
     DataFrame *get(Key *k);
 
+    /** Get data that's mapped to the given key in the KVStore and deserialize it into a
+     * dataframe. Blocking: waits until key exists in expected store. Implemented in 
+     * getImpls.h */
     DataFrame* waitAndGet(Key* k);
 
     /**
