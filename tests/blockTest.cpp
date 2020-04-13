@@ -184,7 +184,6 @@ void boolBlockTest() {
 int main(int argc, char** argv)
 {
 	args.parse(argc, argv);
-    args.print();
 	
     printf("Block tests starting...\n");
 	intBlockTest();

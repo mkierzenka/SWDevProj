@@ -117,7 +117,6 @@ void doubleTest() {
 int main(int argc, char** argv)
 {
 	args.parse(argc, argv);
-    args.print();
 	
     printf("KVStore integration tests starting...\n");
 	checkGetSingle();

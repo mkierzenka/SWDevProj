@@ -266,7 +266,6 @@ void serializeColumnArrTest()
 int main(int argc, char** argv)
 {
     args.parse(argc, argv);
-    args.print();
 
     serializeKeyTest();
     serializeBoolBlockTest();

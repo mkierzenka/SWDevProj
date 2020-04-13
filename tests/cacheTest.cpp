@@ -15,7 +15,6 @@ Arguments args;
 int main(int argc, char** argv)
 {
     args.parse(argc, argv);
-    args.print();
     
     printf("Cache test starting...\n");
     //create cache and some elements to put into the cache

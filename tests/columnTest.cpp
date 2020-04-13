@@ -81,7 +81,6 @@ void columnTests()
 int main(int argc, char **argv)
 {
   args.parse(argc, argv);
-  args.print();
 
   SYSTEM.pln("Column tests started...");
   columnTests();
