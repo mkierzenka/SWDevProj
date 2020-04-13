@@ -264,7 +264,7 @@ set of data. An application will run on each node. To specify operations, Applic
   * Map: represents implementation of a map. Used for when we want an item to map to a specific value
   * Queue: represents implementation of a queue. Used when we want to store and retrieve data on a first-in, first-out basis
   * Thread: represents a thread of execution. Allows program to split into multiple, "simultaneous" tasks
-  * Args: class for handling command line inputs. Sets the field based on what is provided on the command line. Use of "extern" allows entire program to access these elements
+  * Args: class for handling command line inputs. Sets the field based on what is provided on the command line. Use of "extern" allows entire program to access these elements. We run an entry .cpp file that passes the arguments into this Args object and then starts the program based on the configurations.
   
   
 ## Use cases
