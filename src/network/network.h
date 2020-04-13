@@ -44,12 +44,21 @@ public:
         fd = socket(AF_INET, SOCK_STREAM, 0);
         assert(fd > 0);
         //hardcode options for now
-        int rc = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
+        int rc = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+        rc = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
+        if (rc < 0) {
+            perror("setsockopt error");
+        }
         assert(rc >= 0);
 
         address.sin_family = AF_INET;
         int inet = inet_pton(AF_INET, args.ip, &address.sin_addr);
         assert(inet > 0);
+        if (inet < 0) {
+            perror("inet pton error");
+        }
+        assert(rc >= 0);
+
         address.sin_port = htons(args.port);
         bindSocket_();
         listenForConnections();
