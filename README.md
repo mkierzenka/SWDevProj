@@ -64,3 +64,5 @@ It sends the responses if available
 * Figure out how to use port numbers
 
 * Test network from different machines
+
+* Print out error message and number before asserts
