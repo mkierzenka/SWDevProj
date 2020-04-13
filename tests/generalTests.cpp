@@ -191,9 +191,9 @@ int main(int argc, char** argv)
 
   SYSTEM.pln("General tests starting...");
   //basicTest2();
-  //dataFrameTest();
+  dataFrameTest();
   //lengthRowerTest();
-  //dataFrameFromWriter();
+  dataFrameFromWriter();
   dataFrameFromSummer();
   SYSTEM.pln("General tests passed!");
   return 0;
