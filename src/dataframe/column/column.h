@@ -166,7 +166,7 @@ public:
     }
 
     /** Add an entire list of integers to this column*/
-    void add_all(size_t len, int *vals)
+    void add_all(size_t len, int *vals, size_t colIdx)
     {
         if (type_ != ColType::Integer)
         {
@@ -185,7 +185,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / args.blockSize);
+            addBlockToStore_(s, len_added / args.blockSize, colIdx);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -195,7 +195,7 @@ public:
     }
 
     /** Add an entire list of booleans to this column*/
-    void add_all(size_t len, bool *vals)
+    void add_all(size_t len, bool *vals, size_t colIdx)
     {
         if (type_ != ColType::Boolean)
         {
@@ -214,7 +214,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / args.blockSize);
+            addBlockToStore_(s, len_added / args.blockSize, colIdx);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -224,7 +224,7 @@ public:
     }
 
     /** Add an entire list of doubles to this column*/
-    void add_all(size_t len, double *vals)
+    void add_all(size_t len, double *vals, size_t colIdx)
     {
         if (type_ != ColType::Double)
         {
@@ -243,7 +243,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / args.blockSize);
+            addBlockToStore_(s, len_added / args.blockSize, colIdx);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -253,7 +253,7 @@ public:
     }
 
     /** Add an entire list of Strings to this column. Clones each String*/
-    void add_all(size_t len, String **vals)
+    void add_all(size_t len, String **vals, size_t colIdx)
     {
         if (type_ != ColType::Str)
         {
@@ -272,7 +272,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / args.blockSize);
+            addBlockToStore_(s, len_added / args.blockSize, colIdx);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -288,7 +288,7 @@ public:
     }
 
     /** Get double from column at certain index */
-    double get_double(size_t idx)
+    double get_double(size_t idx, size_t colIdx)
     {
         if (!properType(ColType::Double))
         {
@@ -299,14 +299,14 @@ public:
         size_t chunk = idx / args.blockSize;
         size_t idxInChunk = idx % args.blockSize;
 
-        Key *k = genKey_(chunk); //Key to look up data
+        Key *k = genKey_(chunk, colIdx); //Key to look up data
         double out = blocks_->getDouble(k, idxInChunk);
         delete k;
         return out;
     }
 
     /** Get boolean from column at certain index */
-    bool get_bool(size_t idx)
+    bool get_bool(size_t idx, size_t colIdx)
     {
         if (!properType(ColType::Boolean))
         {
@@ -317,14 +317,14 @@ public:
         size_t chunk = idx / args.blockSize;
         size_t idxInChunk = idx % args.blockSize;
 
-        Key *k = genKey_(chunk); //Key to look up data
+        Key *k = genKey_(chunk, colIdx); //Key to look up data
         bool out = blocks_->getBool(k, idxInChunk);
         delete k;
         return out;
     }
 
     /** Get string from column at certain index */
-    String *get_string(size_t idx)
+    String *get_string(size_t idx, size_t colIdx)
     {
         if (!properType(ColType::Str))
         {
@@ -335,14 +335,14 @@ public:
         size_t chunk = idx / args.blockSize;
         size_t idxInChunk = idx % args.blockSize;
 
-        Key *k = genKey_(chunk); //Key to look up data
+        Key *k = genKey_(chunk, colIdx); //Key to look up data
         String *out = blocks_->getString(k, idxInChunk);
         delete k;
         return out;
     }
 
     /** Get int from the column at specified index */
-    int get_int(size_t idx)
+    int get_int(size_t idx, size_t colIdx)
     {
         if (!properType(ColType::Integer))
         {
@@ -353,7 +353,7 @@ public:
         size_t chunk = idx / args.blockSize;
         size_t idxInChunk = idx % args.blockSize;
 
-        Key *k = genKey_(chunk); //Key to look up data
+        Key *k = genKey_(chunk, colIdx); //Key to look up data
         int out = blocks_->getInt(k, idxInChunk);
         delete k;
         return out;
@@ -365,10 +365,12 @@ public:
         return type_ == ct;
     }
 
-    Key *genKey_(size_t blockNum)
+    Key *genKey_(size_t blockNum, size_t colIdx)
     {
         StrBuff *buff = new StrBuff();
         buff->c(*(baseKey_->getKeyStr()));
+        buff->c("-");
+        buff->c(colIdx);
         buff->c("-");
         buff->c(blockNum);
         String *keyStr = buff->get();
@@ -433,9 +435,9 @@ public:
     /** Constructs a new KV pair from the keyIdx and value within the serializer.
      * Adds it to the store.
      */
-    void addBlockToStore_(Serializer *s, size_t keyIdx)
+    void addBlockToStore_(Serializer *s, size_t keyIdx, size_t colIdx)
     {
-        Key *k = genKey_(keyIdx);
+        Key *k = genKey_(keyIdx, colIdx);
         Value *val = new Value(s->getBuffer(), s->getNumBytesWritten());
         store_->put(k, val);
         blocks_->addKey(k);

@@ -62,3 +62,5 @@ It sends the responses if available
 * Distribute data across nodes
 
 * Figure out how to use port numbers
+
+* Demo test doesn't terminate with regular network

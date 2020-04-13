@@ -3,6 +3,7 @@
 #include "../src/store/kvstore.h"
 #include "../src/store/key.h"
 #include "../src/store/value.h"
+#include "../src/store/getImpls.h"
 #include "../src/utils/string.h"
 #include "../src/utils/args.h"
 #include "../src/filereader/summer.h"
@@ -169,9 +170,17 @@ void dataFrameFromSummer()
   KVStore kv(0, nullptr);
   DataFrame* df = DataFrame::fromVisitor(&k, &kv, "SI", &sum);
   assert(df->ncols() == 2);
-  printf("NUM ROWS: %zu\n", df->nrows());
   assert(df->nrows() == 4);
 
+  assert(df->get_string(0,0)->equals(key3));
+  assert(df->get_string(0,1)->equals(key1));
+  assert(df->get_string(0,2)->equals(key2));
+  assert(df->get_string(0,3)->equals(key4));
+  
+  assert(df->get_int(1, 0) == 3);
+  assert(df->get_int(1, 1) == 1);
+  assert(df->get_int(1, 2) == 2);
+  assert(df->get_int(1, 3) == 1);
   printf("Data frame from summer test passed!\n");
 }
 

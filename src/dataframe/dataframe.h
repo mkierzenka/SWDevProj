@@ -650,7 +650,7 @@ public:
         {
           ints[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_int(i);
         }
-        columns_->get(i)->add_all(numRowsInChunk, ints);
+        columns_->get(i)->add_all(numRowsInChunk, ints, i);
         break;
       }
       case 'B':
@@ -660,7 +660,7 @@ public:
         {
           bools[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_bool(i);
         }
-        columns_->get(i)->add_all(numRowsInChunk, bools);
+        columns_->get(i)->add_all(numRowsInChunk, bools, i);
         break;
       }
       case 'S':
@@ -670,7 +670,7 @@ public:
         {
           strs[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_string(i)->clone();
         }
-        columns_->get(i)->add_all(numRowsInChunk, strs);
+        columns_->get(i)->add_all(numRowsInChunk, strs, i);
         break;
       }
       case 'D':
@@ -680,7 +680,7 @@ public:
         {
           dbls[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_double(i);
         }
-        columns_->get(i)->add_all(numRowsInChunk, dbls);
+        columns_->get(i)->add_all(numRowsInChunk, dbls, i);
         break;
       }
       default:

@@ -138,7 +138,7 @@ public:
 		Column *c = new Column(store_, dfKey_->addIndex(length()), ColType::Double); //column steals ownership
 
 		//add all data to the column
-		c->add_all(numElements, elements);
+		c->add_all(numElements, elements, colList_->length());
 
 		//add column to column array
 		add_column(c);
@@ -152,7 +152,7 @@ public:
 		Column *c = new Column(store_, dfKey_->addIndex(length()), ColType::Integer); //column steals ownership
 
 		//add all data to the column
-		c->add_all(numElements, elements);
+		c->add_all(numElements, elements, colList_->length());
 
 		//add column to column array
 		add_column(c);
@@ -166,7 +166,7 @@ public:
 		Column *c = new Column(store_, dfKey_->addIndex(length()), ColType::Boolean); //column steals ownership
 
 		//add all data to the column
-		c->add_all(numElements, elements);
+		c->add_all(numElements, elements, colList_->length());
 
 		//add column to column array
 		add_column(c);
@@ -180,7 +180,7 @@ public:
 		Column *c = new Column(store_, dfKey_->addIndex(length()), ColType::Str); //column steals ownership
 
 		//add all data to the column
-		c->add_all(numElements, elements);
+		c->add_all(numElements, elements, colList_->length());
 
 		//add column to column array
 		add_column(c);
@@ -198,7 +198,7 @@ public:
 			fprintf(stderr, "Cannot get int from null column\n");
 		}
 
-		return c->get_int(row);
+		return c->get_int(row, col);
 	}
 
 	bool get_bool(size_t col, size_t row)
@@ -209,7 +209,7 @@ public:
 			fprintf(stderr, "Cannot get bool from null column\n");
 		}
 		
-		return c->get_bool(row);
+		return c->get_bool(row, col);
 	}
 
 	double get_double(size_t col, size_t row)
@@ -220,7 +220,7 @@ public:
 			fprintf(stderr, "Cannot get double from null column\n");
 		}
 		
-		return c->get_double(row);
+		return c->get_double(row, col);
 	}
 
 	// gets the actual String*, no copy
@@ -232,7 +232,7 @@ public:
 			fprintf(stderr, "Cannot get string from null column\n");
 		}
 
-		return c->get_string(row);
+		return c->get_string(row, col);
 	}
 
 	/** Type appropriate push_back methods. Appends the element to the end of the

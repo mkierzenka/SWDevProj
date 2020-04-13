@@ -176,7 +176,7 @@ void serializeColumnTest()
     }
 
     //add values to the column
-    c->add_all(5, vals);
+    c->add_all(5, vals, 0);
 
     Serializer *s = new Serializer();
     c->serialize(s);

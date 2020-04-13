@@ -73,7 +73,6 @@ public:
       size_t value = v();
       r.set(0, &key);
       r.set(1, (int) value);
-      printf("Adding key %s with value %zu\n", key.c_str(), value);
       next();
   }
  
