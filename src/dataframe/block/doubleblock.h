@@ -3,6 +3,7 @@
 #include "block.h"
 #include "../../serial/serial.h"
 
+#include <math.h>
 
 /**
 * DoubleBlock - to represent a block of doubles.
