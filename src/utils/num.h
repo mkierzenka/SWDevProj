@@ -30,4 +30,9 @@ class Num : public Object {
     Num* clone() {
         return new Num(val_);
     }
+
+    /** Check if two nums equal */
+    bool equals(Num* other) {
+        return this == other || val_ == other->val_;
+    }
 }; 
