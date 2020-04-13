@@ -357,11 +357,11 @@ As part of incorporating their Sorer into our codebase, we discovered a bug that
 locally and notified the team so they could fix their codebase.
 
 We succeeded in creating an adapter to use their Sorer with our DataFrame classes; a test 
-demonstrating this can be found in tests/sorerTest.cpp. We recently updated our adapter to set the rows of the dataframe by using a writer;
+demonstrating this can be found in tests/sorerTest.cpp. We use the datafile.sor file for this test, which can be found in the data directory. We recently updated our adapter to set the rows of the dataframe by using a writer;
 the writer finds the element in the file and sets it in the row passed in to visit.
 
 We have implemented serialization for all of the necessary classes and messages, and are able to use the key-value store for data storage and retrieval. We also have a completely working pseudonetwork and actual network, allowing us to distribute our data. However we currently store our blocks on the same node as our dataframe. We would like to come up with some sort of mechanism for effectively distributing data across nodes.
 
-Our Trivial, Demo, and Wordcount tests work fully on both or pseudo and real networks.
+Our Trivial, Demo, and Wordcount tests work fully on both or pseudo and real networks. For wordcount, we use the test.txt file, which can be found at the top of the repository.
 
 Our Linus program needs to undergo much more testing. Most of our time this week has gone towards fixing the wordcount application from m4. However, now that we updated our sorer, we should be well on our way to testing Linus.
