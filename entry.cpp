@@ -55,7 +55,8 @@ void runPseudo() {
     delete[] nodes;
     delete[] apps;
     delete sharedMQA;
-    exit(0);
+
+    return;
 }
 
 /* Represents the entryt point of our program. Takes in the arguments and handles them to
@@ -75,6 +76,7 @@ int main(int argc, char** argv) {
         node->join();
         printf("Thread %zu ended\n", args.index);
     }
+
     return 0;
 }
 

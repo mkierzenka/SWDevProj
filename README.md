@@ -63,4 +63,4 @@ It sends the responses if available
 
 * Figure out how to use port numbers
 
-* Demo test doesn't terminate with regular network
+* Test network from different machines
