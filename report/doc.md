@@ -95,7 +95,8 @@ be stored in this pointer.
   message queues. Therefore we had to initialize a PseudoNetwork in our .cpp test file and pass
   it in to numerous objects throughout the program, including the Application and the KVStore. When we incorporate the actual network layer, each node will be able to have its own network object
 
-* Network: the actual networking layer that we incorporated into our program for M4. It includes messages for initializing the servers and clients. This kicks off and completes the handshake process. For the client, it connects to the server, sends a register message to the server, and then receives a directory message from the server. For the server (first node per program), it accepts connections from clients, receives register messages from clients, and keeps track of the clients. Once all nodes are registered, it broadcasts a directory message to all of its connected nodes.
+* Network: the actual networking layer that we incorporated into our program for M4. It includes messages for initializing the servers and clients. This kicks off and completes the handshake process. For the client, it connects to the server, sends a register message to the server, and then receives a directory message from the server. For the server (first node per program), it accepts connections from clients, receives register messages from clients, and keeps track of the clients. Once all nodes are registered, it broadcasts a directory message to all of its connected nodes. All the nodes send a done
+message to the server once their work/task is completed. Once the server receives a done message from every node, it broadcasts a teardown message to each node, which tells the nodes to close their connections and terminate execution.
 
 * INetwork: We created an INetwork that both Network and PseudoNetwork inherited. This was so that our entire program could use an INetwork, allowing for easy swapping between our pseudo and real networks in our tests (see the .cpp test files for more context). The interfaces includes six methods. The first two are for sending and receiving. The last four are only used by the actual network: server_init, client_init, handleRegisterMsg, and handleDirectoryMsg. These are not needed for the pseudonetwork, so they were able to be left blank in the INetwork class for PseudoNetwork to inherit
 
@@ -107,6 +108,8 @@ be stored in this pointer.
   * RegisterMsg: allows a client to register with a main, or server, node that keeps track of connections
   * DirectoryMsg: broadcasts a list of connections to each clients; necessary for clients to be able to send messages between each other
   * Other message types that may be used in the future include Ack, Directory, Register, Kill, and Status messages
+  * DoneMsg: a node sends this message to the server when it's done executing its task. It means it is ready to begin the teardown process, once the other nodes complete
+  * TeardownMsg: broadcasted from the server to all connected nodes. Means that the program is terminating, so all nodes should close their connections/sockets and delete their objects
 
 
 * DataFrame: The DataFrame API will be similar to that on previous assignments. It will 
@@ -248,8 +251,20 @@ set of data. An application will run on each node. To specify operations, Applic
     perform some operation on the data). Distributed arrays and dataframes and can be 
     initialized and used for these helpers, depending on the purpose of the application
 
+  * Current applications supported
+    * Trivial: simple single-noded program. Creates a dataframe with a large amount of elements in a single column, then makes sure that the get methods on the dataframe retrieve the proper data.
+    * Demo: currently runs with three nodes. Some nodes are putting data into the KVStore, some are retrieving data from the KVStore, and others are doing both. Program tests that the KVStore can be read from and written to concurrently by using messaging in a network layer.
+    * Wordcount: single-noded program. Tests the functionality of fromVisitor, which allows the user to pass in a writer and generate a dataframe by visiting that writer. This program tests a Summer writer, which takes in an SIMAP of words that appear in a file to the number of occurrences in that file.
 
-* Utilities: We have a variety of common classes used throughout the code base. These include Object, String, Array, Map, Queue, and Thread
+
+* Utilities: We have a variety of common classes used throughout the code base
+  * Object: base class of whole program. Provides method signatures for equals, hash, and clone. Class provided to us
+  * String: represents implementation of a string. Provided to us
+  * Array: represents implementation of an array. Used for storing a collection of objects
+  * Map: represents implementation of a map. Used for when we want an item to map to a specific value
+  * Queue: represents implementation of a queue. Used when we want to store and retrieve data on a first-in, first-out basis
+  * Thread: represents a thread of execution. Allows program to split into multiple, "simultaneous" tasks
+  * Args: class for handling command line inputs. Sets the field based on what is provided on the command line. Use of "extern" allows entire program to access these elements
   
   
 ## Use cases
@@ -331,8 +346,6 @@ Application:
 
 ## Open questions
 
-How do we decide what to make the buffer size for receiving messages? Do we need to be able to fragment messages? We are getting segfaults when we make the demo test too large, not sure if this is related to our buffer
-
 Should all columns be the same length? If so, how should this be enforced?
 
 ## Status
@@ -344,25 +357,10 @@ As part of incorporating their Sorer into our codebase, we discovered a bug that
 locally and notified the team so they could fix their codebase.
 
 We succeeded in creating an adapter to use their Sorer with our DataFrame classes, a test 
-demonstrating this can be found in tests/sorerTest.cpp.
+demonstrating this can be found in tests/sorerTest.cpp. However our program has changed significantly since writing this adapter. For example, we wrote the adapter before we started storing serialized dataframes, so we will need to adjust how the adapter creates and stores the frames. Since we need a sorer for the Linus program, we will need to adjust the adapter to our current program.
 
-We have implemented serialization for all of the necessary classes and message, and are able to use the key-value store for data storage and retrieval. We also have a completely working pseudonetwork and a somewhat functional actual network, allowing us to distribute our data. However we currently store our blocks on the same node as our dataframe. We would like to come up with some sort of mechanism for effectively distributing data across nodes.
+We have implemented serialization for all of the necessary classes and message, and are able to use the key-value store for data storage and retrieval. We also have a completely working pseudonetwork and actual network, allowing us to distribute our data. However we currently store our blocks on the same node as our dataframe. We would like to come up with some sort of mechanism for effectively distributing data across nodes.
 
-Our Trivial test works with both our pseudo and actual network. Our Demo test works fully with our pseudonetwork, but only partially with our actual network. In the demo case, we had to drastically reduce the amount of elements to 100. If the dataframe became too large, the program would either segfault or result in corrupted memory. We are currently unsure of why this issue exists, but believe it may be related to how we are reading in messages.
+Our Trivial, Demo, and Wordcount tests work fully on both or pseudo and real networks.
 
-There are additional features we need to add to our network. For example, we currently hard-code the number of nodes, server node number, and server ip as constants. Rather than having to hard-set those, we would like to pass those in as command line arguments. When we run the trivial test, we have to manually set the number of nodes to 1, then set it back to 3 when we run the demo test.
-
-Our file reading is a work in-progress. We have a target for the test; it compiles, but we are currently getting seg fault issues. In particular, we need to further investigate and test our fromVisitor.
-
-We also have some general code cleanup to do, including remove unused code and reduce our memory leaks.
-
-
-## Remaining tasks from M3:
-  
-* Clean up leaks from tests
-
-
-## Remaining tasks for M4:
-
-* Improve networking/demo code: avoid segfaults for large data
-* Work on file reading
+We still need to test our Linus program. As stated before, we won't be able to test until our Sorer works, so implementing the adapter will be our next step.
