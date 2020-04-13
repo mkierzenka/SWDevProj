@@ -63,7 +63,6 @@ void runPseudo() {
  * set up the program */
 int main(int argc, char** argv) {
     args.parse(argc, argv);
-    args.print();
 
     if (args.usePseudoNet) {
         runPseudo();
