@@ -35,21 +35,21 @@ public:
 }*/
 
   void next() {
-      if (i == map_.capacity_ || !map_.buckets_[i]) return;
+      if (i == map_.capacity_) return;
     //   while (!map_.buckets_[i])
     //   {
     //       i++;
     //       if (i == map_.capacity_ ) return;
     //   }
 
-      if (j < map_.buckets_[i]->length()) {
+      if (map_.buckets_[i] && j < map_.buckets_[i]->length()) {
           j++;
           ++seen;
       } else {
           ++i;
           j = 0;
           while( i < map_.capacity_ && !map_.buckets_[i] )  i++;
-          if (k()) ++seen;
+          //if (k()) ++seen;
       }
   }
  
@@ -73,6 +73,7 @@ public:
       size_t value = v();
       r.set(0, &key);
       r.set(1, (int) value);
+      printf("Adding key %s with value %zu\n", key.c_str(), value);
       next();
   }
  
