@@ -4,7 +4,7 @@
 #include "src/application/demo.h"
 #include "src/application/trivial.h"
 #include "src/application/wordcount.h"
-#include "src/application/nodethread.h"
+#include "src/application/thread/nodethread.h"
 #include "src/network/network.h"
 #include "src/network/pseudo/pseudonetwork.h"
 #include "src/network/pseudo/messagequeuearray.h"
@@ -59,7 +59,7 @@ void runPseudo() {
     return;
 }
 
-/* Represents the entryt point of our program. Takes in the arguments and handles them to
+/* Represents the entry point of our program. Takes in the arguments and handles them to
  * set up the program */
 int main(int argc, char** argv) {
     args.parse(argc, argv);
