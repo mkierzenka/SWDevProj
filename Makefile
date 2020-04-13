@@ -16,7 +16,7 @@ build: buildeau2
 	#g++ --std=c++11 -g tests/memTest.cpp -o tests/testMemory
 	#g++ --std=c++11 -g tests/sorerTest.cpp -o tests/testSorer
 
-test: testTrivial testDemo
+test: testTrivial testDemo testWordcount
 
 ourTests:
 	./tests/testSerial
@@ -47,18 +47,19 @@ runeau2:
 	./eau2 -app demo -num_nodes 3 -pseudo
 
 testTrivial:
-	#./eau2 -app trivial -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
-	./eau2 -app trivial -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 -pseudo
+	./eau2 -app trivial -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	#./eau2 -app trivial -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 -pseudo
 
 testDemo:
-	# ./eau2 -app demo -num_nodes 3 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
-	# ./eau2 -app demo -num_nodes 3 -i 1 -ip 127.0.0.2 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
-	# ./eau2 -app demo -num_nodes 3 -i 2 -ip 127.0.0.3 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	./eau2 -app demo -num_nodes 3 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
+	./eau2 -app demo -num_nodes 3 -i 1 -ip 127.0.0.2 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
+	./eau2 -app demo -num_nodes 3 -i 2 -ip 127.0.0.3 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
 
-	./eau2 -app demo -num_nodes 3 -pseudo
+	#./eau2 -app demo -num_nodes 3 -pseudo
 
 testWordcount:
 	./eau2 -app wordcount -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	#./eau2 -app wordcount -num_nodes 1 -pseudo
 
 buildGeneral:
 	g++ --std=c++11 -g tests/generalTests.cpp -o tests/testGeneral
