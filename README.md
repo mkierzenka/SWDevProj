@@ -28,7 +28,7 @@ It sends the responses if available
 
 * demoTest.cpp does not delete anything, memory leaks here
 
-* DataFrame needs equals and hash (probably other classes do too...)
+* DataFrame needs hash (probably other classes do too...)
 
 * See if there are other places where Blocks can be cleared instead of repeatedly
 	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
@@ -66,3 +66,5 @@ It sends the responses if available
 * Test network from different machines
 
 * Print out error message and number before asserts
+
+* Add blocking boolean to kv.getValue
