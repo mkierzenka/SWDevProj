@@ -708,8 +708,8 @@ class MapStrObj : public Map {
 /** Provided with Milestone 4 */
 class SIMap : public Map {
 public:
-  SIMap () {}
-  SIMap (SIMap &other) {
+  SIMap () : Map() {}
+  SIMap (SIMap &other) : Map() {
 	  Object** keys = other.get_keys();   //do not delete, this is what's going into map
 	  Object** vals = other.get_values(); //do not delete, this is what's going into map
 	  size_t lenOther = other.size();
@@ -719,6 +719,7 @@ public:
 		  set(*k, n);
 	  }
   }
+  ~SIMap() {}
   Num* get(String& key) { return dynamic_cast<Num*>(Map::get(&key)); }
   void set(String& k, Num* v) { assert(v); Map::put(&k, v); }
 };

@@ -5,6 +5,7 @@
 #include "../src/store/value.h"
 #include "../src/utils/string.h"
 #include "../src/utils/args.h"
+#include "../src/filereader/summer.h"
 #include "incwriter.h"
 
 Sys SYSTEM;
@@ -135,6 +136,45 @@ void dataFrameFromWriter() {
   SYSTEM.pln("Data frame from writer test passed!");
 }
 
+void dataFrameFromSummer()
+{
+  printf("Data frame from summer test started\n");
+
+  //SIMap map;
+  SIMap* map = new SIMap();
+
+  //does SIMap own its elements?
+  // map.set(*new String("this"), new Num(1));
+  // map.set(*new String("is"), new Num(2));
+  // map.set(*new String("a"), new Num(3));
+  // map.set(*new String("test"), new Num(1));
+
+  String* key1 = new String("this");
+  String* key2 = new String("is");
+  String* key3 = new String("a");
+  String* key4 = new String("test");
+
+  map->set(*key1, new Num(1));
+  map->set(*key2, new Num(2));
+  map->set(*key3, new Num(3));
+  map->set(*key4, new Num(1));
+
+  assert(map->get(*key1)->equals(new Num(1)));
+  assert(map->get(*key2)->equals(new Num(2)));
+  assert(map->get(*key3)->equals(new Num(3)));
+  assert(map->get(*key4)->equals(new Num(1)));
+
+  Summer sum(*map);
+  Key k("df", 0);
+  KVStore kv(0, nullptr);
+  DataFrame* df = DataFrame::fromVisitor(&k, &kv, "SI", &sum);
+  assert(df->ncols() == 2);
+  printf("NUM ROWS: %zu\n", df->nrows());
+  assert(df->nrows() == 4);
+
+  printf("Data frame from summer test passed!\n");
+}
+
 int main(int argc, char** argv)
 {
   args.parse(argc, argv);
@@ -142,9 +182,10 @@ int main(int argc, char** argv)
 
   SYSTEM.pln("General tests starting...");
   //basicTest2();
-  dataFrameTest();
+  //dataFrameTest();
   //lengthRowerTest();
-  dataFrameFromWriter();
+  //dataFrameFromWriter();
+  dataFrameFromSummer();
   SYSTEM.pln("General tests passed!");
   return 0;
 }

@@ -35,8 +35,14 @@ public:
 }*/
 
   void next() {
-      if (i == map_.capacity_ ) return;
-      if ( j < map_.buckets_[i]->length() ) {
+      if (i == map_.capacity_ || !map_.buckets_[i]) return;
+    //   while (!map_.buckets_[i])
+    //   {
+    //       i++;
+    //       if (i == map_.capacity_ ) return;
+    //   }
+
+      if (j < map_.buckets_[i]->length()) {
           j++;
           ++seen;
       } else {
@@ -48,14 +54,14 @@ public:
   }
  
   String* k() {
-      if (i==map_.capacity_ || j == map_.buckets_[i]->length()) {
+      if (i==map_.capacity_ || !map_.buckets_[i] || j == map_.buckets_[i]->length()) {
           return nullptr;
       }
       return (String*) (map_.buckets_[i]->getKey(j));
   }
 
   size_t v() {
-      if (i == map_.capacity_ || j == map_.buckets_[i]->length()) {
+      if (i == map_.capacity_ || !map_.buckets_[i] || j == map_.buckets_[i]->length()) {
           assert(false); return 0;
       }
       return ((Num*)(map_.buckets_[i]->getValue(j)))->asInt();
