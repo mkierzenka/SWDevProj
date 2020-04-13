@@ -1,8 +1,8 @@
 //lang:Cpp
 
-#include "../utils/thread.h"
-#include "../network/inetwork.h"
-#include "../network/message.h"
+#include "../../utils/thread.h"
+#include "../../network/inetwork.h"
+#include "../../network/message.h"
 #include <assert.h>
 
 /**

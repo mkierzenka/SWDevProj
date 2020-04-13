@@ -1,5 +1,5 @@
 //lang:Cpp
-#include "../src/application/nodethread.h"
+#include "../src/application/thread/nodethread.h"
 #include "../src/application/demo.h"
 #include "../src/network/message.h"
 #include "../src/network/network.h"

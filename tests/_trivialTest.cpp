@@ -1,7 +1,7 @@
 //lang:Cpp
 
 #include "../src/application/trivial.h"
-#include "../src/application/nodethread.h"
+#include "../src/application/thread/nodethread.h"
 #include "../src/network/inetwork.h"
 #include "../src/network/network.h"
 #include "../src/network/pseudo/pseudonetwork.h"

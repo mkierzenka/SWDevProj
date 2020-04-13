@@ -1,12 +1,12 @@
 //lang:Cpp
 
 
-#include "../utils/thread.h"
-#include "../network/inetwork.h"
-#include "application.h"
-#include "demo.h"
+#include "../../utils/thread.h"
+#include "../../utils/args.h"
+#include "../../network/inetwork.h"
+#include "../application.h"
+#include "../demo.h"
 #include "receiverthread.h"
-#include "../utils/args.h"
 
 
 /**
