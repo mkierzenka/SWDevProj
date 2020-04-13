@@ -225,6 +225,17 @@ public:
     schema_->add_rows(numElements);
   }
 
+  /** Check if two dataframes equal */
+  bool equals(Object* o)
+  {
+    if (this == o) return true;
+
+    DataFrame* other = dynamic_cast<DataFrame*>(o);
+
+    return columns_->equals(other->columns_) && schema_->equals(other->schema_)
+    && key_->equals(other->key_);
+  }
+
   /** Returns the dataframe's schema. Modifying the schema after a dataframe
     * has been created in undefined. */
   Schema &get_schema()
