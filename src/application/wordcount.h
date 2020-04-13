@@ -36,7 +36,7 @@ public:
     if (idx_ == 0)
     {
       FileReader fr;
-      /*delete */ DataFrame::fromVisitor(&in, kv_, "S", &fr);
+      delete DataFrame::fromVisitor(&in, kv_, "S", &fr);
     }
     local_count();
     reduce();
