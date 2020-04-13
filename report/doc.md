@@ -356,7 +356,7 @@ https://github.com/yth/CS4500A1P1
 As part of incorporating their Sorer into our codebase, we discovered a bug that we fixed 
 locally and notified the team so they could fix their codebase.
 
-We succeeded in creating an adapter to use their Sorer with our DataFrame classes, a test 
+We succeeded in creating an adapter to use their Sorer with our DataFrame classes; a test 
 demonstrating this can be found in tests/sorerTest.cpp. We recently updated our adapter to set the rows of the dataframe by using a writer;
 the writer finds the element in the file and sets it in the row passed in to visit.
 
