@@ -12,9 +12,11 @@
 #include <sys/mman.h>
 
 #include "../src/sorer/sorer.h"
-#include "../src/dataframe/row/lengthrower.h"
+#include "../src/dataframe/dataframe.h"
 #include "../src/dataframe/column/column.h"
+#include "../src/utils/args.h"
 
+Arguments args;
 
 const char *USAGE = "Usage: ./sorer [-f] [-from] [-len] [-print_col_type] " \
              "[-print_col_idx] [-is_missing_idx]\n" \
@@ -47,13 +49,6 @@ int main(int argc, char **argv) {
     assert(d->get_int(4, 1) == -1924364);
     assert(strcmp(d->get_string(6, 143)->c_str(), "cornworms") == 0);
 
-    puts("Dataframe successfully transferred!");
-
-    LengthRower* lr = new LengthRower(d);
-    d->map(*lr);
-	assert(lr->getLen() == 60631); //check rower is correct
-
-	delete lr;
     delete d;
     delete s;
 	puts("Sorer test passed!");

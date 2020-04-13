@@ -59,7 +59,7 @@ public:
     columns_ = new ColumnArray(store_, key_);
     for (size_t i = 0; i < numCols; i++)
     {
-      columns_->add_column(new Column(store_, key_, scm[i]));
+      columns_->add_column(new Column(store_, key_->clone(), scm[i]));
     }
   }
 

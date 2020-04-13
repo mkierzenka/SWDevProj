@@ -49,8 +49,6 @@ It sends the responses if available
 
 * Sorer code- merge Types enum and our col type enum
 
-* Changing Sorer/reading in file to go bottom up instead of top down (create the blocks then add those to arrays)
-
 * Methods w/o an implementation: add assert(false) and comment
 
 * Add unit tests: distributed array

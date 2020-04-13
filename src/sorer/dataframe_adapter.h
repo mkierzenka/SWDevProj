@@ -3,9 +3,12 @@
 #pragma once
 
 #include "../utils/object.h"
-#include "sorer_helper.h"
-#include "../dataframe/dataframe.h"
 #include "../utils/string.h"
+#include "sorer_helper.h"
+#include "sorwriter.h"
+#include "../dataframe/dataframe.h"
+#include "../store/kvstore.h"
+#include "../store/key.h"
 
 /** This class will be in charge of converting field arrays to
  * dataframes. It will take in a field array, and convert it to
@@ -20,52 +23,14 @@ public:
     {
         //initialize new dataframe
         char *schemaTypes = getTypes_(typ);
-        Schema *s = new Schema(schemaTypes);
-        DataFrame *df = new DataFrame(*s);
+        Key* dfKey = new Key("df", 0); //df steals ownership of this key; don't delete
+        KVStore* store = new KVStore(0, nullptr);
 
-        //assuming # of rows is what first frame array indicates: will check
-        Row* row = new Row(*s);
-		for (int r = 0; r < fa[0]->len(); r++)
-        {
-            for (int c = 0; c < df->ncols(); c++)
-            {
-                size_t field_start = fa[c]->get_start(r);
-                size_t field_end = fa[c]->get_end(r);
+        SorWriter* sw = new SorWriter(fa, typ, file);
 
-                assert(field_start <= field_end);
+        DataFrame* df = DataFrame::fromVisitor(dfKey, store, schemaTypes, sw);
 
-                switch (typ->get(c))
-                {
-                case BOOL:
-                    row->set(c, get_bool_field(file, field_start, field_end));
-                    break;
-                case INT:
-                    row->set(c, get_int_field(file, field_start, field_end));
-                    break;
-                case DOUBLE:
-                    row->set(c, get_double_field(file, field_start, field_end));
-                    break;
-                case STRING:
-                {
-                    String* val = get_string_field(file, field_start, field_end);
-                    row->set(c, val);
-                    delete val;
-                    break;
-                }
-                default:
-                    fprintf(stderr, "Column type not supported");
-                };
-            }
-
-            //add row to df
-
-            df->add_row(*row);
-            row->clear();
-        }
-
-		delete row;
         delete[] schemaTypes;
-        delete s;
 
         return df;
     }
@@ -104,67 +69,67 @@ public:
         };
     }
 
-    int get_int_field(char *file, int start, int end)
-    {
-        // remove empty spaces in front
-        size_t new_start = triml(file, start, end);
+    // int get_int_field(char *file, int start, int end)
+    // {
+    //     // remove empty spaces in front
+    //     size_t new_start = triml(file, start, end);
 
-        return strtoll(&file[new_start], nullptr, 10);
-    }
+    //     return strtoll(&file[new_start], nullptr, 10);
+    // }
 
-    bool get_bool_field(char *file, int start, int end)
-    {
-        // remove empty spaces in front
-        size_t new_start = triml(file, start, end);
+    // bool get_bool_field(char *file, int start, int end)
+    // {
+    //     // remove empty spaces in front
+    //     size_t new_start = triml(file, start, end);
 
-        //return file[new_start];
+    //     //return file[new_start];
 
-        return (file[new_start] == '1') ? true : false;
-    }
+    //     return (file[new_start] == '1') ? true : false;
+    // }
 
-    double get_double_field(char *file, int start, int end)
-    {
-        // remove empty spaces in front
-        size_t new_start = triml(file, start, end);
+    // double get_double_field(char *file, int start, int end)
+    // {
+    //     // remove empty spaces in front
+    //     size_t new_start = triml(file, start, end);
 
-        return strtold(&file[new_start], nullptr);
-    }
+    //     return strtold(&file[new_start], nullptr);
+    // }
 
-    String *get_string_field(char *file, int start, int end)
-    {
-        StrBuff *str = new StrBuff();
-        // remove empty spaces in front and back
-        size_t new_start = triml(file, start, end);
-        size_t new_end = trimr(file, start, end);
+    // String *get_string_field(char *file, int start, int end)
+    // {
+    //     StrBuff *str = new StrBuff();
+    //     // remove empty spaces in front and back
+    //     size_t new_start = triml(file, start, end);
+    //     size_t new_end = trimr(file, start, end);
 
-        if (file[new_start] == '\"')
-        {
-            new_start += 1;
-        }
+    //     if (file[new_start] == '\"')
+    //     {
+    //         new_start += 1;
+    //     }
 
-        if (file[new_end] == '\"')
-        {
-            new_end -= 1;
-        }
+    //     if (file[new_end] == '\"')
+    //     {
+    //         new_end -= 1;
+    //     }
 
-        char* strBuff = new char[2];
-        strBuff[0] = '\0';
-        for (size_t i = new_start; i <= new_end; ++i)
-        {
-            strBuff[0] = file[i];
-            strBuff[1] = '\0';
-            str->c(strBuff);
-        }
+    //     char* strBuff = new char[2];
+    //     strBuff[0] = '\0';
+    //     for (size_t i = new_start; i <= new_end; ++i)
+    //     {
+    //         strBuff[0] = file[i];
+    //         strBuff[1] = '\0';
+    //         str->c(strBuff);
+    //     }
 
-        delete[] strBuff;
+    //     delete[] strBuff;
 
-        if (file[new_start] != '\"' && file[new_end] != '\"')
-        {
-            str->c("");
-        }
+    //     if (file[new_start] != '\"' && file[new_end] != '\"')
+    //     {
+    //         str->c("");
+    //     }
 
-        String *res = str->get();
-        delete str;
-        return res;
-    }
+    //     String *res = str->get();
+    //     delete str;
+    //     return res;
+    // }
 };

@@ -8,9 +8,9 @@
 #include <math.h>
 
 #include "../utils/object.h"
+#include "../utils/string.h"
 #include "string.h"
 #include "types.h"
-
 
 /**
  * TypesArray: represents a resizable array of Types

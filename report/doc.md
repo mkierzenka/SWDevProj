@@ -357,10 +357,11 @@ As part of incorporating their Sorer into our codebase, we discovered a bug that
 locally and notified the team so they could fix their codebase.
 
 We succeeded in creating an adapter to use their Sorer with our DataFrame classes, a test 
-demonstrating this can be found in tests/sorerTest.cpp. However our program has changed significantly since writing this adapter. For example, we wrote the adapter before we started storing serialized dataframes, so we will need to adjust how the adapter creates and stores the frames. Since we need a sorer for the Linus program, we will need to adjust the adapter to our current program.
+demonstrating this can be found in tests/sorerTest.cpp. We recently updated our adapter to set the rows of the dataframe by using a writer;
+the writer finds the element in the file and sets it in the row passed in to visit.
 
-We have implemented serialization for all of the necessary classes and message, and are able to use the key-value store for data storage and retrieval. We also have a completely working pseudonetwork and actual network, allowing us to distribute our data. However we currently store our blocks on the same node as our dataframe. We would like to come up with some sort of mechanism for effectively distributing data across nodes.
+We have implemented serialization for all of the necessary classes and messages, and are able to use the key-value store for data storage and retrieval. We also have a completely working pseudonetwork and actual network, allowing us to distribute our data. However we currently store our blocks on the same node as our dataframe. We would like to come up with some sort of mechanism for effectively distributing data across nodes.
 
 Our Trivial, Demo, and Wordcount tests work fully on both or pseudo and real networks.
 
-We still need to test our Linus program. As stated before, we won't be able to test until our Sorer works, so implementing the adapter will be our next step.
+Our Linus program needs to undergo much more testing. Most of our time this week has gone towards fixing the wordcount application from m4. However, now that we updated our sorer, we should be well on our way to testing Linus.
