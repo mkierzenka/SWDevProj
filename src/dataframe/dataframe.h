@@ -383,7 +383,6 @@ public:
 
     for (size_t rowIdx = startIdx; rowIdx < endIdx; rowIdx++)
     {
-      fprintf(stderr, "map row %zu\n", rowIdx);
       row->set_idx(rowIdx);
       //iterate through each column to get value
       for (int colIdx = 0; colIdx < row->width(); colIdx++)
@@ -410,7 +409,6 @@ public:
         //iterate through each column to get value
         for (int colIdx = 0; colIdx < row->width(); colIdx++)
         {
-          fprintf(stderr, "local_map(%zu, %d) is %c\n", rowIdx, colIdx, schema_->col_type(colIdx));
           setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type(colIdx));
         }
 
