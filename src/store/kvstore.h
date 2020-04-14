@@ -60,6 +60,7 @@ public:
 		}
         
         Object* putRes = kvMap->put(k->getKeyStr()->clone(), data->clone());
+        fprintf(stderr, "#####Node %zu KVStore size: %zu\n", storeId, kvMap->size());
         if (putRes) delete putRes;
 		tryToHandleCache_(k);
     }

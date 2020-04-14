@@ -368,14 +368,14 @@ public:
     Key *genKey_(size_t blockNum, size_t colIdx)
     {
         StrBuff *buff = new StrBuff();
-        buff->c(*(baseKey_->getKeyStr()));
+        buff->c(*(baseKey_->getKeyStr())); //copies memory into buffer
         buff->c("-");
         buff->c(colIdx);
         buff->c("-");
         buff->c(blockNum);
         String *keyStr = buff->get();
         delete buff;
-        Key *k = new Key(keyStr, baseKey_->getNode()); //clones String
+        Key *k = new Key(keyStr, blockNum % args.numNodes); //clones String
         delete keyStr;
         return k;
     }
