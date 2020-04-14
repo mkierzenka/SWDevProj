@@ -60,9 +60,9 @@ public:
     SIMap map;
     Adder add(map);
     words->local_map(add);
-    //delete words;
+    delete words;
     Summer cnt(map);
-    DataFrame::fromVisitor(mk_key(idx_), kv_, "SI", &cnt);
+    delete DataFrame::fromVisitor(mk_key(idx_), kv_, "SI", &cnt);
   }
 
   /** Merge the data frames of all nodes */
