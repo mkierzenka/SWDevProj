@@ -2,7 +2,7 @@
 
 #include "writer.h"
 
-const char *FILE_NAME = "test.txt";
+const char *FILE_NAME = "data/test.txt";
 
 /** Class for reading the files given to us in M4 */
 class FileReader : public Writer
