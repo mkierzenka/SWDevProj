@@ -10,7 +10,7 @@ DataFrame* KVStore::waitAndGet(Key *k)
     Value* val = getValue(k);
     assert(val);
     Serializer* s = new Serializer(val->getSize(), val->getData());
-    DataFrame* df = new DataFrame(k, this);
+    DataFrame* df = new DataFrame(k->clone(), this);
     df->deserialize(s);
     delete s;
     return df;
