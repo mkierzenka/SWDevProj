@@ -9,13 +9,13 @@ void testSchema()
 
   Schema *scm = new Schema();
   scm->add_column('I');
-  scm->add_column('F');
-  scm->add_column('F');
+  scm->add_column('D');
+  scm->add_column('D');
   assert(scm->width() == 3);
   assert(scm->length() == 0);
 
   assert(scm->col_type(0) == 'I');
-  assert(scm->col_type(2) == 'F');
+  assert(scm->col_type(2) == 'D');
 
   scm->add_column('S');
   scm->add_column('B');
@@ -60,14 +60,14 @@ void testSchema3()
 void genSchemaTest()
 {
   SYSTEM->pln("General schema test started...");
-  Schema s("IIFSB");
+  Schema s("IIDSB");
   assert(s.col_type(0) == 'I');
   assert(s.col_type(4) == 'B');
   assert(s.width() == 5);
   assert(s.length() == 0);
 
   s.add_column('I');
-  s.add_column('F');
+  s.add_column('D');
   s.add_column('B');
   s.add_row();
   s.add_row();

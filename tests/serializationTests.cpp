@@ -144,7 +144,7 @@ void serializeSchemaTest()
 {
     printf("Serialize schema test started\n");
 
-    Schema *schem = new Schema("IBFSSI");
+    Schema *schem = new Schema("IBDSSI");
     Serializer *serial = new Serializer();
     schem->serialize(serial);
 
