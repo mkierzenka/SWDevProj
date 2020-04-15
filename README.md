@@ -60,3 +60,5 @@ It sends the responses if available
 * Test network from different machines
 
 * Move reader and writer parent classes into new directory
+
+* Transition field array to regular Array, create Field object to store in array
