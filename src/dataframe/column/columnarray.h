@@ -4,6 +4,7 @@
 
 #include "../../utils/object.h"
 #include "../../utils/array.h"
+#include "../../utils/datatype.h"
 #include "../../store/kvstore.h"
 #include "../../serial/serial.h"
 #include "column.h"
@@ -135,7 +136,7 @@ public:
 	void add_column_fromarray(size_t numElements, double *elements)
 	{
 		//create column
-		Column *c = new Column(store_, dfKey_->addIndex(length()), ColType::Double); //column steals ownership
+		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Double); //column steals ownership
 
 		//add all data to the column
 		c->add_all(numElements, elements, colList_->length());
@@ -149,7 +150,7 @@ public:
 	void add_column_fromarray(size_t numElements, int *elements)
 	{
 		//create column
-		Column *c = new Column(store_, dfKey_->addIndex(length()), ColType::Integer); //column steals ownership
+		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Integer); //column steals ownership
 
 		//add all data to the column
 		c->add_all(numElements, elements, colList_->length());
@@ -163,7 +164,7 @@ public:
 	void add_column_fromarray(size_t numElements, bool *elements)
 	{
 		//create column
-		Column *c = new Column(store_, dfKey_->addIndex(length()), ColType::Boolean); //column steals ownership
+		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Boolean); //column steals ownership
 
 		//add all data to the column
 		c->add_all(numElements, elements, colList_->length());
@@ -177,7 +178,7 @@ public:
 	void add_column_fromarray(size_t numElements, String **elements)
 	{
 		//create column
-		Column *c = new Column(store_, dfKey_->addIndex(length()), ColType::Str); //column steals ownership
+		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Str); //column steals ownership
 
 		//add all data to the column
 		c->add_all(numElements, elements, colList_->length());

@@ -3,6 +3,7 @@
 #include "../../utils/object.h"
 #include "../../utils/string.h"
 #include "../../utils/args.h"
+#include "../../utils/datatype.h"
 #include "../../store/kvstore.h"
 
 #include "distributedarray.h"
@@ -17,14 +18,6 @@
 #include <stdarg.h>
 #include <assert.h>
 
-enum ColType
-{
-    Str = 0,
-    Double = 1,
-    Boolean = 2,
-    Integer = 3
-};
-
 /**************************************************************************
  * Column ::
  * Represents one column of a distributed dataframe. Its members are not
@@ -37,11 +30,11 @@ public:
     size_t size_;              //how many elements are in the column, in theory
     DistributedArray *blocks_; //owned, arr of the keys for data in this column
     KVStore *store_;
-    ColType type_; //what time of column (bool, int, double, string)
+    DataType type_; //what time of column (bool, int, double, string)
     Key *baseKey_; //owned, base key for the column
 
     /** Default constructor: start column to fit two elements. Steals key ownership */
-    Column(KVStore *store, Key *baseKey, ColType t)
+    Column(KVStore *store, Key *baseKey, DataType t)
     {
         blocks_ = new DistributedArray(store);
         store_ = store;
@@ -51,13 +44,13 @@ public:
     }
 
     /** Default constructor: start column to fit two elements. Steals key ownership */
-    Column(KVStore *store, Key *baseKey, const char colType)
+    Column(KVStore *store, Key *baseKey, const char type)
     {
         blocks_ = new DistributedArray(store);
         store_ = store;
         baseKey_ = baseKey;
         size_ = 0;
-        type_ = getColType_(colType);
+        type_ = getDataType_(type);
     }
 
     // For deserializing, hopefully these values will be updated in a few calls
@@ -67,7 +60,7 @@ public:
         store_ = nullptr;
         baseKey_ = new Key();
         size_ = 0;
-        type_ = ColType::Str; //arbitrary
+        type_ = DataType::Str; //arbitrary
     }
 
     ~Column()
@@ -89,13 +82,13 @@ public:
     {
         switch (type_)
         {
-        case ColType::Integer:
+        case DataType::Integer:
             return 'I';
-        case ColType::Str:
+        case DataType::Str:
             return 'S';
-        case ColType::Boolean:
+        case DataType::Boolean:
             return 'B';
-        case ColType::Double:
+        case DataType::Double:
             return 'D';
         default:
             fprintf(stderr, "Unknown enum data type");
@@ -119,7 +112,7 @@ public:
         blocks_->setStore(store_);
 
         blocks_->deserialize(s);
-        type_ = getColType_(s->readChar());
+        type_ = getDataType_(s->readChar());
         baseKey_->deserialize(s);
     }
 
@@ -128,7 +121,7 @@ public:
     void push_back(int val)
     {
         assert(false);
-        if (type_ != ColType::Integer)
+        if (type_ != DataType::Integer)
         {
             fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
             exit(1);
@@ -138,7 +131,7 @@ public:
     void push_back(bool val)
     {
         assert(false);
-        if (type_ != ColType::Boolean)
+        if (type_ != DataType::Boolean)
         {
             fprintf(stderr, "Cannot add boolean to column of type %c", getCharType());
             exit(1);
@@ -148,7 +141,7 @@ public:
     void push_back(double val)
     {
         assert(false);
-        if (type_ != ColType::Double)
+        if (type_ != DataType::Double)
         {
             fprintf(stderr, "Cannot add double to column of type %c", getCharType());
             exit(1);
@@ -158,7 +151,7 @@ public:
     void push_back(String *val)
     {
         assert(false);
-        if (type_ != ColType::Str)
+        if (type_ != DataType::Str)
         {
             fprintf(stderr, "Cannot add String to column of type %c", getCharType());
             exit(1);
@@ -168,7 +161,7 @@ public:
     /** Append an entire list of integers to this column */
     void add_all(size_t len, int *vals, size_t colIdx)
     {
-        if (type_ != ColType::Integer)
+        if (type_ != DataType::Integer)
         {
             fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
             exit(1);
@@ -198,7 +191,7 @@ public:
     /** Append an entire list of booleans to this column */
     void add_all(size_t len, bool *vals, size_t colIdx)
     {
-        if (type_ != ColType::Boolean)
+        if (type_ != DataType::Boolean)
         {
             fprintf(stderr, "Cannot add boolean to column of type %c", getCharType());
             exit(1);
@@ -228,7 +221,7 @@ public:
     /** Append an entire list of doubles to this column */
     void add_all(size_t len, double *vals, size_t colIdx)
     {
-        if (type_ != ColType::Double)
+        if (type_ != DataType::Double)
         {
             fprintf(stderr, "Cannot add double to column of type %c", getCharType());
             exit(1);
@@ -258,7 +251,7 @@ public:
     /** Append an entire list of Strings to this column. Clones each String */
     void add_all(size_t len, String **vals, size_t colIdx)
     {
-        if (type_ != ColType::Str)
+        if (type_ != DataType::Str)
         {
             fprintf(stderr, "Cannot add String to column of type %c", getCharType());
             exit(1);
@@ -294,7 +287,7 @@ public:
     /** Get double from column at certain index */
     double get_double(size_t idx, size_t colIdx)
     {
-        if (!properType(ColType::Double))
+        if (!properType(DataType::Double))
         {
             fprintf(stderr, "Cannot get double from non-double col");
             return -1;
@@ -312,7 +305,7 @@ public:
     /** Get boolean from column at certain index */
     bool get_bool(size_t idx, size_t colIdx)
     {
-        if (!properType(ColType::Boolean))
+        if (!properType(DataType::Boolean))
         {
             fprintf(stderr, "Cannot get bool from non-bool col");
             return -1;
@@ -330,7 +323,7 @@ public:
     /** Get string from column at certain index */
     String *get_string(size_t idx, size_t colIdx)
     {
-        if (!properType(ColType::Str))
+        if (!properType(DataType::Str))
         {
             fprintf(stderr, "Cannot get String from non-String col");
             exit(1);
@@ -348,7 +341,7 @@ public:
     /** Get int from the column at specified index */
     int get_int(size_t idx, size_t colIdx)
     {
-        if (!properType(ColType::Integer))
+        if (!properType(DataType::Integer))
         {
             fprintf(stderr, "Cannot get int from non-int col");
             return -1;
@@ -364,7 +357,7 @@ public:
     }
 
     /** Check if the type of this column matches the given type */
-    bool properType(ColType ct)
+    bool properType(DataType ct)
     {
         return type_ == ct;
     }
@@ -384,22 +377,22 @@ public:
         return k;
     }
 
-    ColType getColType_(char c)
+    DataType getDataType_(char c)
     {
         switch (c)
         {
         case 'I':
         case 'i':
-            return ColType::Integer;
+            return DataType::Integer;
         case 'S':
         case 's':
-            return ColType::Str;
+            return DataType::Str;
         case 'B':
         case 'b':
-            return ColType::Boolean;
+            return DataType::Boolean;
         case 'D':
         case 'd':
-            return ColType::Double;
+            return DataType::Double;
         default:
             fprintf(stderr, "Unknown char data type: %c\n", c);
             exit(-1);

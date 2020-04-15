@@ -5,6 +5,7 @@
 #include "../src/store/value.h"
 #include "../src/utils/string.h"
 #include "../src/utils/args.h"
+#include "../src/utils/datatype.h"
 
 Sys SYSTEM;
 
@@ -15,7 +16,7 @@ void columnTests()
   KVStore *store = new KVStore(0, nullptr);
   Key *baseKeyI = new Key("baseInts", 0);
   int numsI[] = {1, 2, 3, 4};
-  Column *ic = new Column(store, baseKeyI, ColType::Integer);
+  Column *ic = new Column(store, baseKeyI, DataType::Integer);
   ic->add_all(4, numsI, 0);
 
   assert(ic->size() == 4);
@@ -28,7 +29,7 @@ void columnTests()
   //
   Key *baseKeyD = new Key("baseDbls", 0);
   double numsD[] = {4.5, 2.1, 0.0, 0.004};
-  Column *dc = new Column(store, baseKeyD, ColType::Double);
+  Column *dc = new Column(store, baseKeyD, DataType::Double);
   dc->add_all(4, numsD, 0);
 
   assert(dc->size() == 4);
@@ -41,7 +42,7 @@ void columnTests()
   //
   Key *baseKeyB = new Key("baseBools", 0);
   bool valsB[] = {true, false, false, true};
-  Column *bc = new Column(store, baseKeyB, ColType::Boolean);
+  Column *bc = new Column(store, baseKeyB, DataType::Boolean);
   bc->add_all(4, valsB, 0);
 
   assert(bc->size() == 4);
@@ -61,7 +62,7 @@ void columnTests()
   valsS[2] = stringA;
   valsS[3] = stringB;
 
-  Column *sc = new Column(store, baseKeyS, ColType::Str);
+  Column *sc = new Column(store, baseKeyS, DataType::Str);
   sc->add_all(4, valsS, 0);
 
   assert(sc->size() == 4);

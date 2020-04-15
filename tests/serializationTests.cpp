@@ -8,6 +8,7 @@
 #include "../src/store/kvstore.h"
 #include "../src/utils/string.h"
 #include "../src/utils/args.h"
+#include "../src/utils/datatype.h"
 #include "../src/dataframe/block/boolblock.h"
 #include "../src/dataframe/block/doubleblock.h"
 #include "../src/dataframe/block/stringblock.h"
@@ -168,7 +169,7 @@ void serializeColumnTest()
     Key *k = new Key(keyStr, 0);
     delete keyStr;
 
-    Column *c = new Column(store, k, ColType::Integer);
+    Column *c = new Column(store, k, DataType::Integer);
     int *vals = new int[5];
     for (int i = 0; i < 5; i++)
     {

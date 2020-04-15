@@ -163,7 +163,7 @@ frame's columns' chunks
     * blocks_ (DistributedArray): holds blocks of column data
     * size_ (size_t): number of elements in the column (!= number of keys in array)
     * store_ (KVStore): will be used by column to retrieve its own data when needed and add keys to the store
-    * type_ (ColType: enum): what type of column is this? String, boolean, int, or double
+    * type_ (DataType: enum): what type of column is this? String, boolean, int, or double
     * baseKey_ (Key): key of the dataframe that the column belongs to; will be used to build up block keys
 
   * Methods:
