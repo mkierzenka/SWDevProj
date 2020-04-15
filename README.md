@@ -21,7 +21,10 @@ When new data is added to a KVStore (RT calls kv_->put()), KVStore adds it local
   then checks the receivedMsgs_ Queue to see if anyone else was looking for the data that just came in
 It sends the responses if available
 
+### Additional notes
 
+* Don't use args unless it's specifically for network; pseudo doesn't use all of them
+  
 ### Notes for things to improve from before:
 
 * Cleanup and free more memory in pseudonetworking stuff -> receiverthread, nodethread, etc.
