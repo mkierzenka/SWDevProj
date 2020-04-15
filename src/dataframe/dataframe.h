@@ -17,13 +17,12 @@
 #include "row/rower.h"
 #include "row/row.h"
 
-//Arguments args;
 
 /****************************************************************************
  * DataFrame::
  *
  * A DataFrame is table composed of columns of equal length. Each column
- * holds values of the same type (I, S, B, F). A dataframe has a schema that
+ * holds values of the same type (I, S, B, D). A dataframe has a schema that
  * describes it.
  *
  * @author kierzenka.m@husky.neu.edu & broder.c@husky.neu.edu
@@ -31,10 +30,10 @@
 class DataFrame : public Object
 {
 public:
-  ColumnArray *columns_; //keeps track of columns in data frame
-  KVStore *store_;
-  Schema *schema_; //owned, schema of dataframe
-  Key *key_;       //key for this dataframe in the KV store; owns the key passed in
+  ColumnArray *columns_; //owned, keeps track of columns in data frame
+  KVStore *store_;       //external, used to communicate w/ rest of system
+  Schema *schema_;       //owned, schema of dataframe
+  Key *key_;             //owned, key for this dataframe in the KV store
 
   /** This constructor is for the purpose of adding arrays */
   DataFrame(Key *k, KVStore *kv)
@@ -64,20 +63,20 @@ public:
   }
 
   /** Create a data frame with the same columns as the give df but no rows */
-  DataFrame(DataFrame &df, Key *k) : DataFrame(df.get_schema(), k)
+/*  DataFrame(DataFrame &df, Key *k) : DataFrame(df.get_schema(), k)
   {
   }
-
+*/
   /** Create a data frame from a schema and columns. All columns are created
     * empty. */
-  DataFrame(Schema &schema, Key *k)
+ /* DataFrame(Schema &schema, Key *k)
   {
     //don't copy rows
     schema_ = new Schema(schema, false);
     size_t numCols = schema_->width();
     key_ = k;
     columns_ = new ColumnArray(store_, key_);
-  }
+  }*/
 
   ~DataFrame()
   {
@@ -235,6 +234,11 @@ public:
     return columns_->equals(other->columns_) && schema_->equals(other->schema_)
     && key_->equals(other->key_);
   }
+  
+  /** Returns hash of this Dataframe - deprecated */
+  size_t hash() {
+	  assert(false);
+  }
 
   /** Returns the dataframe's schema. Modifying the schema after a dataframe
     * has been created in undefined. */
@@ -252,7 +256,6 @@ public:
     key_->serialize(s);
   }
 
-  //Deserialize store?
   /** Deserialize as a dataframe and set the values in this dataframe */
   void deserialize(Serializer *s)
   {
@@ -279,8 +282,8 @@ public:
       exit(1);
     }
 
-    columns_->add_column(col);      // Must add to end of column array
-    char type = col->getCharType(); //columns_->getType(columns_->length() - 1);
+    columns_->add_column(col);      //Append to column array
+    char type = col->getCharType();
     schema_->add_column(type);
   }
 
@@ -317,8 +320,6 @@ public:
       checkColTypes_(row.col_type(i), i);
       addToEndOfColByType_(i, row);
     }
-
-    //Row does not have a name
     schema_->add_row();
   }
 

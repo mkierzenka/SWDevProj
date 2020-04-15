@@ -28,8 +28,6 @@ It sends the responses if available
 
 * demoTest.cpp does not delete anything, memory leaks here
 
-* DataFrame needs hash (probably other classes do too...)
-
 * See if there are other places where Blocks can be cleared instead of repeatedly
 	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
 
@@ -42,8 +40,6 @@ It sends the responses if available
 * Update schema to use types enum
 
 * Implement push_back for columns
-
-* Add KVstore to DF constructor with schema and key, remove one that takes in dataframe
 
 * Sorer code- make the arrays use our array instead of re-implementing functionality
 
