@@ -45,7 +45,7 @@ public:
     double sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
     DataFrame* dfa = DataFrame::fromArray(main, kv_, SZ, vals);
-    DataFrame* dfs = DataFrame::fromScalar(check, kv_, sum);
+    DataFrame* dfs = DataFrame::fromDouble(check, kv_, sum);
 
     delete dfa;
     delete dfs;
@@ -58,7 +58,7 @@ public:
     double sum = 0;
     for (size_t i = 0; i < 100*1000; ++i) sum += v->get_double(0,i);
     p("The sum is  ").pln(sum);
-    DataFrame::fromScalar(verify, kv_, sum);
+    DataFrame::fromDouble(verify, kv_, sum);
     pln("Counter Finished");
   }
  
