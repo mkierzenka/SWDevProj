@@ -58,20 +58,27 @@ public:
     }
 
     /**
-         * Check if the distributed array contains the given key
-         */
+     * Check if the distributed array contains the given key
+     */
     bool containsKey(Key *k)
     {
         return keyList_->index_of(k) != -1;
     }
 
     /**
-          * Add key to the array. Key is cloned.
-          */
+     * Add key to the array. Key is cloned.
+     */
     void addKey(Key *k)
     {
         keyList_->add(k);
     }
+
+	/**
+	 * Returns the number of keys in this Distributed Array
+	 */
+	size_t length() {
+		return keyList_->length();
+	}
 	
 	/**
 	 * Get specific double from a value stored with key k. Caller responsible for deleting key

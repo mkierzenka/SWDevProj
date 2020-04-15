@@ -165,7 +165,7 @@ public:
         }
     }
 
-    /** Add an entire list of integers to this column*/
+    /** Append an entire list of integers to this column */
     void add_all(size_t len, int *vals, size_t colIdx)
     {
         if (type_ != ColType::Integer)
@@ -173,6 +173,7 @@ public:
             fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
             exit(1);
         }
+        size_t blockCountBefore = blocks_->length();
         IntBlock *block = new IntBlock();
         size_t len_added = 0;
         while (len_added < len)
@@ -185,7 +186,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / args.blockSize, colIdx);
+            addBlockToStore_(s, blockCountBefore + (len_added / args.blockSize), colIdx);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -194,7 +195,7 @@ public:
         delete block;
     }
 
-    /** Add an entire list of booleans to this column*/
+    /** Append an entire list of booleans to this column */
     void add_all(size_t len, bool *vals, size_t colIdx)
     {
         if (type_ != ColType::Boolean)
@@ -202,6 +203,7 @@ public:
             fprintf(stderr, "Cannot add boolean to column of type %c", getCharType());
             exit(1);
         }
+        size_t blockCountBefore = blocks_->length();
         BoolBlock *block = new BoolBlock();
         size_t len_added = 0;
         while (len_added < len)
@@ -214,7 +216,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / args.blockSize, colIdx);
+            addBlockToStore_(s, blockCountBefore + (len_added / args.blockSize), colIdx);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -223,7 +225,7 @@ public:
         delete block;
     }
 
-    /** Add an entire list of doubles to this column*/
+    /** Append an entire list of doubles to this column */
     void add_all(size_t len, double *vals, size_t colIdx)
     {
         if (type_ != ColType::Double)
@@ -231,6 +233,7 @@ public:
             fprintf(stderr, "Cannot add double to column of type %c", getCharType());
             exit(1);
         }
+        size_t blockCountBefore = blocks_->length();
         DoubleBlock *block = new DoubleBlock();
         size_t len_added = 0;
         while (len_added < len)
@@ -243,7 +246,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / args.blockSize, colIdx);
+            addBlockToStore_(s, blockCountBefore + (len_added / args.blockSize), colIdx);
             delete s;
             block->clear();
             len_added += amount_to_add;
@@ -252,7 +255,7 @@ public:
         delete block;
     }
 
-    /** Add an entire list of Strings to this column. Clones each String*/
+    /** Append an entire list of Strings to this column. Clones each String */
     void add_all(size_t len, String **vals, size_t colIdx)
     {
         if (type_ != ColType::Str)
@@ -260,6 +263,7 @@ public:
             fprintf(stderr, "Cannot add String to column of type %c", getCharType());
             exit(1);
         }
+        size_t blockCountBefore = blocks_->length();
         StringBlock *block = new StringBlock();
         size_t len_added = 0;
         while (len_added < len)
@@ -272,7 +276,7 @@ public:
             }
             Serializer *s = new Serializer();
             block->serialize(s);
-            addBlockToStore_(s, len_added / args.blockSize, colIdx);
+            addBlockToStore_(s, blockCountBefore + (len_added / args.blockSize), colIdx);
             delete s;
             block->clear();
             len_added += amount_to_add;
