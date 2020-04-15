@@ -9,10 +9,10 @@
 #include <cassert>
 
 #include "sorer_helper.h"
-#include "dataframe_adapter.h"
+//#include "dataframe_adapter.h"
 
 #include "../utils/object.h"
-#include "../dataframe/dataframe.h"
+//#include "../dataframe/dataframe.h"
 
 /**
  * This class is a sorer implementation. It will take in a file name. It will read in
@@ -31,7 +31,6 @@ class Sorer : public Object
 
         Sorer(const char* fileName)
         {
-            //file = fileName;
             fd = open(fileName, O_RDONLY);
             //make sure file exists
             assert(fd != -1);
@@ -55,25 +54,35 @@ class Sorer : public Object
             return make_columnar(file, 0, fileSize, schema);
         }
 
+        /** Return types of this dataframe */
+        TypesArray* getTypes()
+        {
+            return schema;
+        }
+
+        /** Return file name */
+        char* getFileName()
+        {
+            return file;
+        }
+
         /**
          * Return dataframe form of the data. Will produce the columnar, then
          * use an adapter to convert it to a dataframe
          */
-        DataFrame* getFrame()
-        {
-            FieldArray** fa = getColumnar();
-            DataFrameAdapter* dfa = new DataFrameAdapter();
-            
-            DataFrame* d = dfa->convertToFrame(fa, file, schema);
-
-            delete dfa;
-            for (int i = 0; i < schema->len(); i++)
-            {
-                delete fa[i];
-            }
-            delete[] fa;
-            return d;
-        }
+        // DataFrame* getFrame()
+        // {
+        //     FieldArray** fa = getColumnar();
+        //     DataFrameAdapter* dfa = new DataFrameAdapter();
+        //     DataFrame* d = dfa->convertToFrame(fa, file, schema);
+        //     delete dfa;
+        //     for (int i = 0; i < schema->len(); i++)
+        //     {
+        //         delete fa[i];
+        //     }
+        //     delete[] fa;
+        //     return d;
+        // }
 
         /** Get file size of the read in file */
         size_t getFileSize_(const char* name)

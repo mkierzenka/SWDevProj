@@ -11,7 +11,6 @@
 class SorWriter : public Writer
 {
 public:
-    //size_t col_;        //what column we're currently on
     size_t row_;        //what row we're currently on
     size_t numCols_;    //total number of columns
     size_t numRows_;    //total number of rows
@@ -22,7 +21,6 @@ public:
 
     SorWriter(FieldArray **fa, TypesArray *types, char *file) : Writer()
     {
-        //col_ = 0;
         row_ = 0;
         types_ = types;
         numCols_ = types->len();
@@ -39,20 +37,6 @@ public:
 
     void next()
     {
-        //move on to next row if have already seen every value
-    //     if (col_ == numCols_ - 1)
-    //     {
-    //         row_++;
-    //         col_ = 0;
-    //     }
-    //     else
-    //     {
-    //         //move on in column
-    //         col_++;
-    //     }
-
-    //     //increment # of elements seen
-    //     seen_++;
         row_++;
     }
 
@@ -80,7 +64,7 @@ public:
             {
                 String *val = get_string_field_(file_, field_start, field_end);
                 r.set(col_, val);
-                delete val;
+                delete val; //value gets cloned in the row
                 break;
             }
             default:
