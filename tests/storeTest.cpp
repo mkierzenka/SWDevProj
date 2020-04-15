@@ -18,9 +18,10 @@ void basicSingle() {
 	Value v2("Val 2", 5);
 	kv->put(&k1, &v1);
 	kv->put(&k2, &v2);
-	assert(kv->getValue(&k1)->equals(&v1));
-	assert(!kv->getValue(&k1)->equals(&v2));
-	assert(kv->getValue(&k2)->equals(&v2));
+	assert(kv->getValue(&k1, true)->equals(&v1));
+	assert(kv->getValue(&k1, false)->equals(&v1));
+	assert(!kv->getValue(&k1, true)->equals(&v2));
+	assert(kv->getValue(&k2, true)->equals(&v2));
 	delete kv;
 	delete pNet;
 	delete mqa;

@@ -3,11 +3,14 @@
 #pragma once
 
 #include "../dataframe/dataframe.h"
-#include "../network/message.h"
+#include "../serial/serial.h"
+#include "key.h"
+#include "value.h"
+
 
 DataFrame* KVStore::waitAndGet(Key *k)
 {
-    Value* val = getValue(k);
+    Value* val = getValue(k, true);
     assert(val);
     Serializer* s = new Serializer(val->getSize(), val->getData());
     DataFrame* df = new DataFrame(k->clone(), this);
@@ -18,23 +21,11 @@ DataFrame* KVStore::waitAndGet(Key *k)
 
 DataFrame* KVStore::get(Key *k)
 {
-    Value* val = nullptr;
-    if (k->getNode() == storeId) {
-        val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
-    } else {
-        GetDataMsg* dm = new GetDataMsg(k, storeId, k->getNode());
-        node_->sendMsg(dm);
-		if (msgCache_->contains_key(k)) {
-			ReplyDataMsg* dataMsg = dynamic_cast<ReplyDataMsg*>(msgCache_->remove(k));
-            val = dataMsg->getValue();
-		}
-	}
-	if (!val) {
-		return nullptr;
-	}
+    Value* val = getValue(k, false);
+	if (!val) return nullptr;
     Serializer* s = new Serializer(val->getSize(), val->getData());
-    DataFrame* d = new DataFrame(k->clone(), this);
-    d->deserialize(s);
+    DataFrame* df = new DataFrame(k->clone(), this);
+    df->deserialize(s);
     delete s;
-    return d;	
+    return df;
 }

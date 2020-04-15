@@ -60,7 +60,7 @@ public:
 		}
         
         Object* putRes = kvMap->put(k->getKeyStr()->clone(), data->clone());
-        fprintf(stderr, "#####Node %zu KVStore size: %zu\n", storeId, kvMap->size());
+        //fprintf(stderr, "#####Node %zu KVStore size: %zu\n", storeId, kvMap->size());
         if (putRes) delete putRes;
 		tryToHandleCache_(k);
     }
@@ -77,15 +77,15 @@ public:
 
     /**
      * Get the actual Value that the given key maps to (no clone).
-     * Blocking - will call to network as needed.
+     * shouldBlock specifies behavior for network calls. Has no impact on local lookups.
      */
-    Value *getValue(Key *k)
+    Value *getValue(Key *k, bool shouldBlock)
     {
         Value* val = nullptr;
         if (k->getNode() == storeId) {
             val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
         } else {
-            val = getFromNetwork_(k);
+            val = getFromNetwork_(k, shouldBlock);
         }
 
         return val;
@@ -101,7 +101,7 @@ public:
 	
     /**
      * Our ReceiverThread got a response for a key we requested.
-	 * Does not clone, steals ownership.
+     * Does not clone, steals ownership.
      */
     void addReply(ReplyDataMsg* msg) {
         addToCache_(msg->getKey()->clone(), msg);
@@ -119,48 +119,59 @@ public:
         assert(false);
     }
 
-    /* Waits on ReceiverThread (external to this store) to get the response. */
-	// blocking
-    Value* getFromNetwork_(Key* k) {
-        WaitAndGetMsg *dm = new WaitAndGetMsg(k, storeId, k->getNode());
+    /**
+     * Waits on ReceiverThread (external to this store) to get the response.
+     * Will block and wait for message if shouldBlock. Otherwise, may return nullptr.
+     */
+    Value* getFromNetwork_(Key* k, bool shouldBlock) {
+        Message* dm = nullptr;
+		if (shouldBlock) {
+            dm = new WaitAndGetMsg(k, storeId, k->getNode());
+        } else {
+            dm = new GetDataMsg(k, storeId, k->getNode());
+        }
         node_->sendMsg(dm);
         msgCacheLock_.lock();
-		while (!msgCache_->contains_key(k))
+        while (shouldBlock && !msgCache_->contains_key(k))
         {
             msgCacheLock_.wait();
         }
-        // ... now msgCache has what we are looking for
+        if (!msgCache_->contains_key(k)) {
+            assert(!shouldBlock);
+            return nullptr;
+        }
+        // ... msgCache has what we are looking for
         ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(msgCache_->remove(k));
         msgCacheLock_.unlock();
         assert(dataMsg);
         Value *val = dataMsg->getValue();
         return val;
     }
-	
-	/**
-	 * Given that we just added the k-v pair to the store, see if we can deal
-	 *   with any messages.
-	 */
-	void tryToHandleCache_(Key* k) {
-		msgCacheLock_.lock();
-		if (msgCache_->contains_key(k)) {
-			Object* res = msgCache_->remove(k);
-			WaitAndGetMsg* wagMsg = dynamic_cast<WaitAndGetMsg*>(res);
-			assert(wagMsg);
-			size_t sender = wagMsg->getSender();
-			Value* val = getValue(k); //should be local, we just added it in kv.put()
-			ReplyDataMsg *reply = new ReplyDataMsg(k, val, storeId, sender);
-			node_->sendMsg(reply);
-			delete wagMsg;
-		}
-		msgCacheLock_.unlock();
-	}
 
-	/** Adds a KV pair (Key, Message) to local cache */
-	void addToCache_(Key* k, Message* msg) {
+    /**
+     * Given that we just added the k-v pair to the store, see if we can deal
+     *   with any messages.
+     */
+    void tryToHandleCache_(Key* k) {
+        msgCacheLock_.lock();
+        if (msgCache_->contains_key(k)) {
+            Object* res = msgCache_->remove(k);
+            WaitAndGetMsg* wagMsg = dynamic_cast<WaitAndGetMsg*>(res);
+            assert(wagMsg);
+            size_t sender = wagMsg->getSender();
+            Value* val = getValue(k, false); //should be local, we just added it in kv.put()
+            ReplyDataMsg *reply = new ReplyDataMsg(k, val, storeId, sender);
+            node_->sendMsg(reply);
+            delete wagMsg;
+        }
+        msgCacheLock_.unlock();
+    }
+
+    /** Adds a KV pair (Key, Message) to local cache */
+    void addToCache_(Key* k, Message* msg) {
         msgCacheLock_.lock();
         msgCache_->put(k, msg);
         msgCacheLock_.notify_all();
         msgCacheLock_.unlock();
-	}
+    }
 };

@@ -75,6 +75,7 @@ public:
 	
 	/**
 	 * Get specific double from a value stored with key k. Caller responsible for deleting key
+	 * Blocks on network call
 	 */
     double getDouble(Key *k, size_t itemIdx)
     {
@@ -97,6 +98,7 @@ public:
 
 	/**
 	 * Get specific boolean from a value stored with key k. Caller responsible for deleting key
+	 * Blocks on network call
 	 */
     bool getBool(Key *k, size_t itemIdx)
     {
@@ -119,6 +121,7 @@ public:
 
 	/**
 	 * Get specific integer from a value stored with key k. Caller responsible for deleting key
+	 * Blocks on network call
 	 */
     int getInt(Key *k, size_t itemIdx)
     {
@@ -141,6 +144,7 @@ public:
 
 	/**
 	 * Get specific string from a value stored with key k.
+	 * Blocks on network call
 	 * Caller is responsible for deleting the String returned and the key passed in
 	 */
     String* getString(Key *k, size_t itemIdx)
@@ -200,11 +204,11 @@ public:
     }
 	
 	/** Returns the Value mapped to this key, deserialized as a double block
+	 *  Blocks on network call.
 	 *  Caller is expected to delete the block
 	 */
 	DoubleBlock* getDoubleBlockFromStore_(Key* k) {
-        //printf("Getting block with key %s\n", k->kStr_->c_str());
-		Value* val = store_->getValue(k);
+		Value* val = store_->getValue(k, true);
         assert(val != nullptr);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		DoubleBlock* out = new DoubleBlock();
@@ -214,10 +218,11 @@ public:
 	}
 
 	/** Returns the Value mapped to this key, deserialized as a bool block.
+	 *  Blocks on network call.
 	 *  Caller is expected to delete the block
 	 */
 	BoolBlock* getBoolBlockFromStore_(Key* k) {
-		Value* val = store_->getValue(k);
+		Value* val = store_->getValue(k, true);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		BoolBlock* out = new BoolBlock();
 		out->deserialize(s);
@@ -226,10 +231,11 @@ public:
 	}
 
 	/** Returns the Value mapped to this key, deserialized as a int block.
+	 *  Blocks on network call.
 	 *  Caller is expected to delete the block
 	 */
 	IntBlock* getIntBlockFromStore_(Key* k) {
-		Value* val = store_->getValue(k);
+		Value* val = store_->getValue(k, true);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		IntBlock* out = new IntBlock();
 		out->deserialize(s);
@@ -239,10 +245,11 @@ public:
 
 
 	/** Returns the Value mapped to this key, deserialized as a string block.
+	 *  Blocks on network call.
 	 *  Caller is expected to delete the block
 	 */
 	StringBlock* getStrBlockFromStore_(Key* k) {
-		Value* val = store_->getValue(k);
+		Value* val = store_->getValue(k, true);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
 		StringBlock* out = new StringBlock();
 		out->deserialize(s);
