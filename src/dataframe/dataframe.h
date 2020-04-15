@@ -97,8 +97,9 @@ public:
     return df;
   }
 
-  /** Converts an array into a dataframe object.
-   *  Returns the df result, caller is responsible for deleting it.
+  /**
+   * Converts an array into a dataframe object.
+   * Returns the df result, caller is responsible for deleting it.
    */
   static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, double *elems)
   {
@@ -108,8 +109,9 @@ public:
     return df;
   }
 
-  /** Converts an array of ints into a dataframe object.
-   *  Returns the df result, caller is responsible for deleting it.
+  /**
+   * Converts an array of ints into a dataframe object.
+   * Returns the df result, caller is responsible for deleting it.
    */
   static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, int *elems)
   {
@@ -118,8 +120,9 @@ public:
     return addDFToStore_(df, kv, k);
   }
 
-  /** Converts an array of booleans into a dataframe object.
-   *  Returns the df result, caller is responsible for deleting it.
+  /**
+   * Converts an array of booleans into a dataframe object.
+   * Returns the df result, caller is responsible for deleting it.
    */
   static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, bool *elems)
   {
@@ -128,8 +131,9 @@ public:
     return addDFToStore_(df, kv, k);
   }
 
-  /** Converts an array of Strings into a dataframe object.
-   *  Returns the df result, caller is responsible for deleting it.
+  /**
+   * Converts an array of Strings into a dataframe object.
+   * Returns the df result, caller is responsible for deleting it.
    */
   static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, String **elems)
   {
@@ -139,7 +143,8 @@ public:
     return df;
   }
 
-  /** Adds a double to a new dataframe object. Returns df result, which will be owned
+  /**
+   * Adds a double to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
   static DataFrame *fromScalar(Key *k, KVStore *kv, double elem)
@@ -151,7 +156,8 @@ public:
     return df;
   }
 
-  /** Adds a String (cloned) to a new dataframe object. Returns df result, which will be owned
+  /**
+   * Adds a String (cloned) to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
   static DataFrame *fromScalar(Key *k, KVStore *kv, String *elem)
@@ -164,7 +170,8 @@ public:
     return df;
   }
 
-  /** Adds an int to a new dataframe object. Returns df result, which will be owned
+  /**
+   * Adds an int to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
   static DataFrame *fromScalar(Key *k, KVStore *kv, int elem)
@@ -176,7 +183,8 @@ public:
     return df;
   }
 
-  /** Adds a bool to a new dataframe object. Returns df result, which will be owned
+  /**
+   * Adds a bool to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
   static DataFrame *fromScalar(Key *k, KVStore *kv, bool elem)
@@ -188,8 +196,10 @@ public:
     return df;
   }
 
-  /** Add array of doubles to dataframe as a column. Add the data into chunks, and generate
-   * keys for them. Column needs to get dataframe's key and key-value store */
+  /**
+   * Add array of doubles to dataframe as a column. Add the data into chunks, and generate
+   * keys for them. Column needs to get dataframe's key and key-value store
+   */
   void add_array(size_t numElements, double *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
@@ -197,8 +207,10 @@ public:
     schema_->add_rows(numElements);
   }
 
-  /** Add array of ints to dataframe as a column. Add the data into chunks, and generate
-   * keys for them. Column needs to get dataframe's key and key-value store */
+  /**
+   * Add array of ints to dataframe as a column. Add the data into chunks, and generate
+   * keys for them. Column needs to get dataframe's key and key-value store
+   */
   void add_array(size_t numElements, int *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
@@ -206,8 +218,10 @@ public:
     schema_->add_rows(numElements);
   }
 
-  /** Add array of booleans to dataframe as a column. Add the data into chunks, and generate
-   * keys for them. Column needs to get dataframe's key and key-value store */
+  /**
+   * Add array of booleans to dataframe as a column. Add the data into chunks, and generate
+   * keys for them. Column needs to get dataframe's key and key-value store
+   */
   void add_array(size_t numElements, bool *elements)
   {
     columns_->add_column_fromarray(numElements, elements);
@@ -215,8 +229,10 @@ public:
     schema_->add_rows(numElements);
   }
 
-  /** Add array of Strings to dataframe as a column. Add the data into chunks, and generate
-   * keys for them. Column needs to get dataframe's key and key-value store */
+  /**
+   * Add array of Strings to dataframe as a column. Add the data into chunks, and generate
+   * keys for them. Column needs to get dataframe's key and key-value store
+   */
   void add_array(size_t numElements, String **elements)
   {
     columns_->add_column_fromarray(numElements, elements);
@@ -240,14 +256,15 @@ public:
 	  assert(false);
   }
 
-  /** Returns the dataframe's schema. Modifying the schema after a dataframe
-    * has been created in undefined. */
+  /**
+   * Returns the dataframe's schema. Modifying the schema after a dataframe
+   * has been created in undefined.
+   */
   Schema &get_schema()
   {
     return *schema_;
   }
 
-  // Serialize store?
   /** Serialize this DataFrame into s*/
   void serialize(Serializer *s)
   {
