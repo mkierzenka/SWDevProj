@@ -63,7 +63,7 @@ public:
 		entries_[col]->set(val);
 	}
 
-	/** Acquire ownership of the string. */
+	/** Adds a clone of the string to this row */
 	void set(size_t col, String *val)
 	{
 		exitIfBadSet_(col, 'S');

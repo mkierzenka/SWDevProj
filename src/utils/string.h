@@ -104,13 +104,19 @@ public:
  *  author: jv */
 class StrBuff : public Object {
 public:
-    char *val_; // owned; consumed by get()
+    char *val_; // owned
     size_t capacity_;
     size_t size_;
 
     StrBuff() {
         val_ = new char[capacity_ = 10];
         size_ = 0;
+    }
+
+    StrBuff(const char* s) {
+        val_ = new char[capacity_ = strlen(s) + 1];
+        size_ = 0;
+        c(s);
     }
 
     StrBuff(String* s) {
