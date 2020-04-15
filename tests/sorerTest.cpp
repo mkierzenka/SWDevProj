@@ -9,10 +9,13 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-#include "../src/sorer/sorer.h"
+//#include "../src/sorer/sorer.h"
 #include "../src/dataframe/dataframe.h"
 #include "../src/dataframe/column/column.h"
 #include "../src/utils/args.h"
+#include "../src/sorer/dataframe_adapter.h"
+#include "../src/store/key.h"
+#include "../src/store/kvstore.h"
 
 Arguments args;
 
@@ -20,9 +23,11 @@ Arguments args;
  * it to a DataFrame */
 int main(int argc, char **argv) {
 	puts("Sorer test started...");
-    Sorer* s = new Sorer(argv[1]);
-    DataFrame* d = s->getFrame();
-
+    // Sorer* s = new Sorer(argv[1]);
+    // DataFrame* d = s->getFrame();
+    Key* key = new Key("df", 0);
+    KVStore* store = new KVStore(0, nullptr);
+    DataFrame* d = DataFrameAdapter::convertToFrame(argv[1], key, store);
     //some checks to make sure our dataframe reading worked properly
     assert(d->ncols() == 12);
     assert(d->nrows() == 1000);
@@ -36,7 +41,7 @@ int main(int argc, char **argv) {
     assert(d->get_int(4, 1) == -1924364);
     assert(strcmp(d->get_string(6, 143)->c_str(), "cornworms") == 0);
 
-    delete d;
-    delete s;
+    // delete d;
+    // delete s;
 	puts("Sorer test passed!");
 }

@@ -47,7 +47,7 @@ public:
     }
 
     /**convert Type to character */
-    char toChar_(Types t)
+    static char toChar_(Types t)
     {
         switch (t)
         {
