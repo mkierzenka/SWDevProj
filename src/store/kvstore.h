@@ -75,6 +75,12 @@ public:
      * getImpls.h */
     DataFrame* waitAndGet(Key* k);
 
+    /** Converts a Key-Value pair into a DataFrame that's returned.
+     * The value v is consumed (ie. deleted).
+     * ASSUME v is not nullptr.
+     * Implemented in getImpls.h */
+    DataFrame* getHelper_(Key* k, Value* v);
+
     /**
      * Get the actual Value that the given key maps to (no clone).
      * shouldBlock specifies behavior for network calls. Has no impact on local lookups.
