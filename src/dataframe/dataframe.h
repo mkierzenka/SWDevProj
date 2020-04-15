@@ -12,6 +12,7 @@
 #include "../filereader/writer.h"
 #include "../filereader/adder.h"
 #include "../filereader/reader.h"
+//#include "../sorer/dataframe_adapter.h"
 #include "column/columnarray.h"
 #include "schema.h"
 #include "row/rower.h"
@@ -86,6 +87,18 @@ public:
   }
 
   /**
+  * Creates a new DataFrame from with given schema (scm) from the Writer.
+  * Returns the df result, caller is responsible for deleting it.
+  */
+  // static DataFrame *fromFile(const char* filename, Key *k, KVStore *kv)
+  // {
+  //   //DataFrame *df = sor.getFrame();//new DataFrame(scm, k->clone(), kv);
+  //   DataFrame* df = DataFrameAdapter::convertToFrame(filename, k, kv);
+  //   addDFToStore_(df, kv, k);
+  //   return df;
+  // }
+
+  /**
   * Creates a new DataFrame with given schema (scm) from the Writer.
   * Returns the df result, caller is responsible for deleting it.
   */
@@ -147,7 +160,7 @@ public:
    * Adds a double to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
-  static DataFrame *fromScalar(Key *k, KVStore *kv, double elem)
+  static DataFrame *fromDouble(Key *k, KVStore *kv, double elem)
   {
     double *elements = new double[1];
     elements[0] = elem;
@@ -160,7 +173,7 @@ public:
    * Adds a String (cloned) to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
-  static DataFrame *fromScalar(Key *k, KVStore *kv, String *elem)
+  static DataFrame *fromString(Key *k, KVStore *kv, String *elem)
   {
     String **elements = new String *[1];
     elements[0] = elem->clone();
@@ -174,7 +187,7 @@ public:
    * Adds an int to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
-  static DataFrame *fromScalar(Key *k, KVStore *kv, int elem)
+  static DataFrame *fromInt(Key *k, KVStore *kv, int elem)
   {
     int *elements = new int[1];
     elements[0] = elem;
@@ -187,7 +200,7 @@ public:
    * Adds a bool to a new dataframe object. Returns df result, which will be owned
    * by caller
    */
-  static DataFrame *fromScalar(Key *k, KVStore *kv, bool elem)
+  static DataFrame *fromBool(Key *k, KVStore *kv, bool elem)
   {
     bool *elements = new bool[1];
     elements[0] = elem;
