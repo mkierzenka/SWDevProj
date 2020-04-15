@@ -55,12 +55,8 @@ It sends the responses if available
 
 * doc.md: create diagram for architecture section
 
-* Add underscore to all private fields (KVStore)
-
 * Figure out how to use port numbers
 
 * Test network from different machines
-
-* Print out error message and number before asserts
 
 * Move reader and writer parent classes into new directory

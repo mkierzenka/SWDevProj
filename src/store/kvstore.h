@@ -20,7 +20,7 @@ class DataFrame;
 class KVStore : public Object
 {
 public:
-    MapStrObj *kvMap;       // Owned, holds all key-value pairings
+    MapStrObj *kvMap_;      // Owned, holds all key-value pairings
     INetwork* node_;        // Not owned, object used for Network communication
     size_t storeId;         // Node id that this store belongs to
     Map* msgCache_;         // WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
@@ -33,7 +33,7 @@ public:
 	 */
     KVStore(size_t id, INetwork* net)
     {
-        kvMap = new MapStrObj();
+        kvMap_ = new MapStrObj();
         storeId = id;
         node_ = net;
         msgCache_ = new Map();
@@ -42,7 +42,7 @@ public:
 
     ~KVStore()
     {
-        delete kvMap;
+        delete kvMap_;
         delete msgCache_;
     }
 
@@ -59,8 +59,8 @@ public:
 			return;
 		}
         
-        Object* putRes = kvMap->put(k->getKeyStr()->clone(), data->clone());
-        //fprintf(stderr, "#####Node %zu KVStore size: %zu\n", storeId, kvMap->size());
+        Object* putRes = kvMap_->put(k->getKeyStr()->clone(), data->clone());
+        //fprintf(stderr, "#####Node %zu KVStore size: %zu\n", storeId, kvMap_->size());
         if (putRes) delete putRes;
 		tryToHandleCache_(k);
     }
@@ -83,7 +83,7 @@ public:
     {
         Value* val = nullptr;
         if (k->getNode() == storeId) {
-            val = dynamic_cast<Value *>(kvMap->get(k->getKeyStr()));
+            val = dynamic_cast<Value *>(kvMap_->get(k->getKeyStr()));
         } else {
             val = getFromNetwork_(k, shouldBlock);
         }
