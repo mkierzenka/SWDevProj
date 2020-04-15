@@ -63,6 +63,4 @@ It sends the responses if available
 
 * Print out error message and number before asserts
 
-* Add blocking boolean to kv.getValue
-
 * Move reader and writer parent classes into new directory

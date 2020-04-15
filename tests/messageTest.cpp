@@ -29,7 +29,7 @@ void replyDataMsgTest()
     DataFrame* dfa = DataFrame::fromArray(k, kv_, SZ, vals);
 
     //get value of key
-    Value* v = kv_->getValue(k);
+    Value* v = kv_->getValue(k, false);
 
     //create reply data msg
     ReplyDataMsg* rdm = new ReplyDataMsg(k, v, 0, 1);
