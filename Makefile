@@ -39,10 +39,10 @@ memory:
 
 #use this target if you're trying to debug a specific test in the suite
 buildDebug:
-	g++ --std=c++11 -g -pthread tests/generalTests.cpp -o tests/testGeneral
+	g++ --std=c++11 -g tests/sorerTest.cpp -o tests/testSorer
 
 testDebug:
-	./tests/testGeneral
+	./tests/testSorer data/datafile.sor
 
 buildeau2:
 	g++ --std=c++11 -g -pthread entry.cpp -o eau2

@@ -58,3 +58,5 @@ It sends the responses if available
 * Move reader and writer parent classes into new directory
 
 * Investigate: when running program with multiple nodes (demo), all nodes bind to the same socket
+
+* Make utils file for static methods: char to data type (used in schema and column)

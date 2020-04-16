@@ -103,13 +103,7 @@ public:
 	/** Add a column of the given type */
 	void add_column(char typ)
 	{
-		if (numCols_ >= capCols_)
-		{
-			growColList_();
-		}
-
-		types_[numCols_] = charToType_(typ);
-		numCols_++;
+		add_column(charToType_(typ));
 	}
 
 	/** Add a column of the given type */
@@ -208,6 +202,27 @@ public:
 		numRows_ = 0;
 	}
 
+	/** Return types of this schema */
+	DataType* getTypes()
+	{
+		return types_;
+	}
+
+	/** Return types of this schema in character form. Caller responsible for deleting
+	 * returned character array
+	 */
+	char* getTypesChar()
+	{
+		char* typesChar = new char[numCols_+1];
+		for (size_t i = 0; i < numCols_; i++)
+		{
+			typesChar[i] = typeToChar_(types_[i]);
+		}
+
+		typesChar[numCols_] = '\0';
+		return typesChar;
+	}
+
 	/** Hash this schema - do not use! */
 	size_t hash_me_()
 	{
@@ -246,7 +261,7 @@ public:
         case 'd':
             return DataType::Double;
         default:
-            fprintf(stderr, "Unknown char data type: %c\n", c);
+            fprintf(stderr, "Unknown char data type %c in schema with num cols %zu\n", c, numCols_);
             exit(-1);
         }
     }
