@@ -18,6 +18,7 @@ build: buildeau2
 test: testTrivial testDemo testWordcount
 
 ourTests:
+	./tests/testGeneral
 	./tests/testSerial
 	./tests/testMap
 	./tests/testArray
@@ -31,11 +32,17 @@ ourTests:
 	./tests/testKey
 	./tests/testValue
 	./tests/testColumn
-	./tests/testGeneral
 	./tests/testSorer data/datafile.sor
 	
 memory:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testGeneral
+
+#use this target if you're trying to debug a specific test in the suite
+buildDebug:
+	g++ --std=c++11 -g -pthread tests/generalTests.cpp -o tests/testGeneral
+
+testDebug:
+	./tests/testGeneral
 
 buildeau2:
 	g++ --std=c++11 -g -pthread entry.cpp -o eau2
@@ -45,18 +52,18 @@ runeau2:
 	./eau2 -app demo -num_nodes 3 -pseudo
 
 testTrivial:
-	./eau2 -app trivial -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
-#	./eau2 -app trivial -num_nodes 1 -pseudo
+	#./eau2 -app trivial -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	./eau2 -app trivial -num_nodes 1 -pseudo
 
 testDemo:
-	./eau2 -app demo -num_nodes 3 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
-	./eau2 -app demo -num_nodes 3 -i 1 -ip 127.0.0.2 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
-	./eau2 -app demo -num_nodes 3 -i 2 -ip 127.0.0.3 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
-#	./eau2 -app demo -num_nodes 3 -pseudo
+	#./eau2 -app demo -num_nodes 3 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
+	#./eau2 -app demo -num_nodes 3 -i 1 -ip 127.0.0.2 -port 8080 -serverIp 127.0.0.1 -serverPort 8080 &
+	#./eau2 -app demo -num_nodes 3 -i 2 -ip 127.0.0.3 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	./eau2 -app demo -num_nodes 3 -pseudo
 
 testWordcount:
-	./eau2 -app wordcount -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
-	#./eau2 -app wordcount -num_nodes 1 -pseudo
+	#./eau2 -app wordcount -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	./eau2 -app wordcount -num_nodes 1 -pseudo
 
 .SILENT: clean
 clean:
