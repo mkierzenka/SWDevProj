@@ -74,7 +74,6 @@ public:
         for (int i = 0; i < args.numNodes; i++) {
             if (i == args.serverIndex) continue;
             DirectoryMsg* dMsg = new DirectoryMsg(dir_, 8080, args.index, i, args.index);
-            fprintf(stderr, "Server sending Directory Message to Node %d\n", i);
             sendMsg(dMsg);
         }
     }
@@ -86,7 +85,6 @@ public:
 		Message* m = receiveMsg();
 		assert(m->getKind() == MsgKind::Dir);
 		handleDirectoryMsg(dynamic_cast<DirectoryMsg*>(m));
-        fprintf(stderr, "Node %zu done initializing\n", args.index);
     }
 
     /** Send a message to the given IP with the given contents. This method deletes the message
@@ -94,14 +92,12 @@ public:
     */
     void sendMsg(Message* msg)
     {
-        fprintf(stderr, "Node %zu called sendMsg\n", args.index);
         int targetFd = setupNewSocket_();
         String* targetIp = dir_->getAddress(msg->getTarget());
         struct sockaddr_in targetAddr = charToAddr_(targetIp->c_str(), 8080);
 
         // create conn to client
         connectToNode_(targetFd, targetAddr);
-        fprintf(stderr, "Node %zu Connection established to node %zu\n", args.index, msg->getTarget());
 
         //serialize and send message
         lock_.lock();
@@ -109,7 +105,6 @@ public:
         msg->serialize(mySer_);
         int sendVal = send(targetFd, mySer_->getBuffer(), mySer_->getNumBytesWritten(), 0);
         crashIfError_("send error", sendVal >= 0);
-        fprintf(stderr, "Node %zu Sent message to %zu\n", args.index, msg->getTarget());
         mySer_->clear();
         lock_.unlock();
         close(targetFd);
@@ -125,7 +120,6 @@ public:
         //create dynamically-sized buffer
         String* buffStr = readStrFromNet_(tmpFd);
         close(tmpFd);
-        fprintf(stderr, "Node %zu received message\n", args.index);
         String* typeBuffStr = buffStr->clone(); //just for figuring out msg type
         lock_.lock();
         mySer_->write(typeBuffStr->size(), typeBuffStr->c_str());
@@ -164,7 +158,6 @@ public:
         size_t tmpS = dir_->size();
         dir_->addIp(m->getSender(), m->getClient());
         assert(dir_->size() == tmpS + 1);
-        fprintf(stderr, "Current Directory size = %zu\n", dir_->size());
     }
 
     /** Handle directory message */
@@ -172,7 +165,6 @@ public:
     {
         //current directories call new directory
         dir_->mergeIn(m->getDirectory());
-        fprintf(stderr, "Node %zu: directory merged in\n", args.index);
     }
 
     /** Handle done message. Only for the server */
@@ -185,7 +177,7 @@ public:
                 return; // Not all the nodes are done yet
             }
         }
-        fprintf(stderr, "Server heard that all nodes are done\n");
+        
         sendTeardownMsgs_();
     }
 
@@ -225,7 +217,6 @@ public:
     {
         int val = listen(fd, 32);
         crashIfError_("listen error", val >= 0);
-        fprintf(stderr, "Node %zu listening for connections...\n", args.index);
     }
 
     /** Pulls first connection requests off queue of requests. */
@@ -233,7 +224,6 @@ public:
     {
         int newSock = accept(fd, (struct sockaddr *)&myAddr, (socklen_t *)&myAddrLen);
         crashIfError_("accept error", newSock >= 0);
-        fprintf(stderr, "Node %zu accepted connection!\n", args.index);
         return newSock;
     }
 
@@ -279,6 +269,7 @@ public:
      * Only the Server should call this method
      */
     void sendTeardownMsgs_() {
+        printf("Server starting teardown\n");
         for (size_t i = 0; i < args.numNodes; i++) {
             sendMsg(new TeardownMsg(args.index, i, 0));
         }

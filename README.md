@@ -56,3 +56,5 @@ It sends the responses if available
 * Test network from different machines
 
 * Move reader and writer parent classes into new directory
+
+* Investigate: when running program with multiple nodes (demo), all nodes bind to the same socket

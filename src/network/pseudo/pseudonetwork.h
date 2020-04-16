@@ -54,7 +54,7 @@ public:
                 return; // Not all the nodes are done yet
             }
         }
-        fprintf(stderr, "Server heard that all nodes are done\n");
+        
         sendTeardownMsgs_();
     }
 

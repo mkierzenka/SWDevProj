@@ -102,9 +102,7 @@ public:
             }
             default:
                 pln("Weird msg type...");
-            }
-			
+            }	
         }
-        printf("End of receive thread run\n");
     }
 };
