@@ -41,13 +41,9 @@ It sends the responses if available
 
 * Delete unused message types
 
-* Update schema to use types enum
-
 * Implement push_back for columns
 
 * Sorer code- make the arrays use our array instead of re-implementing functionality
-
-* Sorer code- merge Types enum and our col type enum
 
 * Methods w/o an implementation: add assert(false) and comment
 
@@ -60,5 +56,3 @@ It sends the responses if available
 * Test network from different machines
 
 * Move reader and writer parent classes into new directory
-
-* Transition field array to regular Array, create Field object to store in array

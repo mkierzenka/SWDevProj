@@ -40,7 +40,7 @@ public:
         typeBuf[0] = '\0';
         for (int i = 0; i < types->width(); i++)
         {
-            char typ = toChar_(types->col_type(i));
+            char typ = types->col_type_char(i);
             typeBuf[i] = typ;
             typeBuf[i+1] = '\0';
         }

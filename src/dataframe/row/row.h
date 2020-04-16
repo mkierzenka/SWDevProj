@@ -140,7 +140,7 @@ public:
 			fprintf(stderr, "Column %zu out of bounds in row", idx);
 			exit(1);
 		}
-		return scm_->col_type(idx);
+		return scm_->col_type_char(idx);
 	}
 
 	/** Visit every field of this row. The first argument is
@@ -154,7 +154,7 @@ public:
 		RowElement *curElem = NULL;
 		for (size_t i = 0; i < len_; i++)
 		{
-			colType = scm_->col_type(i);
+			colType = scm_->col_type_char(i);
 			curElem = entries_[i];
 			switch (colType)
 			{
@@ -207,7 +207,7 @@ public:
 			fprintf(stderr, "Column %zu out of bounds in row", idx);
 			exit(1);
 		}
-		char actualType = scm_->col_type(idx);
+		char actualType = scm_->col_type_char(idx);
 		if (actualType != expectedType)
 		{
 			fprintf(stderr, "Cannot set row value. Failed to add entry of type %c to Column %zu of type %c", expectedType, idx, actualType);

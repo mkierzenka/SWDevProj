@@ -53,7 +53,7 @@ public:
     /** This helper determines the type of the row, then returns the length of that element */
     size_t getSizeByType_(Row &r, size_t idx)
     {
-        char colType = df_->get_schema().col_type(idx);
+        char colType = df_->get_schema().col_type_char(idx);
         switch (colType)
         {
             case 'I':

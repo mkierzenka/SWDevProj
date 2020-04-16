@@ -104,7 +104,7 @@ void parseDataFile(DataFrame* df, const char* dataFilename, size_t numLinesToRea
 			
 			if (mmappedData[curIdx] == ',') {
 				curElem[tmpIdx] = 0;
-				addToRow(row, curElem, scm.col_type(colIdx), colIdx);
+				addToRow(row, curElem, scm.col_type_char(colIdx), colIdx);
 				colIdx++;
 				curIdx++;
 				tmpIdx = 0;
@@ -114,7 +114,7 @@ void parseDataFile(DataFrame* df, const char* dataFilename, size_t numLinesToRea
 		curElem[tmpIdx] = 0;
 		curIdx++;
 		tmpIdx = 0;
-		addToRow(row, curElem, scm.col_type(colIdx), colIdx);
+		addToRow(row, curElem, scm.col_type_char(colIdx), colIdx);
 		df->add_row(*row);
 		numRowsAdded++;
 	}

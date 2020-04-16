@@ -102,10 +102,10 @@ public:
   * Creates a new DataFrame with given schema (scm) from the Writer.
   * Returns the df result, caller is responsible for deleting it.
   */
-  static DataFrame *fromVisitor(Key *k, KVStore *kv, const char *scm, Writer *r)
+  static DataFrame *fromVisitor(Key *k, KVStore *kv, const char *scm, Writer *wr)
   {
     DataFrame *df = new DataFrame(scm, k->clone(), kv);
-    df->visit(r);
+    df->visit(wr);
     addDFToStore_(df, kv, k);
     return df;
   }
@@ -418,7 +418,7 @@ public:
       //iterate through each column to get value
       for (int colIdx = 0; colIdx < row->width(); colIdx++)
       {
-        setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type(colIdx));
+        setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type_char(colIdx));
       }
 
       r.visit(*row);
@@ -440,7 +440,7 @@ public:
         //iterate through each column to get value
         for (int colIdx = 0; colIdx < row->width(); colIdx++)
         {
-          setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type(colIdx));
+          setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type_char(colIdx));
         }
 
         r.visit(*row);
@@ -608,7 +608,7 @@ public:
   /** Checks for matching col types. Error and exit if not the same */
   void checkColTypes_(char colTypeFromRow, size_t schemaColIdx)
   {
-    char colTypeFromSchema = schema_->col_type(schemaColIdx);
+    char colTypeFromSchema = schema_->col_type_char(schemaColIdx);
     if (colTypeFromRow != colTypeFromSchema)
     {
       fprintf(stderr, "Row's column type \"%c\" at index %zu does not match dataframe's column type \"%c\"", colTypeFromRow, schemaColIdx, colTypeFromSchema);
@@ -625,7 +625,7 @@ public:
     //iterate through each column to get value
     for (int i = 0; i < r->width(); i++)
     {
-      setRowValByColType_(*r, i, rowIdx, schema_->col_type(i));
+      setRowValByColType_(*r, i, rowIdx, schema_->col_type_char(i));
     }
 
     return r;
@@ -669,7 +669,7 @@ public:
   {
     for (size_t i = 0; i < schema_->width(); i++)
     {
-      char colType = schema_->col_type(i);
+      char colType = schema_->col_type_char(i);
       switch (colType)
       {
       case 'I':

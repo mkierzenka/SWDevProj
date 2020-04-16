@@ -82,7 +82,6 @@ public:
 		s->write(numRows_);
 		for (size_t i = 0; i < numCols_; i++)
 		{
-			printf("Type: %c\n", typeToChar_(types_[i]));
 			s->write(typeToChar_(types_[i]));
 		}
 	}
@@ -98,7 +97,6 @@ public:
 		for (size_t i = 0; i < numCols_; i++)
 		{
 			types_[i] = charToType_(s->readChar());
-			printf("Type: %c\n", typeToChar_(types_[i]));
 		}
 	}
 
