@@ -14,6 +14,7 @@ build: buildeau2
 	g++ --std=c++11 -g tests/valueTest.cpp -o tests/testValue
 	g++ --std=c++11 -g tests/columnTest.cpp -o tests/testColumn
 	g++ --std=c++11 -g tests/sorerTest.cpp -o tests/testSorer
+	g++ --std=c++11 -g tests/distributedArrayTest.cpp -o tests/testDistributedArray
 
 test: testTrivial testDemo testWordcount
 
@@ -32,8 +33,9 @@ ourTests:
 	./tests/testValue
 	./tests/testColumn
 	./tests/testGeneral
+	./tests/testDistributedArray
 	./tests/testSorer data/datafile.sor
-	
+
 memory:
 	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testGeneral
 
@@ -63,4 +65,4 @@ clean:
 	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray \
 	tests/testQueue tests/testSerial tests/testCache tests/testMessage tests/testBlock tests/testColumnArray \
 	tests/testStore tests/testIntegrationStore tests/testSchema tests/testKey tests/testValue \
-	tests/testColumn eau2
+	tests/testColumn tests/testDistributedArray eau2

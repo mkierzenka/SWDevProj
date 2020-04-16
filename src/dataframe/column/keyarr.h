@@ -58,7 +58,7 @@ public:
 	}
 
 	/**
-	 * Get the specified key (does not copy!)
+	 * Get the specified key (does not clone)
 	 */
 	Key *get(size_t index)
 	{
@@ -68,11 +68,11 @@ public:
 	
 
 	/**
-	 * Appends a clone of the Key to this KeyArr.
+	 * Appends the given Key to this KeyArr. (does not clone, steals ownership)
 	 */
 	void add(Key *k)
 	{
-		keyList_->add(k->clone());
+		keyList_->add(k);
 	}
 
 	/**

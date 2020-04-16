@@ -25,9 +25,9 @@
 class DistributedArray : public Object
 {
 public:
-    KeyArr *keyList_; //holds a list of keys that correspond to this DA
-    KVStore *store_;  //store to look up values of keys
-    Cache *cache_;    //holds some values of its keys at any given time
+    KeyArr *keyList_; //owned, a list of keys that correspond to this DA
+    KVStore *store_;  //external, store to look up values of keys
+    Cache *cache_;    //owned, holds some values of its keys at any given time
 
     DistributedArray(KVStore *store)
     {
@@ -58,30 +58,31 @@ public:
     }
 
     /**
-     * Check if the distributed array contains the given key
+     * Check if this Distributed Array contains the given key.
      */
     bool containsKey(Key *k)
     {
-        return keyList_->index_of(k) != -1;
+        return keyList_->index_of(k) >= 0;
     }
 
     /**
-     * Add key to the array. Key is cloned.
+     * Add a clone of the Key to this Distributed Array. Caller responsible for
+	 * deleting k.
      */
     void addKey(Key *k)
     {
-        keyList_->add(k);
+        keyList_->add(k->clone());
     }
 
 	/**
-	 * Returns the number of keys in this Distributed Array
+	 * Returns the number of keys in this Distributed Array.
 	 */
 	size_t length() {
 		return keyList_->length();
 	}
 	
 	/**
-	 * Get specific double from a value stored with key k. Caller responsible for deleting key
+	 * Get specific double from a value stored with key k. Caller responsible for deleting key.
 	 * Blocks on network call
 	 */
     double getDouble(Key *k, size_t itemIdx)
@@ -104,7 +105,7 @@ public:
     }
 
 	/**
-	 * Get specific boolean from a value stored with key k. Caller responsible for deleting key
+	 * Get specific boolean from a value stored with key k. Caller responsible for deleting key.
 	 * Blocks on network call
 	 */
     bool getBool(Key *k, size_t itemIdx)
@@ -127,7 +128,7 @@ public:
     }
 
 	/**
-	 * Get specific integer from a value stored with key k. Caller responsible for deleting key
+	 * Get specific integer from a value stored with key k. Caller responsible for deleting key.
 	 * Blocks on network call
 	 */
     int getInt(Key *k, size_t itemIdx)
@@ -152,7 +153,7 @@ public:
 	/**
 	 * Get specific string from a value stored with key k.
 	 * Blocks on network call
-	 * Caller is responsible for deleting the String returned and the key passed in
+	 * Caller is responsible for deleting the String returned and the key passed in.
 	 */
     String* getString(Key *k, size_t itemIdx)
     {
@@ -170,15 +171,7 @@ public:
 			fprintf(stderr, "Unable to get string from key [%s, %zu]\n", k->getKeyStr()->c_str(), k->getNode());
 			exit(1);
 		}
-		return strData->get(itemIdx); //get should have cloned it
-    }
-
-    /**
-     * Get key at specified index, return error if out-of-bounds
-     */
-    Key *getKeyAtIndex(size_t idx)
-    {
-        return keyList_->get(idx);
+		return strData->get(itemIdx)->clone();
     }
 
     /** Check if two distributed arrats equal */

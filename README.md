@@ -3,7 +3,10 @@
 
 ### Memory/Ownership Notes
 * Array, Map, Queue all steal ownership of what's passed into them
-* Test files without memory leaks: array, queue, map, message, cache, blocks, serial, store, schema
+* Test files without memory leaks:
+  * array, queue, map
+  * message, cache, blocks, store, schema, storeIntegration, distributed array
+
 * Tests with memory leaks/unchecked
   * Distributed array (test not developed)
   * Network
