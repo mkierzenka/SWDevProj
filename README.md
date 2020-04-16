@@ -5,7 +5,10 @@
 * Array, Map, Queue all steal ownership of what's passed into them
 * Test files without memory leaks:
   * array, queue, map
-  * message, cache, blocks, store, schema, storeIntegration, distributed array
+  * serialization
+  * message, cache, blocks, distributed array
+  * schema
+  * store, storeIntegration
 
 * Tests with memory leaks/unchecked
   * Distributed array (test not developed)
