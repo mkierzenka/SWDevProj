@@ -227,23 +227,18 @@ public:
 class DirectoryMsg : public Message
 {
 public:
-	//size_t client_;
 	size_t port_;
-	//StringArray *ipList_;
-	Directory* dir_; //keep track of clients
+	Directory* dir_; //owned, keep track of clients
 
 	DirectoryMsg() : Message()
 	{
-		//ipList_ = new StringArray();
 		dir_ = new Directory();
 	}
 
 	DirectoryMsg(Directory* dir, size_t port, size_t sender, size_t target, size_t id) : Message(Dir, sender, target, id)
 	{
-		//client_ = client;
 		dir_ = dir->clone();
 		port_ = port;
-		//ipList_ = new StringArray();
 	}
 
 	~DirectoryMsg() {
@@ -253,8 +248,6 @@ public:
 	virtual void serialize(Serializer *s)
 	{
 		Message::serialize(s);
-		//ipList_->serialize(s);
-		//s->write(client_);
 		dir_->serialize(s);
 		s->write(port_);
 	}
@@ -262,18 +255,10 @@ public:
 	virtual void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
-		//ipList_->deserialize(s);
-		//client_ = s->readSizeT();
 		delete dir_;
 		dir_ = new Directory();
 		dir_->deserialize(s);
 		port_ = s->readSizeT();
-	}
-
-	void addIp(size_t node, String *ip)
-	{
-		//ipList_->add(ip);
-		dir_->addIp(node, ip);
 	}
 
 	Directory* getDirectory()
@@ -286,64 +271,52 @@ public:
 class RegisterMsg : public Message
 {
 public:
-	//struct sockaddr_in client_;
-	String* client_; //ip address of new client; owned
-	size_t port_;
+	NodeInfo* info_; //owned
 
 	RegisterMsg() : Message()
 	{
-		// client_.sin_family = AF_INET;
-		// inet_pton(AF_INET, "127.0.0.1", &client_.sin_addr);
-		// client_.sin_port = htons(8080);
-		port_ = 8080;
-		client_ = new String("127.0.0.1");
+		String* str = new String("127.0.0.1");
+		info_ = new NodeInfo(str, 8080);
+		delete str;
 	}
 
 	RegisterMsg(String* client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
 	{
-		client_ = client->clone();
-		port_ = port;
+		info_ = new NodeInfo(client, port);
 	}
 
 	RegisterMsg(char* client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
 	{
-		client_ = new String(client);
-		port_ = port;
+		String* str = new String(client);
+		info_ = new NodeInfo(str, port);
+		delete str;
 	}
 
 	~RegisterMsg()
 	{
-		delete client_;
+		delete info_;
 	}
 
 	virtual void serialize(Serializer *s)
 	{
 		Message::serialize(s);
-		// s->write((short)client_.sin_family);
-		// s->write((long)client_.sin_addr.s_addr);
-		// s->write((short)client_.sin_port);
-		client_->serialize(s);
-		s->write(port_);
+		info_->serialize(s);
 	}
 
 	virtual void deserialize(Serializer *s)
 	{
 		Message::deserialize(s);
-		delete client_;
-		client_ = new String("");
-		client_->deserialize(s);
-		// client_.sin_family = s->readShort();
-		// client_.sin_addr.s_addr = s->readLong();
-		// client_.sin_port = s->readShort();
-		port_ = s->readSizeT();
+		delete info_;
+		info_ = new NodeInfo();
+		info_->deserialize(s);
 	}
 
 	String* getClient() {
-		return client_;
+		return new String(info_->getIPAddr());
 	}
 
 	size_t getPort() {
-		return port_;
+		return info_->getPort();
 	}
 };
 
