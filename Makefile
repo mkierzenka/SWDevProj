@@ -5,6 +5,7 @@ build: buildeau2
 	g++ --std=c++11 -g tests/arrayTest.cpp -o tests/testArray
 	g++ --std=c++11 -g tests/queueTest.cpp -o tests/testQueue
 	g++ --std=c++11 -g tests/cacheTest.cpp -o tests/testCache
+	g++ --std=c++11 -g tests/nodeInfoTest.cpp -o tests/testNodeInfo
 	g++ --std=c++11 -g tests/messageTest.cpp -o tests/testMessage
 	g++ --std=c++11 -g tests/blockTest.cpp -o tests/testBlock
 	g++ --std=c++11 -g tests/storeTest.cpp -o tests/testStore
@@ -25,6 +26,7 @@ ourTests:
 	./tests/testQueue
 	./tests/testCache
 	./tests/testMessage
+	./tests/testNodeInfo
 	./tests/testBlock
 	./tests/testStore
 	./tests/testIntegrationStore
@@ -65,4 +67,4 @@ clean:
 	rm -f tests/testGeneral tests/testCA tests/testMemory tests/testSorer tests/testMap tests/testArray \
 	tests/testQueue tests/testSerial tests/testCache tests/testMessage tests/testBlock tests/testColumnArray \
 	tests/testStore tests/testIntegrationStore tests/testSchema tests/testKey tests/testValue \
-	tests/testColumn tests/testDistributedArray eau2
+	tests/testColumn tests/testDistributedArray tests/testNodeInfo eau2
