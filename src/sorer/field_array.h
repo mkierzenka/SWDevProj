@@ -15,7 +15,7 @@
 #include<cassert>
 
 #include "../utils/object.h"
-#include "types.h"
+#include "../utils/datatype.h"
 
 
 /**
@@ -30,7 +30,7 @@
 class FieldArray : public Object {
 
 public:
-    Types type_; // the type
+    DataType type_; // the type
     size_t size_; // the size
     size_t capacity_; // the capacity
     int* starts_; // the start bytes
@@ -40,7 +40,7 @@ public:
      * Default constructor.
      */
     FieldArray() {
-        this->type_ = Types::FIELD;
+        this->type_ = DataType::Field;
         this->size_ = 0;
         this->capacity_ = 4;
         this->starts_ = new int[this->capacity_];
@@ -133,8 +133,8 @@ public:
      * Sets the type of this field array if it was not previously set.
      * @param t the type to set.
      */
-    virtual void set_type(Types t) {
-        if (this->type_ == Types::FIELD) {
+    virtual void set_type(DataType t) {
+        if (this->type_ == DataType::Field) {
             this->type_ = t;
         }
     }

@@ -9,10 +9,8 @@
 #include <cassert>
 
 #include "sorer_helper.h"
-//#include "dataframe_adapter.h"
-
 #include "../utils/object.h"
-//#include "../dataframe/dataframe.h"
+#include "../dataframe/schema.h"
 
 /**
  * This class is a sorer implementation. It will take in a file name. It will read in
@@ -27,7 +25,7 @@ class Sorer : public Object
         int fd; //file descriptor of file to be read
         size_t fileSize; //size of file to be read in
         char* file; //file to be read in
-        TypesArray* schema; //inferred schema from file
+        Schema* schema; //inferred schema from file
 
         Sorer(const char* fileName)
         {
@@ -55,7 +53,7 @@ class Sorer : public Object
         }
 
         /** Return types of this dataframe */
-        TypesArray* getTypes()
+        Schema* getTypes()
         {
             return schema;
         }
@@ -65,24 +63,6 @@ class Sorer : public Object
         {
             return file;
         }
-
-        /**
-         * Return dataframe form of the data. Will produce the columnar, then
-         * use an adapter to convert it to a dataframe
-         */
-        // DataFrame* getFrame()
-        // {
-        //     FieldArray** fa = getColumnar();
-        //     DataFrameAdapter* dfa = new DataFrameAdapter();
-        //     DataFrame* d = dfa->convertToFrame(fa, file, schema);
-        //     delete dfa;
-        //     for (int i = 0; i < schema->len(); i++)
-        //     {
-        //         delete fa[i];
-        //     }
-        //     delete[] fa;
-        //     return d;
-        // }
 
         /** Get file size of the read in file */
         size_t getFileSize_(const char* name)

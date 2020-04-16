@@ -82,6 +82,7 @@ public:
 		s->write(numRows_);
 		for (size_t i = 0; i < numCols_; i++)
 		{
+			printf("Type: %c\n", typeToChar_(types_[i]));
 			s->write(typeToChar_(types_[i]));
 		}
 	}
@@ -97,6 +98,7 @@ public:
 		for (size_t i = 0; i < numCols_; i++)
 		{
 			types_[i] = charToType_(s->readChar());
+			printf("Type: %c\n", typeToChar_(types_[i]));
 		}
 	}
 
@@ -134,8 +136,8 @@ public:
 	  numRows_ += numRows;
   	}
 
-	/** Return type of column at idx. An idx >= width is undefined. */
-	char col_type(size_t idx)
+	/** Return char type of column at idx. An idx >= width is undefined. */
+	char col_type_char(size_t idx)
 	{
 		if (idx >= numCols_)
 		{
@@ -143,6 +145,29 @@ public:
 			exit(1);
 		}
 		return typeToChar_(types_[idx]);
+	}
+
+	/** Return type of column at idx. An idx >= width is undefined. */
+	DataType col_type(size_t idx)
+	{
+		if (idx >= numCols_)
+		{
+			fprintf(stderr, "Index out of bounds: Bad col index (%zu) in Schema", idx);
+			exit(1);
+		}
+		return types_[idx];
+	}
+
+	/** Set column at current index to given data type. An idx >= width is undefined */
+	void set(size_t idx, DataType type)
+	{
+		if (idx >= numCols_)
+		{
+			fprintf(stderr, "Index out of bounds: Bad col index (%zu) in Schema", idx);
+			exit(1);
+		}
+
+		types_[idx] = type;		
 	}
 
 	/** The number of columns */
@@ -168,11 +193,21 @@ public:
 
 		for (size_t i = 0; i < numCols_; i++)
 		{
-			if (typeToChar_(types_[i]) != s->col_type(i))
+			if (types_[i] != s->col_type(i))
 			{
 				return false;
 			}
 		}
+	}
+
+	/** Clear out the schema */
+	void clear()
+	{
+		capCols_ = 2;
+		delete[] types_;
+		types_ = new DataType[capCols_];
+		numCols_ = 0;
+		numRows_ = 0;
 	}
 
 	/** Hash this schema - do not use! */

@@ -4,10 +4,12 @@
 
 #include "../utils/object.h"
 #include "../utils/string.h"
+#include "../utils/datatype.h"
 #include "sorer_helper.h"
 #include "sorwriter.h"
 #include "sorer.h"
 #include "../dataframe/dataframe.h"
+#include "../dataframe/schema.h"
 #include "../store/kvstore.h"
 #include "../store/key.h"
 
@@ -31,14 +33,14 @@ public:
     }
 
     //get character representation of schema types from the types array
-    static char *getTypes_(TypesArray *types)
+    static char *getTypes_(Schema *types)
     {
         //buffer for storing all the types
-        char* typeBuf = new char[types->len()+1];
+        char* typeBuf = new char[types->width()+1];
         typeBuf[0] = '\0';
-        for (int i = 0; i < types->len(); i++)
+        for (int i = 0; i < types->width(); i++)
         {
-            char typ = toChar_(types->get(i));
+            char typ = toChar_(types->col_type(i));
             typeBuf[i] = typ;
             typeBuf[i+1] = '\0';
         }
@@ -47,17 +49,17 @@ public:
     }
 
     /**convert Type to character */
-    static char toChar_(Types t)
+    static char toChar_(DataType t)
     {
         switch (t)
         {
-        case BOOL:
+        case Boolean:
             return 'B';
-        case INT:
+        case Integer:
             return 'I';
-        case DOUBLE:
+        case Double:
             return 'D';
-        case STRING:
+        case Str:
             return 'S';
         default:
             fprintf(stderr, "Column type not supported");

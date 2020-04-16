@@ -8,9 +8,9 @@
 #include <iostream>
 
 #include "../utils/object.h"
+#include "../utils/datatype.h"
+#include "../dataframe/schema.h"
 #include "field_array.h"
-#include "types.h"
-#include "types_array.h"
 
 
 /**
@@ -77,8 +77,8 @@ inline size_t trimr(char *file, size_t start, size_t end) {
  * @param end the byte position of '>'
  * @return returns the type of this field.
  */
-inline Types parse_field_type(char* file, size_t start, size_t end) {
-    Types result = Types::BOOL;
+inline DataType parse_field_type(char* file, size_t start, size_t end) {
+    DataType result = DataType::Boolean;
 
     // removes empty spaces in front and back
     start = triml(file, start, end);
@@ -88,26 +88,26 @@ inline Types parse_field_type(char* file, size_t start, size_t end) {
     if (start <= end) {
         if (file[start] == '\"') {
             // must be a string
-            result = Types::STRING;
+            result = DataType::Str;
         } else if (end == start && (file[start] == '0' || file[start] == '1')) {
-            result = Types::BOOL;
+            result = DataType::Boolean;
         } else {
             char *endptr;
             strtoll(&file[start], &endptr, 10);
             // Make sure we get a number back and that it consume all of the relevant field characters.
             if ((size_t) (endptr - &file[start]) == end - start + 1) {
-                return Types::INT;
+                return DataType::Integer;
             }
             strtold(&file[start], &endptr);
             if ((size_t) (endptr - &file[start]) == end - start + 1) {
-                return Types::DOUBLE;
+                return DataType::Double;
             }
             for (size_t i = start; i <= end; ++i) {
                 if (isspace(file[i])) {
                     return result;
                 }
             }
-            result = Types::STRING;
+            result = DataType::Str;
         }
     }
     return result;
@@ -125,7 +125,7 @@ inline Types parse_field_type(char* file, size_t start, size_t end) {
  *           where this row parsing ended. The row_schema argument is mutated to store
  *           the types of this row.
  */
-inline void parse_row_schema(char* file, size_t* start, TypesArray* row_schema) {
+inline void parse_row_schema(char* file, size_t* start, Schema* row_schema) {
     while (file[*start] != '\n' && file[*start] != EOF && file[*start] != '\0') {
         // find the starting byte of the field
         if (file[*start] == '<') {
@@ -135,8 +135,8 @@ inline void parse_row_schema(char* file, size_t* start, TypesArray* row_schema) 
                 assert(file[field_end] != '\n');
                 ++field_end;
             }
-            Types field_type = parse_field_type(file, *start, field_end);
-            row_schema->pushBack(field_type);
+            DataType field_type = parse_field_type(file, *start, field_end);
+            row_schema->add_column(field_type);
             *start = field_end + 1;
         } else {
             *start += 1;
@@ -154,32 +154,32 @@ inline void parse_row_schema(char* file, size_t* start, TypesArray* row_schema) 
  * less restrictive fields are found, is this result array ever changed.
  * CREDIT: to SnowyJoe team for the schema parsing algorithm.
  */
-inline TypesArray *parse_schema(char *file) {
+inline Schema *parse_schema(char *file) {
     // stores the schema state so far
-    TypesArray* result = new TypesArray();
+    Schema* result = new Schema();
     size_t start = 0;
     // types array to use to store the row schema
     // it is used for all the necessary iterations and only deleted
     // at completion
-    TypesArray* curr = new TypesArray();
+    Schema* curr = new Schema();
     for (size_t i = 0; i < 500; ++i) {
         if (file[start] == EOF || file[start] == '\0') {
             break;
         }
         // pass the curr type array down so to store the row schema
         parse_row_schema(file, &start, curr);
-        size_t result_len = result->len();
-		size_t curr_len = curr->len();
+        size_t result_len = result->width();
+		size_t curr_len = curr->width();
         for (size_t j = 0; j < curr_len; ++j) {
-            Types curr_type = curr->get(j);
+            DataType curr_type = curr->col_type(j);
             // if the current line has more element than the one we accumulated so far,
             // it means this is the longest row and we add those types into our result
             if (j >= result_len) {
-                result->pushBack(curr_type);
+                result->add_column(curr_type);
                 // change the type of a column of the so far array only if the
                 // curr type is less restrictive (meaning it has higher value
                 // in the enum)
-            } else if (result->get(j) < curr_type) {
+            } else if (result->col_type(j) < curr_type) {
                 result->set(j, curr_type);
             }
         }
@@ -234,11 +234,11 @@ inline void parse_row_fields(char* file, size_t* start, FieldArray* row) {
  * @param schema the schema of .sor file.
  * @return whether it is valid or not.
  */
-inline bool is_valid_row(TypesArray* row_types, TypesArray* schema) {
-    size_t max_fields = schema->len();
-    if (row_types->len() == max_fields) {
+inline bool is_valid_row(Schema* row_types, Schema* schema) {
+    size_t max_fields = schema->width();
+    if (row_types->width() == max_fields) {
         for (size_t i = 0; i < max_fields; ++i) {
-            if (row_types->get(i) > schema->get(i)) {
+            if (row_types->col_type(i) > schema->col_type(i)) {
                 return false;
             }
         }
@@ -261,16 +261,16 @@ inline bool is_valid_row(TypesArray* row_types, TypesArray* schema) {
  * @param schema the schema.
  * @return an array of field arrays which are the columnar representation of this portion of file
  */
-inline FieldArray** make_columnar(char* file, size_t start, size_t end, TypesArray* schema) {
-    size_t max_fields = schema->len();
+inline FieldArray** make_columnar(char* file, size_t start, size_t end, Schema* schema) {
+    size_t max_fields = schema->width();
     FieldArray** columnar = new FieldArray*[max_fields];
     for (size_t i = 0; i < max_fields; ++i) {
         columnar[i] = new FieldArray();
-        columnar[i]->set_type(schema->get(i));
+        columnar[i]->set_type(schema->col_type(i));
     }
     while (start < end) {
         // initialized the arrays that are going to be recycled every iteration
-        TypesArray* row_types = new TypesArray();
+        Schema* row_types = new Schema();
         FieldArray* row_fields = new FieldArray();
         while (file[start] != '\n' && file[start] != EOF && file[start] != '\0') {
             size_t row_start = start;
@@ -303,25 +303,25 @@ inline FieldArray** make_columnar(char* file, size_t start, size_t end, TypesArr
  * Print the given type to std out.
  * @param t the type to print.
  */
-inline void print_type(Types t) {
-    switch (t) {
-        case Types::BOOL:
-            std::cout << "BOOL" << "\n";
-            break;
-        case Types::INT:
-            std::cout << "INT" << "\n";
-            break;
-        case Types::DOUBLE:
-            std::cout << "DOUBLE" << "\n";
-            break;
-        case Types::STRING:
-            std::cout << "STRING" << "\n";
-            break;
-        default:
-            std::cout << "Bad type encountered, this value should not be stored";
-            exit(1);
-    }
-}
+// inline void print_type(DataType t) {
+//     switch (t) {
+//         case DataType::Boolean;
+//             std::cout << "BOOL" << "\n";
+//             break;
+//         case Types::INT:
+//             std::cout << "INT" << "\n";
+//             break;
+//         case Types::DOUBLE:
+//             std::cout << "DOUBLE" << "\n";
+//             break;
+//         case Types::STRING:
+//             std::cout << "STRING" << "\n";
+//             break;
+//         default:
+//             std::cout << "Bad type encountered, this value should not be stored";
+//             exit(1);
+//     }
+// }
 
 
 /**
@@ -333,41 +333,41 @@ inline void print_type(Types t) {
  * @param e the ending byte to read to.
  * @param t the type of the field
  */
-inline void print_field(char *file, int start, int end, Types t) {
+// inline void print_field(char *file, int start, int end, Types t) {
 
-    // remove empty spaces in front and back
-    size_t new_start = triml(file, start, end);
-    size_t new_end = trimr(file, start, end);
+//     // remove empty spaces in front and back
+//     size_t new_start = triml(file, start, end);
+//     size_t new_end = trimr(file, start, end);
 
-    // check if it is an empty field
-    if (new_start < new_end) {
-        switch (t) {
-            case Types::BOOL:
-                std::cout << file[new_start] << "\n";
-                break;
-            case Types::INT:
-                std::cout << strtoll(&file[new_start], nullptr, 10) << "\n";
-                break;
-            case Types::DOUBLE:
-                std::cout << strtold(&file[new_start], nullptr) << "\n";
-                break;
-            case Types::STRING:
-                if (file[new_start] != '\"' && file[new_end] != '\"') {
-                    std::cout << '"';
-                }
-                for (size_t i = new_start; i <= new_end; ++i) {
-                    std::cout << file[i];
-                }
-                if (file[new_start] != '\"' && file[new_end] != '\"') {
-                    std::cout << '"';
-                }
-                std::cout << "\n";
-                break;
-            default:
-                std::cout << "Bad type encountered, this value should not be stored";
-                exit(1);
-        }
-    } else {
-        std::cout << 1 << "\n";
-    }
-}
+//     // check if it is an empty field
+//     if (new_start < new_end) {
+//         switch (t) {
+//             case Types::BOOL:
+//                 std::cout << file[new_start] << "\n";
+//                 break;
+//             case Types::INT:
+//                 std::cout << strtoll(&file[new_start], nullptr, 10) << "\n";
+//                 break;
+//             case Types::DOUBLE:
+//                 std::cout << strtold(&file[new_start], nullptr) << "\n";
+//                 break;
+//             case Types::STRING:
+//                 if (file[new_start] != '\"' && file[new_end] != '\"') {
+//                     std::cout << '"';
+//                 }
+//                 for (size_t i = new_start; i <= new_end; ++i) {
+//                     std::cout << file[i];
+//                 }
+//                 if (file[new_start] != '\"' && file[new_end] != '\"') {
+//                     std::cout << '"';
+//                 }
+//                 std::cout << "\n";
+//                 break;
+//             default:
+//                 std::cout << "Bad type encountered, this value should not be stored";
+//                 exit(1);
+//         }
+//     } else {
+//         std::cout << 1 << "\n";
+//     }
+// }

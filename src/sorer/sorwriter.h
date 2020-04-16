@@ -2,8 +2,9 @@
 
 #include "../filereader/writer.h"
 #include "../dataframe/row/row.h"
+#include "../dataframe/schema.h"
+#include "../utils/datatype.h"
 #include "field_array.h"
-#include "types_array.h"
 #include "sorer_helper.h"
 
 /** This writer will be used to fill up a dataframe from the sorer files. It will visit
@@ -15,15 +16,15 @@ public:
     size_t numCols_;    //total number of columns
     size_t numRows_;    //total number of rows
     FieldArray **fa_;   //array of values to iterate through; not owned
-    TypesArray *types_; //type of each column; array not owned
+    Schema *types_; //type of each column; array not owned
     char *file_;        //file to read
     size_t seen_;       //how many elements have we seen
 
-    SorWriter(FieldArray **fa, TypesArray *types, char *file) : Writer()
+    SorWriter(FieldArray **fa, Schema *types, char *file) : Writer()
     {
         row_ = 0;
         types_ = types;
-        numCols_ = types->len();
+        numCols_ = types->width();
         assert(fa[0]); //make sure at least one entry
         numRows_ = fa[0]->len();
         fa_ = fa;
@@ -49,18 +50,18 @@ public:
 
             assert(field_start <= field_end);
 
-            switch (types_->get(col_))
+            switch (types_->col_type(col_))
             {
-            case BOOL:
+            case DataType::Boolean:
                 r.set(col_, get_bool_field_(file_, field_start, field_end));
                 break;
-            case INT:
+            case DataType::Integer:
                 r.set(col_, get_int_field_(file_, field_start, field_end));
                 break;
-            case DOUBLE:
+            case DataType::Double:
                 r.set(col_, get_double_field_(file_, field_start, field_end));
                 break;
-            case STRING:
+            case DataType::Str:
             {
                 String *val = get_string_field_(file_, field_start, field_end);
                 r.set(col_, val);

@@ -14,13 +14,13 @@ void testSchema()
   assert(scm->width() == 3);
   assert(scm->length() == 0);
 
-  assert(scm->col_type(0) == 'I');
-  assert(scm->col_type(2) == 'D');
+  assert(scm->col_type_char(0) == 'I');
+  assert(scm->col_type_char(2) == 'D');
 
   scm->add_column('S');
   scm->add_column('B');
-  assert(scm->col_type(3) == 'S');
-  assert(scm->col_type(4) == 'B');
+  assert(scm->col_type_char(3) == 'S');
+  assert(scm->col_type_char(4) == 'B');
 
   delete scm;
   SYSTEM->pln("Schema basic test passed!");
@@ -32,8 +32,8 @@ void testSchema2()
   Schema *scm = new Schema("II");
   assert(scm->width() == 2);
   assert(scm->length() == 0);
-  assert(scm->col_type(0) == 'I');
-  assert(scm->col_type(1) == 'I');
+  assert(scm->col_type_char(0) == 'I');
+  assert(scm->col_type_char(1) == 'I');
   for (int i = 0; i < 1000; i++)
   {
     scm->add_row();
@@ -49,8 +49,8 @@ void testSchema3()
   Schema *scm = new Schema("II");
   assert(scm->width() == 2);
   assert(scm->length() == 0);
-  assert(scm->col_type(0) == 'I');
-  assert(scm->col_type(1) == 'I');
+  assert(scm->col_type_char(0) == 'I');
+  assert(scm->col_type_char(1) == 'I');
   scm->add_rows(1000);
   assert(scm->length() == 1000);
   delete scm;
@@ -61,8 +61,8 @@ void genSchemaTest()
 {
   SYSTEM->pln("General schema test started...");
   Schema s("IIDSB");
-  assert(s.col_type(0) == 'I');
-  assert(s.col_type(4) == 'B');
+  assert(s.col_type_char(0) == 'I');
+  assert(s.col_type_char(4) == 'B');
   assert(s.width() == 5);
   assert(s.length() == 0);
 
@@ -74,8 +74,8 @@ void genSchemaTest()
 
   assert(s.width() == 8);
   assert(s.length() == 2);
-  assert(s.col_type(5) == 'I');
-  assert(s.col_type(7) == 'B');
+  assert(s.col_type_char(5) == 'I');
+  assert(s.col_type_char(7) == 'B');
   SYSTEM->pln("General schema test passed!");
 }
 
