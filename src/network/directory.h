@@ -39,7 +39,7 @@ public:
     {
         SizeTWrapper *id = new SizeTWrapper(nodeId);
         NodeInfo* newEntry = new NodeInfo(addr, port);
-        ips_->put(id->clone(), newEntry);//addr->clone());
+        ips_->put(id->clone(), newEntry);
         delete id;
     }
 
@@ -50,6 +50,16 @@ public:
     {
         String strAddr(addr);
         addInfo(nodeId, &strAddr, port);
+    }
+
+    /**
+     * Add new node information to this Directory
+     */
+    void addInfo(size_t nodeId, NodeInfo* newInfo)
+    {
+        SizeTWrapper *id = new SizeTWrapper(nodeId);
+        ips_->put(id, newInfo->clone());
+        delete id;
     }
 
     /** Get ip with the given node id */

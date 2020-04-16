@@ -318,6 +318,10 @@ public:
 	size_t getPort() {
 		return info_->getPort();
 	}
+
+	NodeInfo* getInfo() {
+		return info_;
+	}
 };
 
 /**

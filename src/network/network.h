@@ -160,6 +160,7 @@ public:
         //add new client to directory
         size_t sizeBefore = dir_->size();
         dir_->addInfo(m->getSender(), m->getClient(), m->getPort());
+        //dir_->addInfo(m->getSender(), m->getInfo()); something like this should work but doesn't
         assert(dir_->size() == sizeBefore + 1);
         fprintf(stderr, "Current Directory size = %zu\n", dir_->size());
     }
