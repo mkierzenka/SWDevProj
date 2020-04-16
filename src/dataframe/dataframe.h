@@ -12,12 +12,12 @@
 #include "../filereader/writer.h"
 #include "../filereader/adder.h"
 #include "../filereader/reader.h"
-//#include "../sorer/dataframe_adapter.h"
+#include "../sorer/sorer.h"
+#include "../sorer/sorwriter.h"
 #include "column/columnarray.h"
 #include "schema.h"
 #include "row/rower.h"
 #include "row/row.h"
-
 
 /****************************************************************************
  * DataFrame::
@@ -64,13 +64,13 @@ public:
   }
 
   /** Create a data frame with the same columns as the give df but no rows */
-/*  DataFrame(DataFrame &df, Key *k) : DataFrame(df.get_schema(), k)
+  /*  DataFrame(DataFrame &df, Key *k) : DataFrame(df.get_schema(), k)
   {
   }
 */
   /** Create a data frame from a schema and columns. All columns are created
     * empty. */
- /* DataFrame(Schema &schema, Key *k)
+  /* DataFrame(Schema &schema, Key *k)
   {
     //don't copy rows
     schema_ = new Schema(schema, false);
@@ -90,13 +90,13 @@ public:
   * Creates a new DataFrame from with given schema (scm) from the Writer.
   * Returns the df result, caller is responsible for deleting it.
   */
-  // static DataFrame *fromFile(const char* filename, Key *k, KVStore *kv)
-  // {
-  //   //DataFrame *df = sor.getFrame();//new DataFrame(scm, k->clone(), kv);
-  //   DataFrame* df = DataFrameAdapter::convertToFrame(filename, k, kv);
-  //   addDFToStore_(df, kv, k);
-  //   return df;
-  // }
+  static DataFrame *fromFile(const char *filename, Key *k, KVStore *kv)
+  {
+    Sorer sor(filename);
+    SorWriter *sw = new SorWriter(sor.getColumnar(), sor.getTypes(), sor.getFileName());
+    DataFrame *df = DataFrame::fromVisitor(k, kv, sor.getTypes()->getTypesChar(), sw);
+    return df;
+  }
 
   /**
   * Creates a new DataFrame with given schema (scm) from the Writer.
@@ -254,19 +254,20 @@ public:
   }
 
   /** Check if two dataframes equal */
-  bool equals(Object* o)
+  bool equals(Object *o)
   {
-    if (this == o) return true;
+    if (this == o)
+      return true;
 
-    DataFrame* other = dynamic_cast<DataFrame*>(o);
+    DataFrame *other = dynamic_cast<DataFrame *>(o);
 
-    return columns_->equals(other->columns_) && schema_->equals(other->schema_)
-    && key_->equals(other->key_);
+    return columns_->equals(other->columns_) && schema_->equals(other->schema_) && key_->equals(other->key_);
   }
-  
+
   /** Returns hash of this Dataframe - deprecated */
-  size_t hash() {
-	  assert(false);
+  size_t hash()
+  {
+    assert(false);
   }
 
   /**
@@ -312,7 +313,7 @@ public:
       exit(1);
     }
 
-    columns_->add_column(col);      //Append to column array
+    columns_->add_column(col); //Append to column array
     char type = col->getCharType();
     schema_->add_column(type);
   }
@@ -364,7 +365,6 @@ public:
   {
     return schema_->width();
   }
-
 
   /** Add rows to this DataFrame built by Writer. Until wr->done() */
   void visit(Writer *wr)
@@ -435,7 +435,8 @@ public:
 
     for (size_t rowIdx = 0; rowIdx < schema_->length(); rowIdx++)
     {
-      if ((rowIdx / args.blockSize) % args.numNodes == store_->storeId) {
+      if ((rowIdx / args.blockSize) % args.numNodes == store_->storeId)
+      {
         row->set_idx(rowIdx);
         //iterate through each column to get value
         for (int colIdx = 0; colIdx < row->width(); colIdx++)
@@ -445,7 +446,9 @@ public:
 
         r.visit(*row);
         row->clear();
-      } else {
+      }
+      else
+      {
         // skip this block
         rowIdx += args.blockSize;
       }
@@ -721,5 +724,4 @@ public:
     }
     schema_->add_rows(numRowsInChunk);
   }
-
 };
