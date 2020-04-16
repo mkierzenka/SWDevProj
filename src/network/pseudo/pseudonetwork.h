@@ -16,9 +16,9 @@
 class PseudoNetwork : public INetwork
 {
 public:
-    MsgQueueArr *mqa_;   //Not Owned! Holds message arrays for each node
+    MsgQueueArr *mqa_;   //external, Holds message queues for each node
     size_t nodeId_;
-    bool* isNodeDone_; //keep of track of if all the nodes are done
+    bool* isNodeDone_;   //owned, arr to keep of track of all node statuses
 
    /**
    * Pass in number of nodes and a shared Message Queue Array.
@@ -29,9 +29,14 @@ public:
         mqa_ = mqa;
         nodeId_ = ourNode;
         isNodeDone_ = new bool[mqa->size()];
+        for(size_t i = 0; i < mqa->size(); i++) {
+            isNodeDone_[i] = false;
+        }
     }
 
-    ~PseudoNetwork() {}
+    ~PseudoNetwork() {
+        delete[] isNodeDone_;
+    }
 
     void sendMsg(Message *m)
     {
