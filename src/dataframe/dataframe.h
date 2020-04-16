@@ -63,22 +63,6 @@ public:
     }
   }
 
-  /** Create a data frame with the same columns as the give df but no rows */
-  /*  DataFrame(DataFrame &df, Key *k) : DataFrame(df.get_schema(), k)
-  {
-  }
-*/
-  /** Create a data frame from a schema and columns. All columns are created
-    * empty. */
-  /* DataFrame(Schema &schema, Key *k)
-  {
-    //don't copy rows
-    schema_ = new Schema(schema, false);
-    size_t numCols = schema_->width();
-    key_ = k;
-    columns_ = new ColumnArray(store_, key_);
-  }*/
-
   ~DataFrame()
   {
     delete schema_;
