@@ -11,11 +11,10 @@
   * store, storeIntegration
 
 * Tests with memory leaks/unchecked
-  * Distributed array (test not developed)
   * Network
   * Trivial
   * Demo
-  * Sorer (test not working yet)
+  * Sorer
 
 
 
@@ -42,28 +41,14 @@ It sends the responses if available
 * See if there are other places where Blocks can be cleared instead of repeatedly
 	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
 
-* Move most of logic (like loop) from Column.add_all into Distributed Array. Remove block imports from Column
-
-* Delete stringarray, update message classes that use it
-
-* Delete unused message types
-
-* Implement push_back for columns
-
-* Sorer code- make the arrays use our array instead of re-implementing functionality
-
-* Methods w/o an implementation: add assert(false) and comment
-
-* Add unit tests: distributed array
+* Sorer code- make the arrays use our array instead of re-implementing functionality (Field object)
 
 * doc.md: create diagram for architecture section
 
-* Figure out how to use port numbers
+* Figure out how to run with multiple nodes, all using different port numbers
 
 * Test network from different machines
 
 * Move reader and writer parent classes into new directory
-
-* Investigate: when running program with multiple nodes (demo), all nodes bind to the same socket
 
 * Move sorer into sorwriter
