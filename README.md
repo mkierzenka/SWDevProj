@@ -31,6 +31,7 @@ It sends the responses if available
 
 * Don't use args unless it's specifically for network; pseudo doesn't use all of them
 * Key stored for each block (DF is DataFrame's key): Key('DF-colIdx-blockIdx', blockIdx % numNodes)
+* Real Network sends a Message as the serialized msg type prepended to the serialized message.
   
 ### Notes for things to improve from before:
 

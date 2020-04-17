@@ -18,23 +18,23 @@
 #include <assert.h>
 
 /** This class wraps the basic functionality of the POSIX libraries.
- * It is used to make connections between clients and the server. */
+ * It is used to make connections between clients and the server.
+ *
+ * @authors Marcin Kierzenka and Chase Broder
+ */
 class Network : public INetwork
 {
 
 public:
-    Serializer* mySer_;        //used for sending and receiving message
-    Directory* dir_;           //directory of other nodes on program
+    Serializer* mySer_;        //owned, used for sending and receiving message
+    Directory* dir_;           //owned, directory of other nodes on program
     Lock lock_;                //lock for reading from and writing to serializer
     int fd;                    //descriptor to send message to this node
     struct sockaddr_in myAddr;      //address struct for me
     int myAddrLen = sizeof(myAddr);
-    bool* isNodeDone_; //array to keep track of which nodes have completed their work
+    bool* isNodeDone_; //owned, arr to track which nodes have completed their work
 
-    /**
-     * Network constructor. Will take string IP of the client/server
-     * that it was initialized by.
-	 */
+
     Network():INetwork()
     {
         mySer_ = new Serializer();
@@ -60,7 +60,7 @@ public:
         close(fd);
     }
 
-    void server_init() {
+    void server_init() override {
         // Build a Directory from the msgs each node sends
         for (int i = 1; i < args.numNodes; i++) {
             RegisterMsg* rMsg = dynamic_cast<RegisterMsg*>(receiveMsg()); //blocking
@@ -77,7 +77,7 @@ public:
         }
     }
 
-    void client_init() {
+    void client_init() override {
         RegisterMsg* rMsg = new RegisterMsg(args.ip, args.serverPort, args.index, args.serverIndex, 0);
         sendMsg(rMsg);
         fprintf(stderr, "Node %zu Registered\n", args.index);
@@ -86,12 +86,9 @@ public:
 		handleDirectoryMsg(dynamic_cast<DirectoryMsg*>(m));
     }
 
-    /** Send a message to the given IP with the given contents. This method deletes the message
-     * passed in once it's done sending.
-    */
     // Implementation Notes: Assume the data sent across the network is serialized
     // message kind followed by the complete serialized message
-    void sendMsg(Message* msg)
+    void sendMsg(Message* msg) override
     {
         int targetFd = setupNewSocket_();
         NodeInfo* targetInfo = dir_->getInfo(msg->getTarget());
@@ -111,12 +108,9 @@ public:
         delete msg;
     }
 
-    /** Attempt to receive a message and return result.
-	 * Caller is responsible for deleting return val.
-	 */
     // Implementation Notes: Assume the data sent across the network is serialized
     // message kind followed by the complete serialized message
-    Message* receiveMsg()
+    Message* receiveMsg() override
     {
         int tmpFd = acceptConnection_();
         String* buffStr = readStrFromNet_(tmpFd); //Complete set of bytes received on net
@@ -147,8 +141,7 @@ public:
         return tmp;
     }
 
-    /** Handle register message received on this node */
-    void handleRegisterMsg(RegisterMsg* m)
+    void handleRegisterMsg(RegisterMsg* m) override
     {
         //add new client to directory
         size_t sizeBefore = dir_->size();
@@ -157,15 +150,14 @@ public:
         assert(dir_->size() == sizeBefore + 1);
     }
 
-    /** Handle directory message */
-    void handleDirectoryMsg(DirectoryMsg* m)
+    void handleDirectoryMsg(DirectoryMsg* m) override
     {
         //current directories call new directory
         dir_->mergeIn(m->getDirectory());
     }
 
-    /** Handle done message. Only for the server */
-    void handleDoneMsg(DoneMsg* m)
+    /** For this (real) Network, only the server calls this */
+    void handleDoneMsg(DoneMsg* m) override
     {
         assert(m && args.index == args.serverIndex);
         isNodeDone_[m->getSender()] = true;
