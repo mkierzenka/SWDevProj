@@ -89,6 +89,8 @@ public:
     /** Send a message to the given IP with the given contents. This method deletes the message
      * passed in once it's done sending.
     */
+    // Implementation Notes: Assume the data sent across the network is serialized
+    // message kind followed by the complete serialized message
     void sendMsg(Message* msg)
     {
         int targetFd = setupNewSocket_();
@@ -99,6 +101,7 @@ public:
         //serialize and send message
         lock_.lock();
         mySer_->clear();
+        mySer_->write(msg->getKind());
         msg->serialize(mySer_);
         int sendVal = send(targetFd, mySer_->getBuffer(), mySer_->getNumBytesWritten(), 0);
         crashIfError_("send error", sendVal >= 0);
@@ -111,19 +114,18 @@ public:
     /** Attempt to receive a message and return result.
 	 * Caller is responsible for deleting return val.
 	 */
+    // Implementation Notes: Assume the data sent across the network is serialized
+    // message kind followed by the complete serialized message
     Message* receiveMsg()
     {
         int tmpFd = acceptConnection_();
-        //create dynamically-sized buffer
-        String* buffStr = readStrFromNet_(tmpFd);
+        String* buffStr = readStrFromNet_(tmpFd); //Complete set of bytes received on net
         close(tmpFd);
-        String* typeBuffStr = buffStr->clone(); //just for figuring out msg type
+        fprintf(stderr, "Node %zu received message\n", args.index);
         lock_.lock();
-        mySer_->write(typeBuffStr->size(), typeBuffStr->c_str());
-        delete typeBuffStr;
-        // WARNING: Tightly coupled to how we serialize messages!!
+        mySer_->write(buffStr->size(), buffStr->c_str());
         Message* tmp = nullptr;
-        MsgKind type = mySer_->readMsgKind();
+        MsgKind type = mySer_->readMsgKind(); //assume msgkind is serialized before msg
         switch (type) {
             case GetData: tmp = new GetDataMsg(); break;
             case Put: tmp = new PutMsg(); break;
@@ -140,8 +142,6 @@ public:
             }
         }
         assert(tmp);
-        mySer_->clear();
-        mySer_->write(buffStr->size(), buffStr->c_str());
         tmp->deserialize(mySer_);
         delete buffStr;
         lock_.unlock();
