@@ -54,35 +54,29 @@ public:
 		char out[2];
 		switch (mk)
 		{
-		case Ack:
+		case GetData:
 			out[0] = '0';
 			break;
-		case GetData:
+		case Put:
 			out[0] = '1';
 			break;
-		case Put:
+		case ReplyData:
 			out[0] = '2';
 			break;
-		case ReplyData:
+		case WaitAndGet:
 			out[0] = '3';
 			break;
-		case WaitAndGet:
+		case Register:
 			out[0] = '4';
 			break;
-		case Status:
+		case Dir:
 			out[0] = '5';
 			break;
-		case Register:
+		case Done:
 			out[0] = '6';
 			break;
-		case Dir:
-			out[0] = '7';
-			break;
-		case Done:
-			out[0] = '8';
-			break;
 		case Teardown:
-			out[0] = '9';
+			out[0] = '7';
 			break;
 		default:
 			out[0] = 0;
@@ -233,41 +227,33 @@ public:
 		numBytesRead_ += 2;
 		if (strcmp(sMsgKind, "0") == 0)
 		{
-			return Ack;
+			return GetData;
 		}
 		else if (strcmp(sMsgKind, "1") == 0)
 		{
-			return GetData;
+			return Put;
 		}
 		else if (strcmp(sMsgKind, "2") == 0)
 		{
-			return Put;
+			return ReplyData;
 		}
 		else if (strcmp(sMsgKind, "3") == 0)
 		{
-			return ReplyData;
+			return WaitAndGet;
 		}
 		else if (strcmp(sMsgKind, "4") == 0)
 		{
-			return WaitAndGet;
+			return Register;
 		}
 		else if (strcmp(sMsgKind, "5") == 0)
 		{
-			return Status;
+			return Dir;
 		}
 		else if (strcmp(sMsgKind, "6") == 0)
 		{
-			return Register;
-		}
-		else if (strcmp(sMsgKind, "7") == 0)
-		{
-			return Dir;
-		}
-		else if (strcmp(sMsgKind, "8") == 0)
-		{
 			return Done;
 		}
-		else if (strcmp(sMsgKind, "9") == 0)
+		else if (strcmp(sMsgKind, "7") == 0)
 		{
 			return Teardown;
 		}
