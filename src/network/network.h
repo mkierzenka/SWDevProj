@@ -121,7 +121,6 @@ public:
         int tmpFd = acceptConnection_();
         String* buffStr = readStrFromNet_(tmpFd); //Complete set of bytes received on net
         close(tmpFd);
-        fprintf(stderr, "Node %zu received message\n", args.index);
         lock_.lock();
         mySer_->write(buffStr->size(), buffStr->c_str());
         Message* tmp = nullptr;
