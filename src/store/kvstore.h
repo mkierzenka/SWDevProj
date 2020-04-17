@@ -26,7 +26,7 @@ public:
     MapStrObj *kvMap_;  // Owned, holds all key-value pairings
     INetwork *node_;    // Not owned, object used for Network communication
     size_t storeId;     // Node id that this store belongs to
-    Map *msgCache_;     // WaitAndGet msgs we can't answer yet and ReplyData msgs we just got
+    Map *msgCache_;     // WaitAndGet msgs we can't answer yet and ReplyData msgs we just got; key maps to array of messages
     Lock msgCacheLock_; // Owned, controls access to msgCache
 
     /**

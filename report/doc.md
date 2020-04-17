@@ -61,7 +61,7 @@ we provided descriptions of how they'll be used.
     messages from other nodes and send messages to other stores to request data or put data in another node's store
     * storeId (size_t): each local store will be represented by a unique numerical identifier. 
     At a higher level, this identifier will help keep track of where the data is stored
-    * msgCache_ (Map): this map will hold the messages that the KVStore cannot handle right away. For example, if another node requests data from this store that is guaranteed to eventually be in this store, the store will hold that message in the queue until the data is present. The key will be an actual Key object and the value will be the message that the key corresponds to. Right now only two types of messages will exist in this cache: WaitAndGetMsg and ReplyDataMsg
+    * msgCache_ (Map): this map will hold the messages that the KVStore cannot handle right away. For example, if another node requests data from this store that is guaranteed to eventually be in this store, the store will hold that message in the queue until the data is present. The key will be an actual Key object and the value will be an array of messages referencing that key. For example, if two nodes try to get the same data from the same store, then the key for that data will correspond to two get messages. Right now only two types of messages will exist in this cache: WaitAndGetMsg and ReplyDataMsg
     * msgCacheLock_ (Lock): used when accessing the cache, to avoid another thread from reading from/writing to the cache at the same time
  
   * Methods:
