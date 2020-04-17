@@ -74,8 +74,6 @@ public:
     SIMap map;
     Key *own = mk_key(0);
     DataFrame *tmp = kv_->get(own);
-    String *a = tmp->get_string(0, 0);
-    String *a2 = tmp->get_string(0, 1);
     merge(tmp, map);
     for (size_t i = 1; i < args.numNodes; ++i)
     { // merge other nodes
