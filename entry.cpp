@@ -4,7 +4,7 @@
 #include "src/application/demo.h"
 #include "src/application/trivial.h"
 #include "src/application/wordcount.h"
-//#include "src/application/linus.h"
+#include "src/application/linus.h"
 #include "src/application/thread/nodethread.h"
 #include "src/network/network.h"
 #include "src/network/pseudo/pseudonetwork.h"
@@ -24,8 +24,8 @@ Application* initializeApplication(INetwork* net, size_t nodeIdx)
         a = new Demo(nodeIdx, net);
     } else if(strcmp(args.appName, "wordcount") == 0) {
         a = new WordCount(nodeIdx, net);
-    /*} else if(strcmp(args.appName, "linus") == 0) {
-        a = new Linus(nodeIdx, net);*/
+    } else if(strcmp(args.appName, "linus") == 0) {
+        a = new Linus(nodeIdx, net);
     } else {
         fprintf(stderr, "Unknown application type: %s\n", args.appName);
         exit(0);
