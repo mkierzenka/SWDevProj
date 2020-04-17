@@ -48,10 +48,8 @@ public:
         for (size_t i = 0; i < args.numNodes; i++) {
             isNodeDone_[i] = false;
         }
-        String* servIp = new String(args.serverIp);
         //add the server info to this network's directory (even if we are server)
-        dir_->addIp(args.serverIndex, servIp);
-        delete servIp;
+        dir_->addInfo(args.serverIndex, args.serverIp, args.serverPort);
     }
 
     ~Network()
@@ -73,7 +71,8 @@ public:
         // When all nodes (expected number) have registered, send directory to everyone
         for (int i = 0; i < args.numNodes; i++) {
             if (i == args.serverIndex) continue;
-            DirectoryMsg* dMsg = new DirectoryMsg(dir_, 8080, args.index, i, args.index);
+            DirectoryMsg* dMsg = new DirectoryMsg(dir_, 8080, args.index, i, 0);
+            fprintf(stderr, "Server sending Directory Message to Node %d\n", i);
             sendMsg(dMsg);
         }
     }
@@ -93,12 +92,10 @@ public:
     void sendMsg(Message* msg)
     {
         int targetFd = setupNewSocket_();
-        String* targetIp = dir_->getAddress(msg->getTarget());
-        struct sockaddr_in targetAddr = charToAddr_(targetIp->c_str(), 8080);
+        NodeInfo* targetInfo = dir_->getInfo(msg->getTarget());
 
         // create conn to client
-        connectToNode_(targetFd, targetAddr);
-
+        connectToNode_(targetFd, targetInfo->getAddr());
         //serialize and send message
         lock_.lock();
         mySer_->clear();
@@ -155,9 +152,10 @@ public:
     void handleRegisterMsg(RegisterMsg* m)
     {
         //add new client to directory
-        size_t tmpS = dir_->size();
-        dir_->addIp(m->getSender(), m->getClient());
-        assert(dir_->size() == tmpS + 1);
+        size_t sizeBefore = dir_->size();
+        dir_->addInfo(m->getSender(), m->getClient(), m->getPort());
+        //dir_->addInfo(m->getSender(), m->getInfo()); something like this should work but doesn't
+        assert(dir_->size() == sizeBefore + 1);
     }
 
     /** Handle directory message */
@@ -185,12 +183,12 @@ public:
     int setupNewSocket_() {
         int newSock = socket(AF_INET, SOCK_STREAM, 0);
         crashIfError_("socket error", newSock >= 0);
-		int opt = 1;
+        int opt = 1;
         int rc = setsockopt(newSock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
         crashIfError_("setsockopt SO_REUSEADDR error", rc == 0);
         rc = setsockopt(newSock, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
         crashIfError_("setsockopt SO_REUSEPORT error", rc == 0);
-		return newSock;
+        return newSock;
     }
 
     /** Binds sock to address and corresponding port number. */

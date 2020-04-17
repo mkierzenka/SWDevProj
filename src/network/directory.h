@@ -7,6 +7,7 @@
 #include "../utils/map.h"
 #include "../serial/serial.h"
 #include "sizetwrapper.h"
+#include "nodeinfo.h"
 
 #include <arpa/inet.h>
 
@@ -32,12 +33,32 @@ public:
     }
 
     /**
-     * Add a new node id and ip address to this directory
+     * Add new node information to this Directory
      */
-    void addIp(size_t nodeId, String *addr)
+    void addInfo(size_t nodeId, String *addr, size_t port)
     {
         SizeTWrapper *id = new SizeTWrapper(nodeId);
-        ips_->put(id->clone(), addr->clone());
+        NodeInfo* newEntry = new NodeInfo(addr, port);
+        ips_->put(id->clone(), newEntry);
+        delete id;
+    }
+
+    /**
+     * Add new node information to this Directory
+     */
+    void addInfo(size_t nodeId, const char *addr, size_t port)
+    {
+        String strAddr(addr);
+        addInfo(nodeId, &strAddr, port);
+    }
+
+    /**
+     * Add new node information to this Directory
+     */
+    void addInfo(size_t nodeId, NodeInfo* newInfo)
+    {
+        SizeTWrapper *id = new SizeTWrapper(nodeId);
+        ips_->put(id, newInfo->clone());
         delete id;
     }
 
@@ -45,10 +66,22 @@ public:
     String* getAddress(size_t nodeId)
     {
         SizeTWrapper *node = new SizeTWrapper(nodeId);
-        String *addr = dynamic_cast<String *>(ips_->get(node));
+        NodeInfo *addr = dynamic_cast<NodeInfo *>(ips_->get(node));
         assert(addr);
+        String* out = new String(addr->getIPAddr());
         delete node;
-        return addr;
+        return out;
+    }
+
+    /**
+     * Return NodeInfo for the specified node, else nullptr.
+     * Does not clone! Do not delete.
+     */
+    NodeInfo* getInfo(size_t nodeId) {
+        SizeTWrapper node(nodeId);
+        NodeInfo *info = dynamic_cast<NodeInfo *>(ips_->get(&node));
+        assert(info);
+        return info;
     }
 
     /**
@@ -62,10 +95,7 @@ public:
             assert(keys[i]);
             nodes[i] = dynamic_cast<SizeTWrapper*>(keys[i]);
         }
-
-        //delete keys;
         return nodes;
-        //return dynamic_cast<SizeTWrapper**>(ips_->get_keys());
     }
 
     void mergeIn(Directory* other) {
@@ -76,10 +106,9 @@ public:
         SizeTWrapper** otherNodes = other->getNodes();
         assert(otherNodes);
         for (int i = 0; i < other->size(); i++) {
-            ips_->put(otherNodes[i]->clone(), other->getAddress(otherNodes[i]->asSizeT())->clone());
-            //delete otherNodes[i];
+            size_t nodeIdx = otherNodes[i]->asSizeT();
+            ips_->put(otherNodes[i]->clone(), other->getInfo(nodeIdx)->clone());
         }
-        //delete[] otherNodes;
     }
 
     /** Get number of entries in this directory */
@@ -108,10 +137,9 @@ public:
         for (size_t i = 0; i < ips_->size(); i++)
         {
             SizeTWrapper *node = dynamic_cast<SizeTWrapper *>(keys[i]);
-            String *ip = dynamic_cast<String *>(ips_->get(node));
-
+            NodeInfo* ni = dynamic_cast<NodeInfo *>(ips_->get(node));
             node->serialize(s);
-            ip->serialize(s);
+            ni->serialize(s);
         }
     }
 
@@ -123,19 +151,19 @@ public:
         size_t capacity = s->readSizeT();
 
         //initialize map with capacity
+        delete ips_;
         ips_ = new Map(capacity);
 
         SizeTWrapper *node = new SizeTWrapper();
-        String *addr = new String("");
+        NodeInfo* ni = new NodeInfo();
         //deserialize all items and put them in the map
         for (size_t i = 0; i < size; i++)
         {
             node->deserialize(s);
-            addr->deserialize(s);
-            ips_->put(node->clone(), addr->clone());
+            ni->deserialize(s);
+            ips_->put(node->clone(), ni->clone());
         }
-
         delete node;
-        delete addr;
+        delete ni;
     }
 };

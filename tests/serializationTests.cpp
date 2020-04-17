@@ -193,7 +193,6 @@ void serializeColumnTest()
     delete s;
     delete newC;
     delete[] vals;
-
     printf("Column serialization test passed!\n");
 }
 
@@ -202,32 +201,33 @@ void serializeDistArrTest()
     printf("Distributed Array serialization test started\n");
 
     KVStore *store = new KVStore(0, nullptr);
-    String *keyStr = new String("data-0-0");
-    Key *k = new Key(keyStr, 0);
+    String keyStr("data-0-0");
+    Key k(&keyStr, 0);
 
-    String *keyStr1 = new String("data-0-1");
-    Key *k1 = new Key(keyStr1, 0);
+    String keyStr1("data-0-1");
+    Key k1(&keyStr1, 0);
 
-    String *keyStr2 = new String("data-0-2");
-    Key *k2 = new Key(keyStr2, 0);
+    String keyStr2("data-0-2");
+    Key k2(&keyStr2, 0);
 
-    String *keyStr3 = new String("data-0-3");
-    Key *k3 = new Key(keyStr3, 0);
+    String keyStr3("data-0-3");
+    Key k3(&keyStr3, 0);
 
     DistributedArray *da = new DistributedArray(store);
-    da->addKey(k);
-    da->addKey(k1);
-    da->addKey(k2);
-    da->addKey(k3);
+    da->addKey(&k);
+    da->addKey(&k1);
+    da->addKey(&k2);
+    da->addKey(&k3);
 
     Serializer *s = new Serializer();
     da->serialize(s);
-
     DistributedArray *da2 = new DistributedArray(store);
     da2->deserialize(s);
-
     assert(da->equals(da2));
-
+    delete da2;
+    delete s;
+    delete da;
+    delete store;
     printf("Distributed Array serialization test passed!\n");
 }
 
@@ -238,6 +238,7 @@ void serializeColumnArrTest()
     KVStore *store = new KVStore(0, nullptr);
     String *keyStr = new String("data-0");
     Key *k = new Key(keyStr, 0);
+    delete keyStr;
 
     ColumnArray *ca = new ColumnArray(store, k);
     size_t numElems = 7;
@@ -248,15 +249,18 @@ void serializeColumnArrTest()
     }
 
     ca->add_column_fromarray(7, dbls);
+    delete[] dbls;
 
     Serializer *s = new Serializer();
     ca->serialize(s);
-
     ColumnArray *ca2 = new ColumnArray(store, k);
     ca2->deserialize(s);
-
     assert(ca->equals(ca2));
-
+    delete ca2;
+    delete s;
+    delete ca;
+    delete k;
+    delete store;
     printf("Column Array serialization test passed!\n");
 }
 
@@ -266,8 +270,7 @@ void serializeColumnArrTest()
  */
 int main(int argc, char** argv)
 {
-    args.parse(argc, argv);
-
+    args.blockSize = 1024;
     serializeKeyTest();
     serializeBoolBlockTest();
     serializeDoubleBlockTest();
