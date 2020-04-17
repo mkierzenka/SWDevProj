@@ -142,41 +142,6 @@ public:
 		}
 		return scm_->col_type_char(idx);
 	}
-
-	/** Visit every field of this row. The first argument is
-    * index of the row in the dataframe.
-    * Calling this method before the row's fields have been set is undefined. */
-	/*void visit(size_t idx)
-	{
-		// idx is ignored
-		//f.start(idx);
-		char colType = 0;
-		RowElement *curElem = NULL;
-		for (size_t i = 0; i < len_; i++)
-		{
-			colType = scm_->col_type_char(i);
-			curElem = entries_[i];
-			switch (colType)
-			{
-			case 'I':
-				f.accept(curElem->getInt());
-				break;
-			case 'B':
-				f.accept(curElem->getBool());
-				break;
-			case 'D':
-				f.accept(curElem->getDouble());
-				break;
-			case 'S':
-				f.accept(curElem->getString());
-				break;
-			default:
-				fprintf(stderr, "Unknown col type in row: %c", colType);
-				exit(2);
-			}
-		}
-		f.done();
-	}*/
 	
 	/**
 	 * Clears all entries (frees memory) from this row. Leaves size unchanged.
