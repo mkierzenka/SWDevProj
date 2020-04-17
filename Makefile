@@ -39,10 +39,10 @@ memory:
 
 #use this target if you're trying to debug a specific test in the suite
 buildDebug:
-	g++ --std=c++11 -g tests/sorerTest.cpp -o tests/testSorer
+	g++ --std=c++11 -g tests/columnTest.cpp -o tests/testColumn
 
 testDebug:
-	./tests/testSorer data/datafile.sor
+	./tests/testColumn
 
 buildeau2:
 	g++ --std=c++11 -g -pthread entry.cpp -o eau2
@@ -64,6 +64,9 @@ testDemo:
 testWordcount:
 	./eau2 -app wordcount -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
 	#./eau2 -app wordcount -num_nodes 1 -pseudo
+
+testLinus:
+	./eau2 -app linus -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
 
 .SILENT: clean
 clean:

@@ -6,6 +6,7 @@
 #include "../utils/array.h"
 #include "../utils/thread.h"
 #include "../utils/args.h"
+#include "../utils/datatypeutils.h"
 #include "../store/kvstore.h"
 #include "../store/key.h"
 #include "../serial/serial.h"
@@ -298,7 +299,7 @@ public:
     }
 
     columns_->add_column(col); //Append to column array
-    char type = col->getCharType();
+    char type = DataTypeUtils::typeToChar(col->getType());
     schema_->add_column(type);
   }
 

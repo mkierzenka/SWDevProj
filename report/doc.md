@@ -170,7 +170,6 @@ frame's columns' chunks
     * most methods from before, for getting data from the column. not 'set' methods (or anything else that modifies the column). Might include the push_back methods
     * void add_all(size_t, *type*): one for each data type; adds all given elements of that datatype to the column; breaks data up into chunks, creates keys for those chunks, and adds them to the KVStore
     * void setStore(KVStore): pass a KVStore to the dataframe; will initially start in the dataframe, which will be passed to the column array and eventually the column
-    * char getCharType(): get column's data type in character form ('I', 'B', 'S', 'F')
     * void push_back(val): add value to end of column; currently debating whether or not this implementation is necessary, would have one for each type
     * size_t size(): return size of column
     * get: get element from column; one method for each type
@@ -265,6 +264,8 @@ set of data. An application will run on each node. To specify operations, Applic
   * Queue: represents implementation of a queue. Used when we want to store and retrieve data on a first-in, first-out basis
   * Thread: represents a thread of execution. Allows program to split into multiple, "simultaneous" tasks
   * Args: class for handling command line inputs. Sets the field based on what is provided on the command line. Use of "extern" allows entire program to access these elements. We run an entry .cpp file that passes the arguments into this Args object and then starts the program based on the configurations.
+  * DataType: our enum for the four data types
+  * DataTypeUtils: contains static methods relating to data types; currently support converting chars to data types and vice versa
   
   
 ## Use cases

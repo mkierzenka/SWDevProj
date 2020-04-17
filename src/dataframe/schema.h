@@ -3,6 +3,7 @@
 #include "../utils/object.h"
 #include "../utils/string.h"
 #include "../utils/datatype.h"
+#include "../utils/datatypeutils.h"
 #include "../serial/serial.h"
 
 /*************************************************************************
@@ -82,7 +83,7 @@ public:
 		s->write(numRows_);
 		for (size_t i = 0; i < numCols_; i++)
 		{
-			s->write(typeToChar_(types_[i]));
+			s->write(DataTypeUtils::typeToChar(types_[i]));
 		}
 	}
 
@@ -96,14 +97,14 @@ public:
 		types_ = new DataType[capCols_];
 		for (size_t i = 0; i < numCols_; i++)
 		{
-			types_[i] = charToType_(s->readChar());
+			types_[i] = DataTypeUtils::charToType(s->readChar());
 		}
 	}
 
 	/** Add a column of the given type */
 	void add_column(char typ)
 	{
-		add_column(charToType_(typ));
+		add_column(DataTypeUtils::charToType(typ));
 	}
 
 	/** Add a column of the given type */
@@ -136,7 +137,7 @@ public:
 			fprintf(stderr, "Index out of bounds: Bad col index (%zu) in Schema", idx);
 			exit(1);
 		}
-		return typeToChar_(types_[idx]);
+		return DataTypeUtils::typeToChar(types_[idx]);
 	}
 
 	/** Return type of column at idx. An idx >= width is undefined. */
@@ -216,7 +217,7 @@ public:
 		char* typesChar = new char[numCols_+1];
 		for (size_t i = 0; i < numCols_; i++)
 		{
-			typesChar[i] = typeToChar_(types_[i]);
+			typesChar[i] = DataTypeUtils::typeToChar(types_[i]);
 		}
 
 		typesChar[numCols_] = '\0';
@@ -240,48 +241,4 @@ public:
 		delete[] types_;
 		types_ = newTypesArr;
 	}
-
-	/** Convert char to data type
-	 * NOTE: this logic is duplicated in column; maybe make static util file
-	 */
-	DataType charToType_(char c)
-    {
-        switch (c)
-        {
-        case 'I':
-        case 'i':
-            return DataType::Integer;
-        case 'S':
-        case 's':
-            return DataType::Str;
-        case 'B':
-        case 'b':
-            return DataType::Boolean;
-        case 'D':
-        case 'd':
-            return DataType::Double;
-        default:
-            fprintf(stderr, "Unknown char data type %c in schema with num cols %zu\n", c, numCols_);
-            exit(-1);
-        }
-    }
-
-	/** Return character for given type */
-	char typeToChar_(DataType t)
-    {
-        switch (t)
-        {
-        case DataType::Integer:
-            return 'I';
-        case DataType::Str:
-            return 'S';
-        case DataType::Boolean:
-            return 'B';
-        case DataType::Double:
-            return 'D';
-        default:
-            fprintf(stderr, "Unknown data type\n");
-            exit(-1);
-        }
-    }
 };

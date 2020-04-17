@@ -59,6 +59,4 @@ It sends the responses if available
 
 * Investigate: when running program with multiple nodes (demo), all nodes bind to the same socket
 
-* Make utils file for static methods: char to data type (used in schema and column)
-
 * Move sorer into sorwriter

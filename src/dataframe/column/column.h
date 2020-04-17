@@ -4,6 +4,7 @@
 #include "../../utils/string.h"
 #include "../../utils/args.h"
 #include "../../utils/datatype.h"
+#include "../../utils/datatypeutils.h"
 #include "../../store/kvstore.h"
 
 #include "distributedarray.h"
@@ -50,7 +51,7 @@ public:
         store_ = store;
         baseKey_ = baseKey;
         size_ = 0;
-        type_ = getDataType_(type);
+        type_ = DataTypeUtils::charToType(type);
     }
 
     // For deserializing, hopefully these values will be updated in a few calls
@@ -75,32 +76,11 @@ public:
         store_ = store;
     }
 
-    /** 
-     * Get character representation of column's type
-     */
-    char getCharType()
-    {
-        switch (type_)
-        {
-        case DataType::Integer:
-            return 'I';
-        case DataType::Str:
-            return 'S';
-        case DataType::Boolean:
-            return 'B';
-        case DataType::Double:
-            return 'D';
-        default:
-            fprintf(stderr, "Unknown enum data type");
-            exit(-1);
-        }
-    }
-
     void serialize(Serializer *s)
     {
         s->write(size_);
         blocks_->serialize(s);
-        s->write(getCharType());
+        s->write(DataTypeUtils::typeToChar(type_));
         baseKey_->serialize(s);
     }
 
@@ -112,7 +92,8 @@ public:
         blocks_->setStore(store_);
 
         blocks_->deserialize(s);
-        type_ = getDataType_(s->readChar());
+        //type_ = getDataType_(s->readChar());
+        type_ = DataTypeUtils::charToType(s->readChar());
         baseKey_->deserialize(s);
     }
 
@@ -123,7 +104,7 @@ public:
         assert(false);
         if (type_ != DataType::Integer)
         {
-            fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
+            fprintf(stderr, "Cannot add integer to column of type %c", DataTypeUtils::charToType(type_));
             exit(1);
         }
     }
@@ -133,7 +114,7 @@ public:
         assert(false);
         if (type_ != DataType::Boolean)
         {
-            fprintf(stderr, "Cannot add boolean to column of type %c", getCharType());
+            fprintf(stderr, "Cannot add boolean to column of type %c", DataTypeUtils::charToType(type_));
             exit(1);
         }
     }
@@ -143,7 +124,7 @@ public:
         assert(false);
         if (type_ != DataType::Double)
         {
-            fprintf(stderr, "Cannot add double to column of type %c", getCharType());
+            fprintf(stderr, "Cannot add double to column of type %c", DataTypeUtils::charToType(type_));
             exit(1);
         }
     }
@@ -153,7 +134,7 @@ public:
         assert(false);
         if (type_ != DataType::Str)
         {
-            fprintf(stderr, "Cannot add String to column of type %c", getCharType());
+            fprintf(stderr, "Cannot add String to column of type %c", DataTypeUtils::charToType(type_));
             exit(1);
         }
     }
@@ -163,7 +144,7 @@ public:
     {
         if (type_ != DataType::Integer)
         {
-            fprintf(stderr, "Cannot add integer to column of type %c", getCharType());
+            fprintf(stderr, "Cannot add integer to column of type %c", DataTypeUtils::charToType(type_));
             exit(1);
         }
         size_t blockCountBefore = blocks_->length();
@@ -193,7 +174,7 @@ public:
     {
         if (type_ != DataType::Boolean)
         {
-            fprintf(stderr, "Cannot add boolean to column of type %c", getCharType());
+            fprintf(stderr, "Cannot add boolean to column of type %c", DataTypeUtils::charToType(type_));
             exit(1);
         }
         size_t blockCountBefore = blocks_->length();
@@ -223,7 +204,7 @@ public:
     {
         if (type_ != DataType::Double)
         {
-            fprintf(stderr, "Cannot add double to column of type %c", getCharType());
+            fprintf(stderr, "Cannot add double to column of type %c", DataTypeUtils::charToType(type_));
             exit(1);
         }
         size_t blockCountBefore = blocks_->length();
@@ -253,7 +234,7 @@ public:
     {
         if (type_ != DataType::Str)
         {
-            fprintf(stderr, "Cannot add String to column of type %c", getCharType());
+            fprintf(stderr, "Cannot add String to column of type %c", DataTypeUtils::charToType(type_));
             exit(1);
         }
         size_t blockCountBefore = blocks_->length();
@@ -362,41 +343,10 @@ public:
         return type_ == ct;
     }
 
-    Key *genKey_(size_t blockNum, size_t colIdx)
+    /** Return type of column */
+    DataType getType()
     {
-        StrBuff *buff = new StrBuff();
-        buff->c(*(baseKey_->getKeyStr())); //copies memory into buffer
-        buff->c("-");
-        buff->c(colIdx);
-        buff->c("-");
-        buff->c(blockNum);
-        String *keyStr = buff->get();
-        delete buff;
-        Key *k = new Key(keyStr, blockNum % args.numNodes); //clones String
-        delete keyStr;
-        return k;
-    }
-
-    DataType getDataType_(char c)
-    {
-        switch (c)
-        {
-        case 'I':
-        case 'i':
-            return DataType::Integer;
-        case 'S':
-        case 's':
-            return DataType::Str;
-        case 'B':
-        case 'b':
-            return DataType::Boolean;
-        case 'D':
-        case 'd':
-            return DataType::Double;
-        default:
-            fprintf(stderr, "Unknown char data type: %c\n", c);
-            exit(-1);
-        }
+        return type_;
     }
 
     /** Check if two columns equal */
@@ -418,6 +368,21 @@ public:
         return true;
     }
 
+    Key *genKey_(size_t blockNum, size_t colIdx)
+    {
+        StrBuff *buff = new StrBuff();
+        buff->c(*(baseKey_->getKeyStr())); //copies memory into buffer
+        buff->c("-");
+        buff->c(colIdx);
+        buff->c("-");
+        buff->c(blockNum);
+        String *keyStr = buff->get();
+        delete buff;
+        Key *k = new Key(keyStr, blockNum % args.numNodes); //clones String
+        delete keyStr;
+        return k;
+    }
+
     /** Compute hash code of this column */
     size_t hash_me_()
     {
@@ -425,7 +390,7 @@ public:
         hash_ += size_;
         hash_ += reinterpret_cast<size_t>(baseKey_);
         hash_ += reinterpret_cast<size_t>(blocks_);
-        hash_ += getCharType();
+        hash_ += DataTypeUtils::typeToChar(type_);
         return hash_;
     }
 
