@@ -52,7 +52,7 @@ public:
                 WaitAndGetMsg *wagMsg = dynamic_cast<WaitAndGetMsg *>(m);
                 size_t sender = wagMsg->getSender();
                 // Respond with data, add it to the queue if we don't have it yet
-                Value* val = kv_->getValue(wagMsg->getKey(), true);
+                Value* val = kv_->getValue(wagMsg->getKey(), false);
                 if (val) {
                     ReplyDataMsg *reply = new ReplyDataMsg(wagMsg->getKey(), val, nodeNum_, sender);
                     network_->sendMsg(reply);
