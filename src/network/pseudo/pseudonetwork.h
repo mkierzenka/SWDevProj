@@ -20,10 +20,10 @@ public:
     size_t nodeId_;
     bool* isNodeDone_;   //owned, arr to keep of track of all node statuses
 
-   /**
-   * Pass in number of nodes and a shared Message Queue Array.
-   * mqa is external, the caller is responsible for deleting it.
-   */
+    /**
+     * Pass in number of nodes and a shared Message Queue Array.
+     * mqa is external, the caller is responsible for deleting it.
+     */
     PseudoNetwork(MsgQueueArr* mqa, size_t ourNode) : INetwork()
     {
         mqa_ = mqa;
@@ -38,19 +38,31 @@ public:
         delete[] isNodeDone_;
     }
 
-    void sendMsg(Message *m)
+    //The following few methods are intentionally blank, as a PseudoNetwork does
+    //not need to do anything for those events.
+    //--------------------------------------------------------------------------
+    void server_init() override {}
+
+    void client_init() override {}
+
+    void handleRegisterMsg(RegisterMsg* m) override {}
+
+    void handleDirectoryMsg(DirectoryMsg* m) override {}
+    //--------------------------------------------------------------------------
+
+    void sendMsg(Message *m) override
     {
         size_t target = m->getTarget();
         mqa_->get(target)->push(m);
     }
 
-    Message *receiveMsg()
+    Message *receiveMsg() override
     {
         return mqa_->get(nodeId_)->pop();
     }
 
     /** Handle done message. Only for the server */
-    void handleDoneMsg(DoneMsg* m)
+    void handleDoneMsg(DoneMsg* m) override
     {
         assert(m && nodeId_ == 0);
         isNodeDone_[m->getSender()] = true;
