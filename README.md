@@ -10,9 +10,9 @@
   * schema
   * store, storeIntegration
   * trivial test (all 4 trials)
+  * demo test
 
 * Tests with memory leaks/unchecked
-  * Demo
   * Sorer
 
 
