@@ -57,7 +57,7 @@ void doubleTestWag() {
 	WaitAndGetMsg* wag = new WaitAndGetMsg(&k1, 1, 0);
 	kv0->addMsgWaitingOn(wag); //Node1 wants k1 from Node0
 	assert(mqa->get(1)->size() == 0);
-	kv0->put(&k1, &v1); //Node0 got the data
+	kv0->put(k1.clone(), &v1); //Node0 got the data
 	assert(mqa->get(1)->size() == 1);
 	// Check reply message has the data we want
 	ReplyDataMsg* actualReply = dynamic_cast<ReplyDataMsg*>(mqa->get(1)->pop());

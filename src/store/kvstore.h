@@ -193,7 +193,6 @@ public:
                 WaitAndGetMsg *wagMsg = dynamic_cast<WaitAndGetMsg *>(arrMsgs->get(i));
                 assert(wagMsg);
                 size_t sender = wagMsg->getSender();
-                //delete wagMsg;
                 Value *val = getValue(k, false); //should be local, we just added it in kv.put()
                 ReplyDataMsg *reply = new ReplyDataMsg(k, val, storeId, sender);
                 node_->sendMsg(reply);
