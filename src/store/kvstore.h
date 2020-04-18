@@ -82,14 +82,16 @@ public:
     DataFrame* getHelper_(Key* k, Value* v);
 
     /**
-     * Get the actual Value that the given key maps to (no clone).
+     * Get the a clone of the Value that the given key maps to.
      * shouldBlock specifies behavior for network calls. Has no impact on local lookups.
+     * Caller is responsible for deleting return value.
      */
     Value *getValue(Key *k, bool shouldBlock)
     {
         Value* val = nullptr;
         if (k->getNode() == storeId) {
             val = dynamic_cast<Value *>(kvMap_->get(k->getKeyStr()));
+            val = val ? val->clone() : nullptr;
         } else {
             val = getFromNetwork_(k, shouldBlock);
         }
@@ -150,7 +152,8 @@ public:
         ReplyDataMsg *dataMsg = dynamic_cast<ReplyDataMsg *>(msgCache_->remove(k));
         msgCacheLock_.unlock();
         assert(dataMsg);
-        Value *val = dataMsg->getValue();
+        Value *val = dataMsg->getValue()->clone();
+        delete dataMsg;
         return val;
     }
 
@@ -168,6 +171,7 @@ public:
             Value* val = getValue(k, false); //should be local, we just added it in kv.put()
             ReplyDataMsg *reply = new ReplyDataMsg(k, val, storeId, sender);
             node_->sendMsg(reply);
+            delete val;
             delete wagMsg;
         }
         msgCacheLock_.unlock();
