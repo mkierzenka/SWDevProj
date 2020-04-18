@@ -9,11 +9,9 @@
   * message, cache, blocks, distributed array
   * schema
   * store, storeIntegration
+  * trivial test (all 4 trials)
 
 * Tests with memory leaks/unchecked
-  * Distributed array (test not developed)
-  * Network
-  * Trivial
   * Demo
   * Sorer (test not working yet)
 
@@ -35,20 +33,14 @@ It sends the responses if available
   
 ### Notes for things to improve from before:
 
-* demoTest.cpp does not delete anything, memory leaks here
-
 * See if there are other places where Blocks can be cleared instead of repeatedly
 	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
 
 * Move most of logic (like loop) from Column.add_all into Distributed Array. Remove block imports from Column
 
-* Delete stringarray, update message classes that use it
-
 * Delete unused message types
 
 * Update schema to use types enum
-
-* Implement push_back for columns
 
 * Sorer code- make the arrays use our array instead of re-implementing functionality
 
