@@ -45,9 +45,9 @@ public:
 
     void client_init() override {}
 
-    void handleRegisterMsg(RegisterMsg* m) override {}
+    void handleRegisterMsg(RegisterMsg* m) override { delete m; }
 
-    void handleDirectoryMsg(DirectoryMsg* m) override {}
+    void handleDirectoryMsg(DirectoryMsg* m) override { delete m; }
     //--------------------------------------------------------------------------
 
     void sendMsg(Message *m) override
@@ -66,6 +66,7 @@ public:
     {
         assert(m && nodeId_ == 0);
         isNodeDone_[m->getSender()] = true;
+        delete m;
         for (size_t i = 0; i < mqa_->size(); i++) {
             if (!isNodeDone_[i]) {
                 return; // Not all the nodes are done yet
