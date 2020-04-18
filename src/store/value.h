@@ -56,15 +56,11 @@ public:
 
     /** Deserializes s into this Value */
     void deserialize(Serializer* s) {
+        capacity_ = s->readSizeT();
         if (val_) {
             delete[] val_;
         }
-        capacity_ = s->readSizeT();
-        val_ = new char[capacity_];
-        char* newVal = s->readCharPtr(capacity_);
-        //memcpy(val_, s->readCharPtr(capacity_), capacity_);
-        memcpy(val_, newVal, capacity_);
-        delete[] newVal;
+        val_ = s->readCharPtr(capacity_);
     }
 
 

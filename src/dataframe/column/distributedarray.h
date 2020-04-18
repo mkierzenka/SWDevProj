@@ -211,6 +211,7 @@ public:
 		Value* val = store_->getValue(k, true);
         assert(val != nullptr);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
+		delete val;
 		DoubleBlock* out = new DoubleBlock();
 		out->deserialize(s);
 		delete s;
@@ -224,6 +225,7 @@ public:
 	BoolBlock* getBoolBlockFromStore_(Key* k) {
 		Value* val = store_->getValue(k, true);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
+		delete val;
 		BoolBlock* out = new BoolBlock();
 		out->deserialize(s);
 		delete s;
@@ -237,6 +239,7 @@ public:
 	IntBlock* getIntBlockFromStore_(Key* k) {
 		Value* val = store_->getValue(k, true);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
+		delete val;
 		IntBlock* out = new IntBlock();
 		out->deserialize(s);
 		delete s;
@@ -251,6 +254,7 @@ public:
 	StringBlock* getStrBlockFromStore_(Key* k) {
 		Value* val = store_->getValue(k, true);
 		Serializer* s = new Serializer(val->getSize(), val->getData());
+		delete val;
 		StringBlock* out = new StringBlock();
 		out->deserialize(s);
 		delete s;

@@ -84,8 +84,9 @@ public:
     DataFrame *getHelper_(Key *k, Value *v);
 
     /**
-     * Get the actual Value that the given key maps to (no clone).
+     * Get the a clone of the Value that the given key maps to.
      * shouldBlock specifies behavior for network calls. Has no impact on local lookups.
+     * Caller is responsible for deleting return value.
      */
     Value *getValue(Key *k, bool shouldBlock)
     {
@@ -97,6 +98,7 @@ public:
             {
                 val = dynamic_cast<Value *>(kvMap_->get(k->getKeyStr()));
             }
+            val = val ? val->clone() : nullptr;
         }
         else
         {
@@ -191,9 +193,11 @@ public:
                 WaitAndGetMsg *wagMsg = dynamic_cast<WaitAndGetMsg *>(arrMsgs->get(i));
                 assert(wagMsg);
                 size_t sender = wagMsg->getSender();
+                //delete wagMsg;
                 Value *val = getValue(k, false); //should be local, we just added it in kv.put()
                 ReplyDataMsg *reply = new ReplyDataMsg(k, val, storeId, sender);
                 node_->sendMsg(reply);
+                delete val;
             }
             delete arrMsgs;
         }

@@ -46,6 +46,7 @@ public:
 				// Respond with data, nullptr if we don't have it right now
 				Value* val = kv_->getValue(gdMsg->getKey(), false);
 				ReplyDataMsg *reply = new ReplyDataMsg(gdMsg->getKey(), val, nodeNum_, sender);
+				delete val;
 				network_->sendMsg(reply);
 				delete gdMsg;
                 break;
@@ -60,6 +61,7 @@ public:
                     ReplyDataMsg *reply = new ReplyDataMsg(wagMsg->getKey(), val, nodeNum_, sender);
                     network_->sendMsg(reply);
                     delete wagMsg;
+                    delete val;
                 } else {
                     kv_->addMsgWaitingOn(wagMsg);
                 }

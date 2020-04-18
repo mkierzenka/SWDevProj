@@ -22,11 +22,12 @@ DataFrame* KVStore::get(Key *k)
     return getHelper_(k, val);
 }
 
-DataFrame* KVStore::getHelper_(Key*k, Value* val)
+DataFrame* KVStore::getHelper_(Key* k, Value* val)
 {
     Serializer* s = new Serializer(val->getSize(), val->getData());
     DataFrame* df = new DataFrame(k->clone(), this);
     df->deserialize(s);
     delete s;
+    delete val;
     return df;
 }

@@ -12,15 +12,15 @@
 #include <arpa/inet.h>
 
 /**
- * This class represents a node's directory, maintaining a list of its 
- * client connections. It will wrap a map, allowing look up by node id
+ * This class represents a node's directory, maintaining a list of known nodes.
+ * A user can add and lookup network information by a node's id number.
  * 
  * @author broder.c@husky.neu.edu
  */
 class Directory : public Object
 {
 public:
-    Map *ips_; //map of node id to ip address
+    Map *ips_; //owned, map of node id to nodeinfo
 
     Directory()
     {
@@ -33,36 +33,26 @@ public:
     }
 
     /**
-     * Add new node information to this Directory
-     */
-    void addInfo(size_t nodeId, String *addr, size_t port)
-    {
-        SizeTWrapper *id = new SizeTWrapper(nodeId);
-        NodeInfo* newEntry = new NodeInfo(addr, port);
-        ips_->put(id->clone(), newEntry);
-        delete id;
-    }
-
-    /**
-     * Add new node information to this Directory
+     * Add new node information to this Directory. Overwrites old value.
      */
     void addInfo(size_t nodeId, const char *addr, size_t port)
     {
         String strAddr(addr);
-        addInfo(nodeId, &strAddr, port);
+        NodeInfo newEntry(&strAddr, port);
+        addInfo(nodeId, &newEntry);
     }
 
     /**
-     * Add new node information to this Directory
+     * Add new node information to this Directory. Overwrites old value.
+     * Clones - Caller responsible for deleting newInfo
      */
     void addInfo(size_t nodeId, NodeInfo* newInfo)
     {
         SizeTWrapper *id = new SizeTWrapper(nodeId);
         ips_->put(id, newInfo->clone());
-        delete id;
     }
 
-    /** Get ip with the given node id */
+    /** Get ip with the given node id. Caller responsible for deleting the String */
     String* getAddress(size_t nodeId)
     {
         SizeTWrapper *node = new SizeTWrapper(nodeId);
@@ -75,7 +65,7 @@ public:
 
     /**
      * Return NodeInfo for the specified node, else nullptr.
-     * Does not clone! Do not delete.
+     * Does not clone! Do not delete returned value.
      */
     NodeInfo* getInfo(size_t nodeId) {
         SizeTWrapper node(nodeId);
@@ -93,8 +83,9 @@ public:
         for (int i = 0; i < ips_->size(); i++)
         {
             assert(keys[i]);
-            nodes[i] = dynamic_cast<SizeTWrapper*>(keys[i]);
+            nodes[i] = dynamic_cast<SizeTWrapper*>(keys[i])->clone();
         }
+        delete[] keys; //Delete the array but not the entries (they are the actual keys)
         return nodes;
     }
 
@@ -107,8 +98,10 @@ public:
         assert(otherNodes);
         for (int i = 0; i < other->size(); i++) {
             size_t nodeIdx = otherNodes[i]->asSizeT();
-            ips_->put(otherNodes[i]->clone(), other->getInfo(nodeIdx)->clone());
+            Object* prevEntry = ips_->put(otherNodes[i], other->getInfo(nodeIdx)->clone());
+            delete prevEntry;
         }
+        delete[] otherNodes; //delete the arr, not each obj because they are in ips_ now
     }
 
     /** Get number of entries in this directory */
@@ -128,7 +121,6 @@ public:
     /** Serialize this directory */
     void serialize(Serializer *s)
     {
-        //write size and capacity
         s->write(ips_->size());
         s->write(ips_->capacity());
 
@@ -141,9 +133,10 @@ public:
             node->serialize(s);
             ni->serialize(s);
         }
+        delete[] keys; //delete the array, not each obj because they are in ips_ now
     }
 
-    /** Deserialize this directory */
+    /** Deserialize into this directory (overwrites and mutates) */
     void deserialize(Serializer *s)
     {
         //read size and capacity
@@ -154,16 +147,14 @@ public:
         delete ips_;
         ips_ = new Map(capacity);
 
-        SizeTWrapper *node = new SizeTWrapper();
-        NodeInfo* ni = new NodeInfo();
-        //deserialize all items and put them in the map
+        SizeTWrapper tmpNodeId;
+        NodeInfo tmpNodeInfo;
+        //deserialize all items and put them into the map
         for (size_t i = 0; i < size; i++)
         {
-            node->deserialize(s);
-            ni->deserialize(s);
-            ips_->put(node->clone(), ni->clone());
+            tmpNodeId.deserialize(s);
+            tmpNodeInfo.deserialize(s);
+            ips_->put(tmpNodeId.clone(), tmpNodeInfo.clone());
         }
-        delete node;
-        delete ni;
     }
 };
