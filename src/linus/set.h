@@ -30,6 +30,7 @@ class Set
 public:
     bool *vals_;  // owned; data
     size_t size_; // number of elements
+    size_t setSize_; //number of elements set
 
     /** Creates a set of the same size as the dataframe. */
     Set(DataFrame *df) : Set(df->nrows()) {}
@@ -39,6 +40,8 @@ public:
     {
         for (size_t i = 0; i < size_; i++)
             vals_[i] = false;
+        
+        setSize_ = 0;
     }
 
     ~Set() { delete[] vals_; }
@@ -51,7 +54,9 @@ public:
     {
         if (idx >= size_)
             return; // ignoring out of bound writes
+            
         vals_[idx] = true;
+        setSize_++;
     }
 
     /** Is idx in the set?  See comment for set(). */
@@ -63,6 +68,10 @@ public:
     }
 
     size_t size() { return size_; }
+
+    /** How many elements in the size are set */
+    size_t setSize() { return setSize_; }
+
 
     /** Performs set union in place. */
     void union_(Set &from)

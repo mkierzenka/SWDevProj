@@ -22,7 +22,7 @@ class Linus : public Application
 {
 public:
     int DEGREES = 4;  // How many degrees of separation form linus?
-    int LINUS = 4967; // The uid of Linus (offset in the user df)
+    int LINUS = 4; // The uid of Linus (offset in the user df)
     // const char *PROJ = "data/projects.ltgt";
     // const char *USER = "data/users.ltgt";
     // const char *COMM = "data/commits.ltgt";
@@ -79,7 +79,7 @@ public:
     }
 
     /** Performs a step of the linus calculation. It operates over the three
-  *  datafrrames (projects, users, commits), the sets of tagged users and
+  *  dataframes (projects, users, commits), the sets of tagged users and
   *  projects, and the users added in the previous round. */
     void step(int stage)
     {
@@ -91,6 +91,7 @@ public:
         Set delta(users);
         SetUpdater upd(delta);
         newUsers->map(upd); // all of the new users are copied to delta.
+        printf("New users: %zu\n", newUsers->nrows());
         delete newUsers;
         ProjectsTagger ptagger(delta, *pSet, projects);
         commits->local_map(ptagger); // marking all projects touched by delta
@@ -101,8 +102,10 @@ public:
         merge(utagger.newUsers, "users-", stage + 1);
         uSet->union_(utagger.newUsers);
         p("    after stage ").p(stage).pln(":");
-        p("        tagged projects: ").pln(pSet->size());
-        p("        tagged users: ").pln(uSet->size());
+        // p("        tagged projects: ").pln(pSet->size());
+        // p("        tagged users: ").pln(uSet->size());
+        p("        tagged projects: ").pln(pSet->setSize());
+        p("        tagged users: ").pln(uSet->setSize());
     }
 
     /** Gather updates to the given set from all the nodes in the systems.
