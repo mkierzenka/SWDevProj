@@ -148,12 +148,14 @@ public:
         dir_->addInfo(m->getSender(), m->getClient(), m->getPort());
         //dir_->addInfo(m->getSender(), m->getInfo()); something like this should work but doesn't
         assert(dir_->size() == sizeBefore + 1);
+        delete m;
     }
 
     void handleDirectoryMsg(DirectoryMsg* m) override
     {
         //current directories call new directory
         dir_->mergeIn(m->getDirectory());
+        delete m;
     }
 
     /** For this (real) Network, only the server calls this */
@@ -168,6 +170,7 @@ public:
         }
         
         sendTeardownMsgs_();
+        delete m;
     }
 
    /** Creates a new socket with our standard options. Crash if error. */

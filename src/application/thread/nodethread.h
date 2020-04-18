@@ -1,25 +1,26 @@
 //lang:Cpp
 
-
 #include "../../utils/thread.h"
 #include "../../utils/args.h"
 #include "../../network/inetwork.h"
 #include "../application.h"
-#include "../demo.h"
 #include "receiverthread.h"
 
 
 /**
- * This class represents a node thread. It represents a node on our distributed system.
+ * This class represents a single node of our distributed system.
  * The "parent" thread (where this node is running) will run the actual application code.
  * This class starts/manages a new thread that will handle receiving/reacting to messages
- * from other nodes.
+ * from other nodes. Its fields are external, it is a vehicle for running a given
+ * application.
+ *
+ * @authors Chase Broder and Marcin Kierzenka
  */
 class NodeThread : public Thread
   {
   public:
-    Application* app_;
-    INetwork* net_;
+    Application* app_;  //external
+    INetwork* net_;     //external
 
     NodeThread(Application* a) : Thread() {
         app_ = a;
@@ -31,7 +32,6 @@ class NodeThread : public Thread
     void run()
     {
         printf("Starting NodeThread %zu\n", app_->this_node());
-
         if (app_->this_node() == args.serverIndex) {
           net_->server_init();
         } else {
@@ -43,8 +43,9 @@ class NodeThread : public Thread
         rt->start();
         app_->run_();
 
-        // Let server know that done executing
+        // Let server know that we're done executing
         net_->sendMsg(new DoneMsg(app_->this_node(), args.serverIndex, 0));
         rt->join();
+        delete rt;
     }
   };

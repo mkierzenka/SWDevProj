@@ -99,7 +99,7 @@ public:
 
     /** Type appropriate push_back methods. Calling the wrong method is
     * undefined behavior. **/
-    void push_back(int val)
+    /*void push_back(int val)
     {
         assert(false);
         if (type_ != DataType::Integer)
@@ -137,7 +137,7 @@ public:
             fprintf(stderr, "Cannot add String to column of type %c", DataTypeUtils::charToType(type_));
             exit(1);
         }
-    }
+    }*/
 
     /** Append an entire list of integers to this column */
     void add_all(size_t len, int *vals, size_t colIdx)

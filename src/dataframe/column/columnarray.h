@@ -18,11 +18,14 @@
 class ColumnArray : public Object
 {
 public:
-	KVStore *store_; // NOT OWNED
-	Array *colList_;
-	Key *dfKey_; //key of dataframe this column array belongs to
+	KVStore *store_;  //external
+	Array *colList_;  //owned, the columns in this ColumnArray
+	Key *dfKey_;      //external, key of dataframe this column array belongs to
 
-	// constructor
+    /**
+     * Constructs a new ColumnArray from external arguments (not cloned).
+     * Do not delete store and k until done with this ColumnArray.
+     */
 	ColumnArray(KVStore *store, Key *k)
 	{
 		store_ = store;
@@ -30,33 +33,29 @@ public:
 		colList_ = new Array();
 	}
 
-	// destructor
 	~ColumnArray()
 	{
 		delete colList_;
 	}
 
-	/** Serialize a ColumnArray into char* representation */
+	/** Serialize a ColumnArray */
 	void serialize(Serializer *s)
 	{
-		//since using standard array, need to cast to column and serialize
-		//each of those
 		size_t len = colList_->length();
 		s->write(len);
 		for (size_t i = 0; i < len; i++)
 		{
 			(dynamic_cast<Column *>(colList_->get(i)))->serialize(s);
 		}
-
 		dfKey_->serialize(s);
 	}
 
-	/** Deserialize as a ColumnArray, set values into this ColumnArray*/
+	/** Deserialize as a ColumnArray, set values into this ColumnArray (mutates) */
 	void deserialize(Serializer *s)
 	{
-		//need to pass on KVStore to columns: assuming KVStore here is already set
-		assert(store_ != nullptr);
+		assert(store_); //need to pass KVStore into columns: assume KVStore is already set
 		size_t len = s->readSizeT();
+		colList_->clear();
 		for (size_t i = 0; i < len; i++)
 		{
 			Column *c = new Column();
@@ -64,43 +63,39 @@ public:
 			c->deserialize(s);
 			colList_->add(c);
 		}
-
 		dfKey_->deserialize(s);
 	}
 
-	/** get the length of this array */
+	/** Get the number of columns in this array */
 	size_t length()
 	{
 		return colList_->length();
 	}
 
-	/**Set column array's store */
+	/** Set this column array's store (no clone) */
 	void setStore(KVStore *store)
 	{
 		store_ = store;
 	}
 
-	/** Check if two column arrays are equal */
-	bool equals(Object *other)
+	/** Check if this ColumnArray equals another Object */
+	bool equals(Object *other) override
 	{
 		if (this == other)
 		{
 			return true;
 		}
-
 		ColumnArray *ca = dynamic_cast<ColumnArray *>(other);
 
 		// store_ is not included
-		if (ca == nullptr || !(colList_->equals(ca->colList_)) || !(dfKey_->equals(ca->dfKey_)))
+		if (!ca || !(colList_->equals(ca->colList_)) || !(dfKey_->equals(ca->dfKey_)))
 		{
 			return false;
 		}
-
 		return true;
 	}
 
-	// hash_me override
-	size_t hash_me()
+	size_t hash_me() override
 	{
 		size_t hash = 0;
 		hash += colList_->hash();
@@ -108,7 +103,7 @@ public:
 		return hash;
 	}
 
-	// get the specified column (does not make a copy!)
+	/** Return a pointer to the specified column (does not clone!) */
 	Column *get(size_t index)
 	{
 		Object *colObj = colList_->get(index);
@@ -116,7 +111,7 @@ public:
 	}
 
 	/**
-	 * Appends column to this columnarray. Does not make copy
+	 * Appends a column to this ColumnArray. Does not make copy.
 	 */
 	void add_column(Column *c)
 	{
@@ -131,59 +126,47 @@ public:
 		add_column(new Column(store_, dfKey_->addIndex(length()), colType));
 	}
 
-	/** Create a new column of the given types and add in the elements, chunks at a
-	 * time */
+	/**
+	 * Create a new column of the given type with specified elements.
+	 * Caller responsible for deleting elements argument.
+	 */
 	void add_column_fromarray(size_t numElements, double *elements)
 	{
-		//create column
-		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Double); //column steals ownership
-
-		//add all data to the column
+		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Double);
 		c->add_all(numElements, elements, colList_->length());
-
-		//add column to column array
-		add_column(c);
+		add_column(c); //add column to this columnarray
 	}
 
-	/** Create a new column of the given types and add in the elements, chunks at a
-	 * time */
+	/**
+	 * Create a new column of the given type with specified elements.
+	 * Caller responsible for deleting elements argument.
+	 */
 	void add_column_fromarray(size_t numElements, int *elements)
 	{
-		//create column
-		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Integer); //column steals ownership
-
-		//add all data to the column
+		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Integer);
 		c->add_all(numElements, elements, colList_->length());
-
-		//add column to column array
 		add_column(c);
 	}
 
-	/** Create a new column of the given types and add in the elements, chunks at a
-	 * time */
+	/**
+	 * Create a new column of the given type with specified elements.
+	 * Caller responsible for deleting elements argument.
+	 */
 	void add_column_fromarray(size_t numElements, bool *elements)
 	{
-		//create column
-		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Boolean); //column steals ownership
-
-		//add all data to the column
+		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Boolean);
 		c->add_all(numElements, elements, colList_->length());
-
-		//add column to column array
 		add_column(c);
 	}
 
-	/** Create a new column of the given types and add in the elements, chunks at a
-	 * time */
+	/**
+	 * Create a new column of the given type with specified elements.
+	 * Caller responsible for deleting elements argument.
+	 */
 	void add_column_fromarray(size_t numElements, String **elements)
 	{
-		//create column
-		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Str); //column steals ownership
-
-		//add all data to the column
+		Column *c = new Column(store_, dfKey_->addIndex(length()), DataType::Str);
 		c->add_all(numElements, elements, colList_->length());
-
-		//add column to column array
 		add_column(c);
 	}
 
@@ -238,31 +221,27 @@ public:
 
 	/** Type appropriate push_back methods. Appends the element to the end of the
 	  * specified column. Calling the wrong method is undefined behavior. **/
-	void push_back(size_t col, int val)
+/*	void push_back(size_t col, int val)
 	{
 		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		//can check the type in the row
 		return c->push_back(val);
 	}
 
 	void push_back(size_t col, bool val)
 	{
 		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		//can check the type in the row
 		return c->push_back(val);
 	}
 
 	void push_back(size_t col, double val)
 	{
 		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		//can check the type in the row
 		return c->push_back(val);
 	}
 
 	void push_back(size_t col, String *val)
 	{
 		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		//can check the type in the row
 		return c->push_back(val);
-	}
+	}*/
 };

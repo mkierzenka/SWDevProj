@@ -22,68 +22,59 @@ class Trivial : public Application {
   void run_()
   {
     pln("Trivial Test Started");
-    trial1();
-    trial2();
-    trial3();
-    trial4();
+    size_t SZ = 1000 * 1000;
+    trial1(SZ);
+    trial2(SZ);
+    trial3(SZ);
+    trial4(SZ);
     pln("Trivial Test Passed!");
   }
 
-  void trial1()
+  void trial1(size_t sz)
   {
-    size_t SZ = 1000 * 1000;
-    //size_t SZ = 10;
-    double *vals = new double[SZ];
+    double *vals = new double[sz];
     double sum = 0;
-    for (size_t i = 0; i < SZ; ++i)
+    for (size_t i = 0; i < sz; ++i)
       sum += vals[i] = i;
-    String* trivKey = new String("triv");
-    //Key key(trivKey, 0);
-    Key* key = new Key(trivKey, 0);
-    // DataFrame *df = DataFrame::fromArray(&key, kv_, SZ, vals);
-    DataFrame *df = DataFrame::fromArray(key->clone(), kv_, SZ, vals);
+    Key key("triv", 0);
+    DataFrame *df = DataFrame::fromArray(&key, kv_, sz, vals);
     assert(df->get_double(0, 1) == 1);
-    //DataFrame *df2 = kv_->get(&key);
-    DataFrame *df2 = kv_->get(key);
-    for (size_t i = 0; i < SZ; ++i)
+    DataFrame *df2 = kv_->get(&key);
+    for (size_t i = 0; i < sz; ++i)
       sum -= df2->get_double(0, i);
-    fprintf(stdout, "Final double sum = %3.6lf\n", sum);
+    printf("Final Difference (double) = %3.6lf\n", sum);
     assert(sum == 0);
     delete df;
     delete df2;
     delete[] vals;
-    delete trivKey;
-    delete key;
   }
 
-  void trial2()
+  void trial2(size_t sz)
   {
-    size_t SZ = 1000 * 1000;
-    int *vals = new int[SZ];
+    int *vals = new int[sz];
     int sum = 0;
-    for (size_t i = 0; i < SZ; ++i)
+    for (size_t i = 0; i < sz; ++i)
       sum += vals[i] = i;
-    Key key(new String("triv"), 0);
-    DataFrame *df = DataFrame::fromArray(&key, kv_, SZ, vals);
+    Key key("triv", 0);
+    DataFrame *df = DataFrame::fromArray(&key, kv_, sz, vals);
     assert(df->get_int(0, 1) == 1);
     DataFrame *df2 = kv_->get(&key);
-    for (size_t i = 0; i < SZ; ++i)
+    for (size_t i = 0; i < sz; ++i)
       sum -= df2->get_int(0, i);
-    fprintf(stdout, "Final int sum = %d\n", sum);
+    printf("Final Difference (int) = %d\n", sum);
     assert(sum == 0);
     delete df;
     delete df2;
     delete[] vals;
   }
 
-  void trial3()
+  void trial3(size_t sz)
   {
-    size_t SZ = 1000 * 1000;
     StrBuff *buf = new StrBuff();
-    String **vals = new String *[SZ];
+    String **vals = new String *[sz];
     String *tmp = nullptr;
     char temp_string[10];
-    for (size_t i = 0; i < SZ; ++i)
+    for (size_t i = 0; i < sz; ++i)
     {
       memset(&temp_string, 0, 10);
       sprintf(temp_string, "%zu", i);
@@ -93,11 +84,18 @@ class Trivial : public Application {
     }
     String *expected = buf->get();
     delete buf;
-    Key key(new String("triv"), 0);
-    DataFrame *df = DataFrame::fromArray(&key, kv_, SZ, vals);
-    assert(df->get_string(0, 1)->equals(vals[1]));
-    assert(df->get_string(0, 5)->equals(vals[5]));
-    for (size_t i = 0; i < SZ; ++i)
+    Key key("triv", 0);
+    DataFrame *df = DataFrame::fromArray(&key, kv_, sz, vals);
+
+    // Test df values are okay
+    String* actualStr = df->get_string(0, 1);
+    assert(actualStr->equals(vals[1]));
+    delete actualStr;
+    actualStr = df->get_string(0, 5);
+    assert(actualStr->equals(vals[5]));
+    delete actualStr;
+
+    for (size_t i = 0; i < sz; ++i)
     {
       delete vals[i];
     }
@@ -105,7 +103,7 @@ class Trivial : public Application {
 
     DataFrame *df2 = kv_->get(&key);
     buf = new StrBuff();
-    for (size_t i = 0; i < SZ; ++i)
+    for (size_t i = 0; i < sz; ++i)
     {
       tmp = df2->get_string(0, i);
       buf->c(*tmp);
@@ -122,23 +120,23 @@ class Trivial : public Application {
     fprintf(stdout, "String DataFrame OK\n");
   }
 
-  void trial4()
+  void trial4(size_t sz)
   {
-    size_t SZ = 1000 * 1000;
-    bool *vals = new bool[SZ];
-    for (size_t i = 0; i < SZ; ++i)
+    assert(sz >= 10);
+    bool *vals = new bool[sz];
+    for (size_t i = 0; i < sz; ++i)
     {
-      vals[i] = ((i % 2) == 0 || (i > (SZ - 5)));
+      vals[i] = ((i % 2) == 0 || (i > (sz - 5)));
     }
-    Key key(new String("triv"), 0);
-    DataFrame *df = DataFrame::fromArray(&key, kv_, SZ, vals);
+    Key key("triv", 0);
+    DataFrame *df = DataFrame::fromArray(&key, kv_, sz, vals);
     assert(df->get_bool(0, 1) == false);
     assert(df->get_bool(0, 4) == true);
-    assert(df->get_bool(0, SZ - 3) == true);
+    assert(df->get_bool(0, sz - 3) == true);
     DataFrame *df2 = kv_->get(&key);
-    for (size_t i = 0; i < SZ; ++i)
+    for (size_t i = 0; i < sz; ++i)
     {
-      assert(df2->get_bool(0, i) == ((i % 2) == 0 || (i > (SZ - 5))));
+      assert(df2->get_bool(0, i) == ((i % 2) == 0 || (i > (sz - 5))));
     }
     delete df;
     delete df2;

@@ -9,10 +9,9 @@
   * message, cache, blocks, distributed array
   * schema
   * store, storeIntegration
+  * trivial test (all 4 trials)
 
 * Tests with memory leaks/unchecked
-  * Network
-  * Trivial
   * Demo
   * Sorer
 
@@ -33,10 +32,6 @@ It sends the responses if available
 * Real Network sends a Message as the serialized msg type prepended to the serialized message.
   
 ### Notes for things to improve from before:
-
-* Cleanup and free more memory in pseudonetworking stuff -> receiverthread, nodethread, etc.
-
-* demoTest.cpp does not delete anything, memory leaks here
 
 * See if there are other places where Blocks can be cleared instead of repeatedly
 	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
