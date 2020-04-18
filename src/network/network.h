@@ -151,8 +151,7 @@ public:
     {
         //add new client to directory
         size_t sizeBefore = dir_->size();
-        dir_->addInfo(m->getSender(), m->getClient(), m->getPort());
-        //dir_->addInfo(m->getSender(), m->getInfo()); something like this should work but doesn't
+        dir_->addInfo(m->getSender(), m->getInfo());
         assert(dir_->size() == sizeBefore + 1);
         fprintf(stderr, "Current Directory size = %zu\n", dir_->size());
         delete m;
@@ -171,6 +170,7 @@ public:
     {
         assert(m && args.index == args.serverIndex);
         isNodeDone_[m->getSender()] = true;
+        delete m;
         for (size_t i = 0; i < args.numNodes; i++) {
             if (!isNodeDone_[i]) {
                 return; // Not all the nodes are done yet
@@ -178,7 +178,6 @@ public:
         }
         fprintf(stderr, "Server heard that all nodes are done\n");
         sendTeardownMsgs_();
-        delete m;
     }
 
    /** Creates a new socket with our standard options. Crash if error. */
