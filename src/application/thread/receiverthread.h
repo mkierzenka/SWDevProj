@@ -77,6 +77,7 @@ public:
 				Key* k = msg->getKey();
 				assert(k->getNode() == nodeNum_);
 				kv_->put(k, msg->getValue());
+				delete msg;
                 break;
 			}
             case (MsgKind::Register):
@@ -100,6 +101,7 @@ public:
             }
             case (MsgKind::Teardown):
             {
+                delete m;
                 isDone = true;
                 break;
             }

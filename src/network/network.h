@@ -155,6 +155,7 @@ public:
         //dir_->addInfo(m->getSender(), m->getInfo()); something like this should work but doesn't
         assert(dir_->size() == sizeBefore + 1);
         fprintf(stderr, "Current Directory size = %zu\n", dir_->size());
+        delete m;
     }
 
     void handleDirectoryMsg(DirectoryMsg* m) override
@@ -162,6 +163,7 @@ public:
         //current directories call new directory
         dir_->mergeIn(m->getDirectory());
         fprintf(stderr, "Node %zu: directory merged in\n", args.index);
+        delete m;
     }
 
     /** For this (real) Network, only the server calls this */
@@ -176,6 +178,7 @@ public:
         }
         fprintf(stderr, "Server heard that all nodes are done\n");
         sendTeardownMsgs_();
+        delete m;
     }
 
    /** Creates a new socket with our standard options. Crash if error. */
