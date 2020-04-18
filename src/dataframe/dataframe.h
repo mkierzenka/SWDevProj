@@ -4,17 +4,14 @@
 #include "../utils/string.h"
 #include "../utils/helper.h"
 #include "../utils/array.h"
-#include "../utils/thread.h"
 #include "../utils/args.h"
 #include "../store/kvstore.h"
 #include "../store/key.h"
 #include "../serial/serial.h"
 #include "../filereader/writer.h"
-#include "../filereader/adder.h"
 #include "../filereader/reader.h"
 #include "column/columnarray.h"
 #include "schema.h"
-#include "row/rower.h"
 #include "row/row.h"
 
 
@@ -23,7 +20,8 @@
  *
  * A DataFrame is table composed of columns of equal length. Each column
  * holds values of the same type (I, S, B, D). A dataframe has a schema that
- * describes it.
+ * describes it. The actual data is not stored within this object, but can be
+ * pulled on-demand from a KVStore.
  *
  * @author kierzenka.m@husky.neu.edu & broder.c@husky.neu.edu
  */
@@ -35,7 +33,10 @@ public:
   Schema *schema_;       //owned, schema of dataframe
   Key *key_;             //owned, key for this dataframe in the KV store
 
-  /** This constructor is for the purpose of adding arrays */
+  /**
+   * This constructor is for the purpose of adding arrays.
+   * Steals ownership of Key, not store.
+   */
   DataFrame(Key *k, KVStore *kv)
   {
     schema_ = new Schema();
@@ -47,7 +48,8 @@ public:
 
   /**
    * Create a data frame from a schema description and columns and a store.
-   * All columns are created empty.
+   * All columns are created empty. Steals ownership of Key.
+   * Caller responsible for deleting scm.
    */
   DataFrame(const char *scm, Key *k, KVStore *kv)
   {
@@ -62,22 +64,6 @@ public:
     }
   }
 
-  /** Create a data frame with the same columns as the give df but no rows */
-/*  DataFrame(DataFrame &df, Key *k) : DataFrame(df.get_schema(), k)
-  {
-  }
-*/
-  /** Create a data frame from a schema and columns. All columns are created
-    * empty. */
- /* DataFrame(Schema &schema, Key *k)
-  {
-    //don't copy rows
-    schema_ = new Schema(schema, false);
-    size_t numCols = schema_->width();
-    key_ = k;
-    columns_ = new ColumnArray(store_, key_);
-  }*/
-
   ~DataFrame()
   {
     delete schema_;
@@ -86,66 +72,78 @@ public:
   }
 
   /**
-  * Creates a new DataFrame with given schema (scm) from the Writer.
-  * Returns the df result, caller is responsible for deleting it.
+  * Creates a new DataFrame with given schema (scm) from the Writer. Adds it to
+  * the distributed KV store.
+  * Caller responsible for deleting scm, k, w.
+  * Returns the DataFrame result, caller is responsible for deleting it.
   */
-  static DataFrame *fromVisitor(Key *k, KVStore *kv, const char *scm, Writer *r)
+  static DataFrame *fromVisitor(Key *k, KVStore *kv, const char *scm, Writer *w)
   {
     DataFrame *df = new DataFrame(scm, k->clone(), kv);
-    df->visit(r);
-    addDFToStore_(df, kv, k);
+    df->visit(w);
+    addDFToStore_(df, kv);
     return df;
   }
 
   /**
-   * Converts an array into a dataframe object.
-   * Returns the df result, caller is responsible for deleting it.
+   * Constructs a new DataFrame from an array of doubles (added as a single column).
+   * Adds the new DataFrame into the distributed KV store.
+   * Caller responsible for deleting k and elems.
+   * Returns a local copy of the DataFrame result, caller is responsible for deleting it.
    */
   static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, double *elems)
   {
     DataFrame *df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
-    addDFToStore_(df, kv, k);
+    addDFToStore_(df, kv);
     return df;
   }
 
   /**
-   * Converts an array of ints into a dataframe object.
-   * Returns the df result, caller is responsible for deleting it.
+   * Constructs a new DataFrame from an array of integers (added as a single column).
+   * Adds the new DataFrame into the distributed KV store.
+   * Caller responsible for deleting k and elems.
+   * Returns a local copy of the DataFrame result, caller is responsible for deleting it.
    */
   static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, int *elems)
   {
     DataFrame *df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
-    return addDFToStore_(df, kv, k);
+    return addDFToStore_(df, kv);
   }
 
   /**
-   * Converts an array of booleans into a dataframe object.
-   * Returns the df result, caller is responsible for deleting it.
+   * Constructs a new DataFrame from an array of booleans (added as a single column).
+   * Adds the new DataFrame into the distributed KV store.
+   * Caller responsible for deleting k and elems.
+   * Returns a local copy of the DataFrame result, caller is responsible for deleting it.
    */
   static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, bool *elems)
   {
     DataFrame *df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
-    return addDFToStore_(df, kv, k);
+    return addDFToStore_(df, kv);
   }
 
   /**
-   * Converts an array of Strings into a dataframe object.
-   * Returns the df result, caller is responsible for deleting it.
+   * Constructs a new DataFrame from an array of Strings (added as a single column).
+   * Adds the new DataFrame into the distributed KV store.
+   * Caller responsible for deleting k and elems.
+   * Returns a local copy of the DataFrame result, caller is responsible for deleting it.
    */
   static DataFrame *fromArray(Key *k, KVStore *kv, size_t numElems, String **elems)
   {
     DataFrame *df = new DataFrame(k->clone(), kv);
     df->add_array(numElems, elems);
-    addDFToStore_(df, kv, k);
+    addDFToStore_(df, kv);
     return df;
   }
 
   /**
-   * Adds a double to a new dataframe object. Returns df result, which will be owned
-   * by caller
+   * Constructs a new DataFrame from a single double.
+   * Adds the new DataFrame into the distributed KV store.
+   * Caller responsible for deleting k.
+   * Returns a local copy of the DataFrame result, caller is responsible for deleting it.
    */
   static DataFrame *fromScalar(Key *k, KVStore *kv, double elem)
   {
@@ -156,9 +154,12 @@ public:
     return df;
   }
 
+
   /**
-   * Adds a String (cloned) to a new dataframe object. Returns df result, which will be owned
-   * by caller
+   * Constructs a new DataFrame from a single String*.
+   * Adds the new DataFrame into the distributed KV store.
+   * Caller responsible for deleting k and elem.
+   * Returns a local copy of the DataFrame result, caller is responsible for deleting it.
    */
   static DataFrame *fromScalar(Key *k, KVStore *kv, String *elem)
   {
@@ -171,8 +172,10 @@ public:
   }
 
   /**
-   * Adds an int to a new dataframe object. Returns df result, which will be owned
-   * by caller
+   * Constructs a new DataFrame from a single integer.
+   * Adds the new DataFrame into the distributed KV store.
+   * Caller responsible for deleting k.
+   * Returns a local copy of the DataFrame result, caller is responsible for deleting it.
    */
   static DataFrame *fromScalar(Key *k, KVStore *kv, int elem)
   {
@@ -184,8 +187,10 @@ public:
   }
 
   /**
-   * Adds a bool to a new dataframe object. Returns df result, which will be owned
-   * by caller
+   * Constructs a new DataFrame from a single boolean.
+   * Adds the new DataFrame into the distributed KV store.
+   * Caller responsible for deleting k.
+   * Returns a local copy of the DataFrame result, caller is responsible for deleting it.
    */
   static DataFrame *fromScalar(Key *k, KVStore *kv, bool elem)
   {
@@ -198,7 +203,7 @@ public:
 
   /**
    * Add array of doubles to dataframe as a column. Add the data into chunks, and generate
-   * keys for them. Column needs to get dataframe's key and key-value store
+   * keys for them. Caller responsible for deleting elements.
    */
   void add_array(size_t numElements, double *elements)
   {
@@ -209,7 +214,7 @@ public:
 
   /**
    * Add array of ints to dataframe as a column. Add the data into chunks, and generate
-   * keys for them. Column needs to get dataframe's key and key-value store
+   * keys for them. Caller responsible for deleting elements.
    */
   void add_array(size_t numElements, int *elements)
   {
@@ -220,7 +225,7 @@ public:
 
   /**
    * Add array of booleans to dataframe as a column. Add the data into chunks, and generate
-   * keys for them. Column needs to get dataframe's key and key-value store
+   * keys for them. Caller responsible for deleting elements.
    */
   void add_array(size_t numElements, bool *elements)
   {
@@ -231,7 +236,7 @@ public:
 
   /**
    * Add array of Strings to dataframe as a column. Add the data into chunks, and generate
-   * keys for them. Column needs to get dataframe's key and key-value store
+   * keys for them. Caller responsible for deleting elements.
    */
   void add_array(size_t numElements, String **elements)
   {
@@ -265,6 +270,13 @@ public:
     return *schema_;
   }
 
+  /**
+   * Returns a pointer to this DataFrame's key. No clone.
+   */
+  Key* get_key() {
+    return key_;
+  }
+
   /** Serialize this DataFrame into s*/
   void serialize(Serializer *s)
   {
@@ -284,8 +296,8 @@ public:
   }
 
   /** Adds the column this dataframe, updates the schema, the new column
-    * is external, and appears as the last column of the dataframe, the
-    * name is optional and external. A nullptr colum is undefined. */
+   * is external, and appears as the last column of the dataframe, the
+   * name is optional and external. A nullptr colum is undefined. */
   void add_column(Column *col)
   {
     if (col == nullptr)
@@ -328,7 +340,7 @@ public:
 
   /** Add a row at the end of this dataframe. The row is expected to have
    *  the right schema and be filled with values, otherwise undefined.  */
-  void add_row(Row &row)
+  /*void add_row(Row &row)
   {
     size_t rowWidth = row.width();
     checkRowLen_(rowWidth);
@@ -338,7 +350,7 @@ public:
       addToEndOfColByType_(i, row);
     }
     schema_->add_row();
-  }
+  }*/
 
   /** The number of rows in the dataframe. */
   size_t nrows()
@@ -353,7 +365,10 @@ public:
   }
 
 
-  /** Add rows to this DataFrame built by Writer. Until wr->done() */
+  /**
+   * Add rows to this DataFrame built by Writer. Until wr->done().
+   * Caller responsible for deleting wr.
+   */
   void visit(Writer *wr)
   {
     size_t block_size = args.blockSize;
@@ -535,7 +550,7 @@ public:
   }*/
 
   /** Add to end of column depending on the type */
-  void addToEndOfColByType_(size_t colIdx, Row &row)
+ /* void addToEndOfColByType_(size_t colIdx, Row &row)
   {
     switch (row.col_type(colIdx))
     {
@@ -554,18 +569,18 @@ public:
     default:
       fprintf(stderr, "Invalid col type: %c", row.col_type(colIdx));
     }
-  }
+  }*/
 
-  /** Adds the DataFrame to the given KVStore with the given key.
+  /** Adds the DataFrame to the given KVStore under df's key.
+   *
    *  Returns the DataFrame just added (df).
    */
-  static DataFrame *addDFToStore_(DataFrame *df, KVStore *kv, Key *k)
+  static DataFrame *addDFToStore_(DataFrame *df, KVStore *kv)
   {
-    Serializer *s = new Serializer();
-    df->serialize(s);
-    Value *v = new Value(s->getBuffer(), s->getNumBytesWritten());
-    kv->put(k, v);
-    delete s;
+    Serializer s;
+    df->serialize(&s);
+    Value *v = new Value(s.getBuffer(), s.getNumBytesWritten());
+    kv->put(df->get_key(), v);
     delete v;
     return df;
   }
