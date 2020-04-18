@@ -49,6 +49,7 @@ public:
 
     delete dfa;
     delete dfs;
+    delete[] vals;
     pln("Producer Finished");
   }
  
@@ -58,7 +59,8 @@ public:
     double sum = 0;
     for (size_t i = 0; i < 100*1000; ++i) sum += v->get_double(0,i);
     p("The sum is  ").pln(sum);
-    DataFrame::fromScalar(verify, kv_, sum);
+    delete DataFrame::fromScalar(verify, kv_, sum);
+    delete v;
     pln("Counter Finished");
   }
  
@@ -67,6 +69,8 @@ public:
     DataFrame* result = kv_->waitAndGet(verify);
     DataFrame* expected = kv_->waitAndGet(check);
     pln(expected->get_double(0,0)==result->get_double(0,0) ? "SUCCESS":"FAILURE");
+    delete result;
+    delete expected;
     pln("Summarizer Finished");
   }
 };
