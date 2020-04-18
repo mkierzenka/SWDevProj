@@ -47,3 +47,5 @@ It sends the responses if available
 * Move reader and writer parent classes into new directory
 
 * Move sorer into sorwriter
+
+* Add better print statements for linus
