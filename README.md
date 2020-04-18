@@ -13,7 +13,7 @@
 
 * Tests with memory leaks/unchecked
   * Demo
-  * Sorer (test not working yet)
+  * Sorer
 
 
 
@@ -38,15 +38,7 @@ It sends the responses if available
 
 * Move most of logic (like loop) from Column.add_all into Distributed Array. Remove block imports from Column
 
-* Delete unused message types
-
-* Update schema to use types enum
-
 * Sorer code- make the arrays use our array instead of re-implementing functionality
-
-* Sorer code- merge Types enum and our col type enum
-
-* Methods w/o an implementation: add assert(false) and comment
 
 * doc.md: create diagram for architecture section
 
