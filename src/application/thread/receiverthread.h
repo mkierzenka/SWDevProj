@@ -6,8 +6,10 @@
 #include <assert.h>
 
 /**
- * This class represents the receiver thread. It will listen for messages continuously
- * and handle them accordingly 
+ * This class represents the receiver thread, which manages network communications.
+ * An assistant to a NodeThread, all fields are external and pointers to what's kept
+ * in the parent NodeThread. ReceiverThread will listen for and handle messages
+ * continuously until a Teardown Message is received.
  * 
  * @authors: broder.c@husky.neu.edu and kierzenka.m@husky.neu.edu
  */
@@ -15,9 +17,10 @@ class ReceiverThread : public Thread
 {
 public:
     size_t nodeNum_;
-    INetwork *network_;
-    KVStore *kv_;
+    INetwork *network_;   //external, used for communication with other nodes
+    KVStore *kv_;         //external, a pointer to this node's store
 
+    /** Constructs a new ReceiverThread from external arguments */
     ReceiverThread(size_t node, INetwork *net, KVStore *kv) : Thread()
     {
         nodeNum_ = node;
@@ -29,7 +32,7 @@ public:
 
     void run()
     {
-        bool isDone = false; //listens for messages as long as still true
+        bool isDone = false; //when to stop responding to messages
         while (!isDone)
         {
 			Message *m = network_->receiveMsg(); // blocks until new message arrives
@@ -101,9 +104,8 @@ public:
                 break;
             }
             default:
-                pln("Weird msg type...");
+                p("Node ").p(nodeNum_).pln(" ReceiverThread found unexpected msg type...");
             }
-			
         }
         printf("End of receive thread run\n");
     }

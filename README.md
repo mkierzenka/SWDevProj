@@ -35,8 +35,6 @@ It sends the responses if available
   
 ### Notes for things to improve from before:
 
-* Cleanup and free more memory in pseudonetworking stuff -> receiverthread, nodethread, etc.
-
 * demoTest.cpp does not delete anything, memory leaks here
 
 * See if there are other places where Blocks can be cleared instead of repeatedly
@@ -57,8 +55,6 @@ It sends the responses if available
 * Sorer code- merge Types enum and our col type enum
 
 * Methods w/o an implementation: add assert(false) and comment
-
-* Add unit tests: distributed array
 
 * doc.md: create diagram for architecture section
 
