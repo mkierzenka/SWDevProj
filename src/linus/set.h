@@ -54,7 +54,8 @@ public:
     {
         if (idx >= size_)
             return; // ignoring out of bound writes
-            
+        if (vals_[idx])
+            return; // ignoring double-setting values
         vals_[idx] = true;
         setSize_++;
     }
@@ -79,5 +80,14 @@ public:
         for (size_t i = 0; i < from.size_; i++)
             if (from.test(i))
                 set(i);
+    }
+
+    /** Simple print to display the values of this set (1 = set, 0 = unset) */
+    void print() {
+        printf("Printing Set: ");
+        for(size_t i = 0; i < size(); i++) {
+            printf("%d ", vals_[i]);
+        }
+        printf("\n");
     }
 };

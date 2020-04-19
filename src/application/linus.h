@@ -22,7 +22,7 @@ class Linus : public Application
 {
 public:
     int DEGREES = 4;  // How many degrees of separation form linus?
-    int LINUS = 4; // The uid of Linus (offset in the user df)
+    int LINUS = 3; // The uid of Linus (offset in the user df)
     // const char *PROJ = "data/projects.ltgt";
     // const char *USER = "data/users.ltgt";
     // const char *COMM = "data/commits.ltgt";
@@ -84,6 +84,8 @@ public:
     void step(int stage)
     {
         p("Stage ").pln(stage);
+		//printf("###A");
+		//uSet->print();
         // Key of the shape: users-stage-0
         Key uK(StrBuff("users-").c(stage).c("-0").get(), 0);
         // A df with all the users added on the previous round
@@ -104,8 +106,14 @@ public:
         p("    after stage ").p(stage).pln(":");
         // p("        tagged projects: ").pln(pSet->size());
         // p("        tagged users: ").pln(uSet->size());
-        p("        tagged projects: ").pln(pSet->setSize());
-        p("        tagged users: ").pln(uSet->setSize());
+        //p("        tagged projects: ").pln(pSet->setSize());
+        //p("        tagged users: ").pln(uSet->setSize());
+        p("        Number of users with degree ").p(stage).p(" of Linus: ").pln(utagger.newUsers.setSize());
+        p("        Number of users with degree <= ").p(stage).p(" of Linus: ").pln(uSet->setSize());
+        p("        Number of projects with degree ").p(stage).p(" of Linus: ").pln(ptagger.newProjects.setSize());
+        p("        Number of projects with degree <= ").p(stage).p(" of Linus: ").pln(pSet->setSize());
+		//printf("###B");
+		//uSet->print();
     }
 
     /** Gather updates to the given set from all the nodes in the systems.
@@ -127,7 +135,7 @@ public:
                 delta->map(upd);
                 delete delta;
             }
-            p("    storing ").p(set.size()).pln(" merged elements");
+            p("    storing ").p(set.setSize()).pln(" merged elements");
             SetWriter writer(set);
             Key k(StrBuff(name).c(stage).c("-0").get(), 0);
             delete DataFrame::fromVisitor(&k, kv_, "I", &writer);
