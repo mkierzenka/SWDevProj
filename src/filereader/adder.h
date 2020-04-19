@@ -21,6 +21,8 @@ public:
     assert(num != nullptr);
     num->val_++;
     map_.put(word->clone(), num->clone());
+    delete word;
+    delete num;
     return false;
   }
 };

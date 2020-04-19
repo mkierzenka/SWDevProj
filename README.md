@@ -11,9 +11,11 @@
   * store, storeIntegration
   * trivial test (all 4 trials)
   * demo test
+  * Sorer
 
 * Tests with memory leaks/unchecked
-  * Sorer
+  * Wordcount
+  * Linus
 
 
 
@@ -42,10 +44,6 @@ It sends the responses if available
 
 * Figure out how to run with multiple nodes, all using different port numbers
 
-* Test network from different machines
-
 * Move reader and writer parent classes into new directory
 
 * Move sorer into sorwriter
-
-* Add better print statements for linus

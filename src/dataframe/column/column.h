@@ -301,7 +301,9 @@ public:
         return out;
     }
 
-    /** Get string from column at certain index */
+    /** Get string from column at certain index.
+     * Caller responsible for deleting string
+     */
     String *get_string(size_t idx, size_t colIdx)
     {
         if (!properType(DataType::Str))

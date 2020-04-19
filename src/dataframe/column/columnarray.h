@@ -207,7 +207,7 @@ public:
 		return c->get_double(row, col);
 	}
 
-	// gets the actual String*, no copy
+	// gets a cloned string; caller responsible for deleting
 	String *get_string(size_t col, size_t row)
 	{
 		Column *c = dynamic_cast<Column *>(colList_->get(col));

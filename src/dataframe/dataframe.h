@@ -679,7 +679,7 @@ public:
       r.set(colIdx, columns_->get_double(colIdx, rowIdx));
       break;
     case 'S':
-      r.set(colIdx, columns_->get_string(colIdx, rowIdx)->clone());
+      r.set(colIdx, columns_->get_string(colIdx, rowIdx));
       break;
     default:
       fprintf(stderr, "Invalid col type: %c", colType);

@@ -8,6 +8,32 @@ const char *FILE_NAME = "data/100k.txt";
 class FileReader : public Writer
 {
 public:
+    char *buf_;
+    size_t end_ = 0;
+    size_t i_ = 0;
+    FILE *file_;
+
+    /** Creates the reader and opens the file for reading.  */
+    FileReader() : Writer()
+    {
+        file_ = fopen(FILE_NAME, "r");
+        if (file_ == nullptr)
+        {
+            fprintf(stderr, "Cannot open file %s\n", FILE_NAME);
+            exit(1);
+            //FATAL_ERROR("Cannot open file " << FILE_NAME);
+        }
+        buf_ = new char[BUFSIZE + 1]; //  null terminator
+        fillBuffer_();
+        skipWhitespace_();
+    }
+
+    ~FileReader()
+    {
+        delete[] buf_;
+        fclose(file_);
+    }
+
     /** Reads next word and stores it in the row. Actually read the word.
       While reading the word, we may have to re-fill the buffer  */
     void visit(Row &r) override
@@ -43,23 +69,6 @@ public:
        more to read if we are at the end of the buffer and the file has
        all been read.     */
     bool done() override { return (i_ >= end_) && feof(file_); }
-
-    /** Creates the reader and opens the file for reading.  */
-    FileReader() : Writer()
-    {
-        file_ = fopen(FILE_NAME, "r");
-        if (file_ == nullptr)
-        {
-            fprintf(stderr, "Cannot open file %s\n", FILE_NAME);
-            exit(1);
-            //FATAL_ERROR("Cannot open file " << FILE_NAME);
-        }
-        buf_ = new char[BUFSIZE + 1]; //  null terminator
-        fillBuffer_();
-        skipWhitespace_();
-    }
-
-    ~FileReader() {}
 
     static const size_t BUFSIZE = 1024;
 
@@ -97,9 +106,4 @@ public:
             ++i_;
         }
     }
-
-    char *buf_;
-    size_t end_ = 0;
-    size_t i_ = 0;
-    FILE *file_;
 };

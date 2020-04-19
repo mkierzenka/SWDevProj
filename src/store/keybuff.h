@@ -13,15 +13,22 @@ class KeyBuff : public Object {
   public:                                                                        
   Key* orig_; // external                                                        
   StrBuff buf_;                                                                  
-                                                                                 
-  KeyBuff(Key* orig) : orig_(orig->clone()), buf_(orig->getKeyStr()->clone()) {}
+
+  /** Caller should delete passed in key */                                                                               
+  KeyBuff(Key* orig) : orig_(orig->clone()), buf_(orig->getKeyStr()) {}
                  
+  ~KeyBuff()
+  {
+    delete orig_;
+  }
+
   // Methods that append to the key.				 
   KeyBuff& c(String &s) { buf_.c(s); return *this;  }                            
   KeyBuff& c(size_t v) { buf_.c(v); return *this; }                              
   KeyBuff& c(const char* v) { buf_.c(v); return *this; }                         
                    
-  /** Get the key we've constructed in this buffer */  
+  /** Get the key we've constructed in this buffer. Caller responsible
+   * for deleting key */  
   Key* get() {                                                                   
     String* s = buf_.get();                                                      
     buf_.c(orig_->c_str());                                                      

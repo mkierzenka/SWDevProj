@@ -24,11 +24,12 @@ class WordCount : public Application
 public:
   static const size_t BUFSIZE = 1024;
   Key in;
+  Key bufKey;
   KeyBuff kbuf;
   SIMap all;
   DataFrame* df;
 
-  WordCount(size_t idx, INetwork *net) : Application(idx, net), in("data", 0), kbuf(new Key("wc-map-", 0)) {}
+  WordCount(size_t idx, INetwork *net) : Application(idx, net), in("data", 0), bufKey("wc-m", 0), kbuf(&bufKey) {}
 
   /** The master nodes reads the input, then all of the nodes count. */
   void run_() override
@@ -43,10 +44,10 @@ public:
   }
 
   /** Returns a key for given node.  These keys are homed on master node
-   *  which then joins them one by one. */
+   *  which then joins them one by one. Caller responsible for deleting key */
   Key *mk_key(size_t idx)
   {
-    Key *k = kbuf.c(idx).get()->clone();
+    Key *k = kbuf.c(idx).get();
     p("Created key ").pln(k->c_str());
     //LOG("Created key " << k->c_str());
     return k;
@@ -62,7 +63,9 @@ public:
     words->local_map(add);
     delete words;
     Summer cnt(map);
-    delete DataFrame::fromVisitor(mk_key(idx_), kv_, "SI", &cnt);
+    Key* localKey = mk_key(idx_);
+    delete DataFrame::fromVisitor(localKey, kv_, "SI", &cnt);
+    delete localKey;
   }
 
   /** Merge the data frames of all nodes */
