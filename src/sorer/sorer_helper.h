@@ -250,7 +250,8 @@ inline bool is_valid_row(Schema* row_types, Schema* schema) {
 
 /**
  * Creates a columnar representation of a portion of a file delimited by the given
- * start and end according to a schema.
+ * start and end according to a schema. Caller responsible for deleting returned
+ * structure.
  *
  * NOTE: the function assumes that start always points to the beginning of a line
  *       and the end to the end of a line.

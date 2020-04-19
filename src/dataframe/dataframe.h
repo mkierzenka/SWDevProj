@@ -13,6 +13,7 @@
 #include "../filereader/reader.h"
 #include "../sorer/sorer.h"
 #include "../sorer/sorwriter.h"
+#include "../sorer/field_array.h"
 #include "column/columnarray.h"
 #include "schema.h"
 #include "row/row.h"
@@ -80,8 +81,20 @@ public:
   static DataFrame *fromFile(const char *filename, Key *k, KVStore *kv)
   {
     Sorer sor(filename);
-    SorWriter *sw = new SorWriter(sor.getColumnar(), sor.getTypes(), sor.getFileName());
-    DataFrame *df = DataFrame::fromVisitor(k, kv, sor.getTypes()->getTypesChar(), sw);
+    FieldArray** fa = sor.getColumnar();
+    Schema* schem = sor.getTypes(); //sorer owns this schema, so don't delete
+    SorWriter *sw = new SorWriter(fa, schem, sor.getFileName());
+    char* typesChar = schem->getTypesChar();
+    DataFrame *df = DataFrame::fromVisitor(k, kv, typesChar, sw);
+    delete sw;
+    //length of field array array be number of columns
+    for (size_t i = 0; i < schem->width(); i++)
+    {
+      delete fa[i];
+    }
+
+    delete[] fa;
+    delete[] typesChar;
     return df;
   }
 
@@ -700,6 +713,7 @@ public:
           ints[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_int(i);
         }
         columns_->get(i)->add_all(numRowsInChunk, ints, i);
+        delete[] ints;
         break;
       }
       case 'B':
@@ -710,16 +724,25 @@ public:
           bools[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_bool(i);
         }
         columns_->get(i)->add_all(numRowsInChunk, bools, i);
+        delete[] bools;
         break;
       }
       case 'S':
       {
         String **strs = new String *[numRowsInChunk];
+        size_t strsLen = 0;
         for (size_t j = 0; j < numRowsInChunk; j++)
         {
           strs[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_string(i)->clone();
+          strsLen++;
         }
         columns_->get(i)->add_all(numRowsInChunk, strs, i);
+        for (size_t k = 0; k < strsLen; k++)
+        {
+          delete strs[k];
+        }
+
+        delete[] strs;
         break;
       }
       case 'D':
@@ -730,6 +753,7 @@ public:
           dbls[j] = (dynamic_cast<Row *>(rowChunk->get(j)))->get_double(i);
         }
         columns_->get(i)->add_all(numRowsInChunk, dbls, i);
+        delete[] dbls;
         break;
       }
       default:

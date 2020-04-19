@@ -31,13 +31,27 @@ int main(int argc, char **argv) {
     assert(d->get_bool(1, 0) == false);
     assert(d->get_bool(1, 1) == true);
     assert(d->get_double(3, 0) - 1040.435425 < 0.00001);
-    assert(strcmp(d->get_string(2, 0)->c_str(), "inflexive") == 0);
-    assert(strcmp(d->get_string(2, 1)->c_str(), "abdominal's") == 0);
-    assert(strcmp(d->get_string(2, 2)->c_str(), "discourtesy's") == 0);
-    assert(d->get_int(4, 1) == -1924364);
-    assert(strcmp(d->get_string(6, 143)->c_str(), "cornworms") == 0);
 
-    // delete d;
-    // delete s;
+    String* cmp = d->get_string(2, 0);
+    assert(strcmp(cmp->c_str(), "inflexive") == 0);
+    delete cmp;
+
+    cmp = d->get_string(2, 1);
+    assert(strcmp(cmp->c_str(), "abdominal's") == 0);
+    delete cmp;
+
+    cmp = d->get_string(2, 2);
+    assert(strcmp(cmp->c_str(), "discourtesy's") == 0);
+    delete cmp;
+
+    assert(d->get_int(4, 1) == -1924364);
+
+    cmp = d->get_string(6, 143);
+    assert(strcmp(cmp->c_str(), "cornworms") == 0);
+    delete cmp;
+
+    delete d;
+    delete key;
+    delete store;
 	puts("Sorer test passed!");
 }

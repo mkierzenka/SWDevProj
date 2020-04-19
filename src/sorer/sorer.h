@@ -45,14 +45,16 @@ class Sorer : public Object
 			delete schema;
         }
 
-        /** Return columnar form of the data. The length of the FieldArray is schema->len() */
+        /** Return columnar form of the data. The length of the FieldArray is schema->len().
+         * Caller responsible for deleting returned structure
+         */
         FieldArray** getColumnar()
         {
             //make column for whole file
             return make_columnar(file, 0, fileSize, schema);
         }
 
-        /** Return types of this dataframe */
+        /** Return types of this dataframe. Schema returned is owned by sorer */
         Schema* getTypes()
         {
             return schema;
