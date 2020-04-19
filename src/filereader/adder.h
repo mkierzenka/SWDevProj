@@ -20,7 +20,7 @@ public:
     Num* num = map_.contains_key(word) ? dynamic_cast<Num*>(map_.get(*word))->clone() : new Num();
     assert(num != nullptr);
     num->val_++;
-    map_.put(word->clone(), num->clone());
+    delete map_.put(word->clone(), num->clone());
     delete word;
     delete num;
     return false;

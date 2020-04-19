@@ -81,10 +81,10 @@ public:
   static DataFrame *fromFile(const char *filename, Key *k, KVStore *kv)
   {
     Sorer sor(filename);
-    FieldArray** fa = sor.getColumnar();
-    Schema* schem = sor.getTypes(); //sorer owns this schema, so don't delete
+    FieldArray **fa = sor.getColumnar();
+    Schema *schem = sor.getTypes(); //sorer owns this schema, so don't delete
     SorWriter *sw = new SorWriter(fa, schem, sor.getFileName());
-    char* typesChar = schem->getTypesChar();
+    char *typesChar = schem->getTypesChar();
     DataFrame *df = DataFrame::fromVisitor(k, kv, typesChar, sw);
     delete sw;
     //length of field array array be number of columns
@@ -180,7 +180,6 @@ public:
     delete[] elements;
     return df;
   }
-
 
   /**
    * Constructs a new DataFrame from a single String*.
@@ -301,7 +300,8 @@ public:
   /**
    * Returns a pointer to this DataFrame's key. No clone.
    */
-  Key* get_key() {
+  Key *get_key()
+  {
     return key_;
   }
 
@@ -581,7 +581,7 @@ public:
   }*/
 
   /** Add to end of column depending on the type */
- /* void addToEndOfColByType_(size_t colIdx, Row &row)
+  /* void addToEndOfColByType_(size_t colIdx, Row &row)
   {
     switch (row.col_type(colIdx))
     {
@@ -670,17 +670,28 @@ public:
     switch (colType)
     {
     case 'I':
+    {
       r.set(colIdx, columns_->get_int(colIdx, rowIdx));
       break;
+    }
     case 'B':
+    {
       r.set(colIdx, columns_->get_bool(colIdx, rowIdx));
       break;
+    }
     case 'D':
+    {
       r.set(colIdx, columns_->get_double(colIdx, rowIdx));
       break;
+    }
     case 'S':
-      r.set(colIdx, columns_->get_string(colIdx, rowIdx));
+    {
+      String *str = columns_->get_string(colIdx, rowIdx);
+      //row clones string
+      r.set(colIdx, str);
+      delete str;
       break;
+    }
     default:
       fprintf(stderr, "Invalid col type: %c", colType);
     }

@@ -125,6 +125,11 @@ public:
         c(*s);
     }
 
+    ~StrBuff()
+    {
+        //delete[] val_;
+    }
+
     void grow_by_(size_t step) {
         if (step + size_ < capacity_) return;
         capacity_ *= 2;
