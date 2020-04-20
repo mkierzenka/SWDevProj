@@ -222,7 +222,7 @@ public:
     void connectToNode_(int sockFd, struct sockaddr_in addr)
     {
         int conn = connect(sockFd, (struct sockaddr *)&addr, sizeof(addr));
-        crashIfError_("accept error", conn >= 0);
+        crashIfError_("connect error", conn >= 0);
     }
 
     /**
