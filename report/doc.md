@@ -41,32 +41,47 @@ difference between the server and other nodes.
 Each node is made up of three layers of abstraction.
 
 The first and lowest layer is the distributed key-value store. There will be one key-value
-store per node, containing a portion of the data. The node can put and retrieve data from its
-KVStore based on the needs of the application.
-Each key in the store will map to a chunk of serialized data or a dataframe. If a node requires data that it does not have, then 
-its store will be able to communicate with the other key-value stores to retrieve this 
-information. This will be done via a networking abstraction, which will allow key-value 
-stores to send and receive messages between each other.
+store per node, containing the data it is in charge of. The node can put and retrieve data from its
+key-value store based on the needs of the application.
+Each key in the store will map to a chunk of serialized data or a dataframe. If a node
+asks its store for data not stored locally, the store will be able to communicate with the other
+key-value stores to retrieve the proper values. This will be done via a networking abstraction,
+which will allow key-value stores to send and receive messages to each other.
 
 The next layer will include abstractions for holding and representing the data from the key-value stores. 
 These abstractions include distributed arrays and dataframes. A dataframe allows the user
-to access a set of data distributed across multiple nodes. It supports data storage and retrieval 
-without exposing the details of how and where the data is stored. A dataframe holds a 
+to access a set of values distributed across multiple nodes. It supports data storage and retrieval 
+without exposing the details of how and where the individual elements are stored. A dataframe holds a 
 collection of columns. Columns do not own their own data, rather they are distributed arrays. 
 Therefore, columns contain references to their data that exists across the nodes' stores. 
 
 The last and highest level is the application layer. In the application, the user 
 will be able to specify what they want each node to do. Each node will run its assigned operations
 in its copy of the application. The application can get data from and put data into the distributed
-key-value store. Distributed arrays can be used to track, organize, and work with specific data across the eau2 system.
+key-value store system. Distributed arrays can be used to track, organize, and work with specific
+data across the eau2 system.
 
-In the following paragraphs, we will explain diagrams that outline the basic interactions between components of our system. There are three PNG diagrams, and can be found within this "report" folder.
+In the following paragraphs, we will explain diagrams that outline the basic interactions between
+components of our system. There are three PNG diagrams, and can be found within this "report" folder.
 
-The first diagram, "localgetflow," shows a node running an application that retrieves data that exists locally in its KV store. The process is fairly simple; the application calls on the store to get data under a certain key. The store recognizes it has that data. It then takes the serialized data, converts it into a dataframe, and then returns the result to the application. 
+The first diagram, "localgetflow," shows a node running an application that retrieves data that
+exists locally in its KV store. The process is fairly simple; the application calls on the store
+to get data under a certain key. The store recognizes it has that data. It then takes the serialized
+data, converts it into a dataframe, and then returns the result to the application. 
 
-The second diagram, "networkgetflow," represents the process of retrieving data that does not exist in the node's local store. Like in localget, the application calls on its store to get data under a certain key. However, this time, the store does not have that key. Therefore, the store needs to request the data from a store running on a different node. Through the networking layer, the local store asks the store mapped to that key for the data. If it is available, the remote store sends the data back to the local store. The store then converts the data received and returns the dataframe result.
+The second diagram, "networkgetflow," represents the process of retrieving data that does not
+exist in the node's local store. Like in localget, the application calls on its store to get data
+under a certain key. However, this time, the store does not have that key. Therefore, the store
+needs to request the data from a store running on a different node. Through the networking layer,
+the local store asks the store mapped to that key for the data. If it is available, the remote store
+sends the data back to the local store. The store then converts the data received and returns the
+dataframe result.
 
-The last diagram, "addframeflow," represents how an application can insert a dataframe into its node's store. First, the application needs to call a static "from" method, which will create a dataframe given a key and certain pieces of information. Contrary to the previous cases, the method converts a dataframe into a blob of data. It then takes the key and the value generated and puts it into the store. Lastly, the "from" method will return the produced dataframe for the application to use. 
+The last diagram, "addframeflow," represents how an application can insert a dataframe into its
+node's store. First, the application needs to call a static "from" method, which will create a
+dataframe given a key and certain pieces of information. Contrary to the previous cases, the method
+converts a dataframe into a blob of data. It then takes the key and the value generated and puts it
+into the store. Lastly, the "from" method will return the produced dataframe for the application to use. 
 
 ## Implementation
 
@@ -74,13 +89,13 @@ For the critical classes that we will implement for this system, we included a r
 of their fields and public methods. For components that are re-used from previous assignments,
 we provided descriptions of how they'll be used.
 
-* KVStore: this class will represent a local key-value store
+* KVStore: This class will represent a local key-value store.
 
   * Fields:
     * kvMap_ (MapStrObj): the String key will map to a serialized piece of data (Value)
     * node_ (INetwork): this network abstraction will allow the store to listen for 
     messages from other nodes and send messages to other stores to request data or put data in another node's store
-    * storeId (size_t): each local store will be represented by a unique numerical identifier. 
+    * storeId (size_t): each local store will be represented by a unique numerical identifier (the "index" commandline argument)
     At a higher level, this identifier will help keep track of where the data is stored
     * msgCache_ (Map): this map will hold the messages that the KVStore cannot handle right away. For example, if another node requests data from this store that is guaranteed to eventually be in this store, the store will hold that message in the queue until the data is present. The key will be an actual Key object and the value will be an array of messages referencing that key. For example, if two nodes try to get the same data from the same store, then the key for that data will correspond to two get messages. Right now only two types of messages will exist in this cache: WaitAndGetMsg and ReplyDataMsg
     * msgCacheLock_ (Lock): used when accessing the cache, to avoid another thread from reading from/writing to the cache at the same time
@@ -90,38 +105,49 @@ we provided descriptions of how they'll be used.
     not blocking; sends Put message if Key's node id doesn't correspond to this store's id
     * get(Key): request for the data; returns deserialized data from its own store or from the network if data for the key exists, otherwise returns nullptr
     * waitAndGet(Key): retrieves data with the given Key from the Key's node or from the network if not local; blocking, so won't return until data exists in store specified by key
-    * getValue(Key): return the value that the given key maps to; this method will not do
-    any serialization or deserialization, rather will return the result exactly as it is stored; goes to the network if data not stored locally
-    * addMsgWaitingOn(WaitAndGetMsg): add wait and get message to cache; this kvstore currently doesn't have the data to send a reply data, so need to wait until the data put into the store
-    * addReply(ReplyDataMsg): adds reply data message to the cache
+    * getValue(Key): return the value that the given key maps to, in the raw storage format (Value); goes to the network if data not stored locally
+    * addMsgWaitingOn(WaitAndGetMsg): add the message to cache; this kvstore currently doesn't have the data to respond to another node's request, so need to wait until the data is put into the local store
+    * addReply(ReplyDataMsg): adds reply data message to the cache, to be forwarded to the application (which is waiting for it)
 
-* Key: these are used to define a piece of data at a level higher than the local KV store. 
-Since data can exist in any of the stores, we need multiple attributes to keep track of data
+* Key: These are used to identify a piece of data at a level higher than the local KV store. 
+Since data can exist in any of the stores, we need multiple attributes specify location
   * Fields:
-    * kStr_ (String): maps to a piece of data in a key-value store
+    * kStr_ (String): maps to a piece of data within a key-value store
     * homeNode_ (size_t): the identifier for the key-value store in which the data is stored
 
  *NOTE: Keys are immutable. There will be methods to retrieve these values but not modify them*
 
-* Value: represents the serialized data that a Key maps to. It will include a character pointer 
+* Value: Represents the serialized data that a Key maps to. It will include a character pointer 
 that holds the serialized data and a size_t that describes the maximum amount of bytes that can
 be stored in this pointer.
 
-* PseudoNetwork: for Milestone 3, we created a fake networking layer to aid with debugging
-  for our distributed KV store. Similarly to the videos, we set up a PseudoNetwork to have
-  an array of message queues; each queue keeps track of the messages received and pending for
-  each node. The pseudonetwork supports sending and receiving messages. Send pushes the given
-  message to the target node's queue, while receive pops from the node's queue. Due to this 
-  setup with a single message queue array, each node and thread needs access to the same 
-  message queues. Therefore we had to initialize a PseudoNetwork in our .cpp test file and pass
-  it in to numerous objects throughout the program, including the Application and the KVStore. When we incorporate the actual network layer, each node will be able to have its own network object
+* INetwork: An interface outlining the required operations to be a valid network in our system. This was so that our entire program could use an INetwork, allowing for easy swapping between network implementations. The interfaces includes seven methods.
 
-* Network: the actual networking layer that we incorporated into our program for M4. It includes messages for initializing the servers and clients. This kicks off and completes the handshake process. For the client, it connects to the server, sends a register message to the server, and then receives a directory message from the server. For the server (first node per program), it accepts connections from clients, receives register messages from clients, and keeps track of the clients. Once all nodes are registered, it broadcasts a directory message to all of its connected nodes. All the nodes send a done
-message to the server once their work/task is completed. Once the server receives a done message from every node, it broadcasts a teardown message to each node, which tells the nodes to close their connections and terminate execution.
+* PseudoNetwork: A fake networking layer to aid with debugging our eau2 system (implements INetwork).
+  The design was similar to that specified by Professor Vitek in his videos.
+  A PseudoNetwork has a pointer to an external array of message queues; each queue keeps
+  track of the messages received and pending for the node (id = index in array).
+  Send pushes the given message to the target node's queue, while receive pops from the node's
+  queue. This means each node (ie. thread) needs access to the same message queues. Therefore,
+  we initialize a common MessageQueueArray that is passed into every PseudoNetwork object.
+  This is the network class used when the "-pseudo" flag is specified. The INetwork methods
+  server_init(), client_init(), handleRegisterMsg(), and handleDirectoryMsg() have empty implementations
+  because their behavior is unneeded for this fake network.
 
-discuss teardown/setup process (diagrams?)
+* Network: A TCP networking layer for the eau2 system (implements INetwork). It's implementations
+  of the INetwork methods contain all the code for opening/closing sockets, sending/receiving, etc.
+  It implements the registration and teardown processes outlined below.
 
-* INetwork: We created an INetwork that both Network and PseudoNetwork inherited. This was so that our entire program could use an INetwork, allowing for easy swapping between our pseudo and real networks in our tests (see the .cpp test files for more context). The interfaces includes six methods. The first two are for sending and receiving. The last four are only used by the actual network: server_init, client_init, handleRegisterMsg, and handleDirectoryMsg. These are not needed for the pseudonetwork, so they were able to be left blank in the INetwork class for PseudoNetwork to inherit
+  * Registration:
+    * Server starts with IP Address and Port known to all nodes, will accept all incoming connections
+	* The rest of the nodes each start up and send a RegisterMsg containing their NodeInfo. Then blocking, waiting for a response from the server
+	* Once all of the nodes (expected number specified on the commandline) have registered, the Server node will send each one a Directory containing the information for how to contact every node.
+
+  * Teardown:
+    * Once a non-server node completes their application tasks, it will send the server a DoneMsg and wait to receive a response
+	* The server node tracks which nodes have finished. Once all nodes in the system are finished, the server sends everyone a TeardownMsg and shuts down.
+	* Each client shuts down when it receives a TeardownMsg
+
 
 * Messages: messages are what nodes use to communicate each other. Data can be placed inside messages. Messages are serialized by the sending node, then sent, then deserialized and read by the receiving node. Each message type has a different purposes. The following outlines the current message types sent between nodes in our program:
   * Get: this is a request for data. It is not blocking, so it will return a nullptr if the data doesn't exist in the requested node's store
