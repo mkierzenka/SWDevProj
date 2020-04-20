@@ -47,6 +47,14 @@ with responsibilities distributed across each node. The application can get data
 from and put data into the key-value store. Distributed arrays can be used to track, 
 organize, and work with specific data across the eau2 system.
 
+In the following paragraphs, we will explain diagrams that represent basic interaction between components of our system. There are three PNG diagrams, and can be found within this "report" folder.
+
+The first diagram, "localget," represents an application retrieving data that exists in its node's KV store. The process is fairly simple; the application calls on the store to get data under a certain key. The store recognizes it has that data. It then takes the serialized data, converts it into a dataframe, and then returns the deserialized result to the application. 
+
+The second diagram, "networkget," represents the process of retrieving data that does not exist in the node's local store. Like in localget, the application calls on its store to get data under a certain key. However, this time, the store does not have that key. Therefore, the store needs to request the data from a store running on a different node. It looks at the key to see which node the mapped data lives on. It then sends a message to that store, through a network layer, to request that data. The other store checks if it has data for that key. If it does, then it sends the serialized data in a message back to the original KV store. The store reads the data from the message, and like the local case, deserializes the blob into a DataFrame and returns it to the Application.
+
+The last diagram, "createdf," represents how an application can insert a dataframe into its node's store. First, the application needs to call a static "from" method, which will create a dataframe given a key and certain pieces of information. Contrary to the previous cases, the method uses a serializer to convert a dataframe into a blob of data. It then takes the key and the value generated and puts it into the store. Lastly, the "from" method will return the produced dataframe for the application to use. 
+
 ## Implementation
 
 For the critical classes that we will implement for this system, we included a run-down
