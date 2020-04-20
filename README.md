@@ -40,10 +40,14 @@ It sends the responses if available
 
 * Sorer code- make the arrays use our array instead of re-implementing functionality (Field object)
 
-* doc.md: create diagram for architecture section
-
-* Figure out how to run with multiple nodes, all using different port numbers
-
 * Move reader and writer parent classes into new directory
 
 * Move sorer into sorwriter
+
+* Check command line arguments for valid input
+
+* Remove message ids from Message classes
+
+* Remove unused port_ field from DirectoryMsg
+
+* Move from methods from dataframe.h to own file

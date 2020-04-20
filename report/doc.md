@@ -1,14 +1,27 @@
 ## Usage:
+### Makefile
 * "make build" - compiles all tests
 * "make test" - runs tests supplied to us (eg. trivial, demo tests)
 * "make ourTests" - runs sorer test and a bunch of others testing different parts of our program
+* "make debug" - runs particular test from suite. Useful if one test in particular is failing and want to focus on that one
 * "make memory" - runs selected test through valgrind
 * "make clean" - deletes compiled files
-* there are also targets for specific programs we are focusing on (ex. buildDemo and testDemo for M3)
+* there are also targets for specific applications (eg. buildDemo and testDemo)
 
+### Program command line usage
+./eau2 -app S -num_nodes N -i N -ip S -port N -serverIp S -serverPort N -pseudo -blockSize N
+
+* app (string): which program you want to run; either trivial, demo, wordcount, or linus
+* num_nodes (int > 0): how many nodes should be ran; default is 1
+* i (int >= 0): this node's index (node number); default is 0
+* ip (string): this node's IPv4 address (dotted quad)
+* port (int > 0): node's port for receiving messages; default is 8080
+* serverIp (string): IPv4 address (dotted quad) of server node
+* serverPort (int > 0): server's port for receiving messages; default is 8080
+* blockSize (int > 0): how many elements each chunk of stored data should have; default is 1024
+* pseudo (flag): indicated whether pseudonetwork (threads) should be used
 
 ## Introduction
-
 The eau2 system is a framework to allow a wide variety of applications to
 operate on large datasets distributed across nodes in a network. Each node
 has a collection of key-value pairs stored locally as well as the ability to
@@ -19,41 +32,41 @@ one to produce data and another to consume it.
 
 ## Architecture
 
-The eau2 system is made up of three layers of abstraction.
+The eau2 system will run in parallel across a collection of nodes. Each node performs a portion
+of the "work" for the chosen application. There will be a lead node ("server") that keeps track
+of registered nodes as well as initiates and terminates the application. Besides that, there is no inherent
+difference between the server and other nodes.
 
-The first and lowest layer is the distributed key-value store. There will be 
-multiple key-value stores, one per node; each will hold some portion of data. Each key 
-will map to a chunk of serialized data or a dataframe. Each store will be able to serialize 
-and deserialize its own data. If a key-value store requires data that it does not have, then 
-it will be able to communicate with the other key-value stores to retrieve this 
+
+Each node is made up of three layers of abstraction.
+
+The first and lowest layer is the distributed key-value store. There will be one key-value
+store per node, containing a portion of the data. The node can put and retrieve data from its
+KVStore based on the needs of the application.
+Each key in the store will map to a chunk of serialized data or a dataframe. If a node requires data that it does not have, then 
+its store will be able to communicate with the other key-value stores to retrieve this 
 information. This will be done via a networking abstraction, which will allow key-value 
-stores to behave as nodes on a network and send messages to each other. In addition to the stores, there will also be a lead
-node, which will keep track of registered stores and notify all connected stores when a new 
-store is added to the network.
+stores to send and receive messages between each other.
 
 The next layer will include abstractions for holding and representing the data from the key-value stores. 
 These abstractions include distributed arrays and dataframes. A dataframe allows the user
-to access a set of data across multiple nodes. It supports data storage and retrieval 
+to access a set of data distributed across multiple nodes. It supports data storage and retrieval 
 without exposing the details of how and where the data is stored. A dataframe holds a 
-collection of columns. Each column is a distributed array. A distributed array contains a 
-collection of keys as well as a cache, which will support short-term storage for some of the 
-keys' deserialized data. The distributed array will also have a key-value store; therefore even if data
-does not live in the cache, the array will be able to look up the corresponding data for 
-all of its keys. 
+collection of columns. Columns do not own their own data, rather they are distributed arrays. 
+Therefore, columns contain references to their data that exists across the nodes' stores. 
 
 The last and highest level is the application layer. In the application, the user 
-will be able to specify what they want to do. Each node will run its own application, 
-with responsibilities distributed across each node. The application can get data 
-from and put data into the key-value store. Distributed arrays can be used to track, 
-organize, and work with specific data across the eau2 system.
+will be able to specify what they want each node to do. Each node will run its assigned operations
+in its copy of the application. The application can get data from and put data into the distributed
+key-value store. Distributed arrays can be used to track, organize, and work with specific data across the eau2 system.
 
-In the following paragraphs, we will explain diagrams that represent basic interaction between components of our system. There are three PNG diagrams, and can be found within this "report" folder.
+In the following paragraphs, we will explain diagrams that outline the basic interactions between components of our system. There are three PNG diagrams, and can be found within this "report" folder.
 
-The first diagram, "localgetflow," represents an application retrieving data that exists in its node's KV store. The process is fairly simple; the application calls on the store to get data under a certain key. The store recognizes it has that data. It then takes the serialized data, converts it into a dataframe, and then returns the deserialized result to the application. 
+The first diagram, "localgetflow," shows a node running an application that retrieves data that exists locally in its KV store. The process is fairly simple; the application calls on the store to get data under a certain key. The store recognizes it has that data. It then takes the serialized data, converts it into a dataframe, and then returns the result to the application. 
 
-The second diagram, "networkgetflow," represents the process of retrieving data that does not exist in the node's local store. Like in localget, the application calls on its store to get data under a certain key. However, this time, the store does not have that key. Therefore, the store needs to request the data from a store running on a different node. It looks at the key to see which node the mapped data lives on. It then sends a message to that store, through a network layer, to request that data. The other store checks if it has data for that key. If it does, then it sends the serialized data in a message back to the original KV store. The store reads the data from the message, and like the local case, deserializes the blob into a DataFrame and returns it to the Application.
+The second diagram, "networkgetflow," represents the process of retrieving data that does not exist in the node's local store. Like in localget, the application calls on its store to get data under a certain key. However, this time, the store does not have that key. Therefore, the store needs to request the data from a store running on a different node. Through the networking layer, the local store asks the store mapped to that key for the data. If it is available, the remote store sends the data back to the local store. The store then converts the data received and returns the dataframe result.
 
-The last diagram, "addframeflow," represents how an application can insert a dataframe into its node's store. First, the application needs to call a static "from" method, which will create a dataframe given a key and certain pieces of information. Contrary to the previous cases, the method uses a serializer to convert a dataframe into a blob of data. It then takes the key and the value generated and puts it into the store. Lastly, the "from" method will return the produced dataframe for the application to use. 
+The last diagram, "addframeflow," represents how an application can insert a dataframe into its node's store. First, the application needs to call a static "from" method, which will create a dataframe given a key and certain pieces of information. Contrary to the previous cases, the method converts a dataframe into a blob of data. It then takes the key and the value generated and puts it into the store. Lastly, the "from" method will return the produced dataframe for the application to use. 
 
 ## Implementation
 
@@ -106,6 +119,8 @@ be stored in this pointer.
 * Network: the actual networking layer that we incorporated into our program for M4. It includes messages for initializing the servers and clients. This kicks off and completes the handshake process. For the client, it connects to the server, sends a register message to the server, and then receives a directory message from the server. For the server (first node per program), it accepts connections from clients, receives register messages from clients, and keeps track of the clients. Once all nodes are registered, it broadcasts a directory message to all of its connected nodes. All the nodes send a done
 message to the server once their work/task is completed. Once the server receives a done message from every node, it broadcasts a teardown message to each node, which tells the nodes to close their connections and terminate execution.
 
+discuss teardown/setup process (diagrams?)
+
 * INetwork: We created an INetwork that both Network and PseudoNetwork inherited. This was so that our entire program could use an INetwork, allowing for easy swapping between our pseudo and real networks in our tests (see the .cpp test files for more context). The interfaces includes six methods. The first two are for sending and receiving. The last four are only used by the actual network: server_init, client_init, handleRegisterMsg, and handleDirectoryMsg. These are not needed for the pseudonetwork, so they were able to be left blank in the INetwork class for PseudoNetwork to inherit
 
 * Messages: messages are what nodes use to communicate each other. Data can be placed inside messages. Messages are serialized by the sending node, then sent, then deserialized and read by the receiving node. Each message type has a different purposes. The following outlines the current message types sent between nodes in our program:
@@ -145,6 +160,8 @@ it will not support operations such as deleting, setting, and modifying columns 
   the column's distributed array. Once the input array is completely broken up and stored, the 
   DataFrame will be serialized and stored under its key in the distributed system.
 
+ [[note how we distribute the blocks]]
+
   * Fields:
     * columns_ (ColumnArray): holds column information
     * store_ (KVStore): dataframe passes store to classes that need it for data lookup; static initialization 
@@ -155,7 +172,7 @@ frame's columns' chunks
 
   * Methods (new ones we anticipate):
     * all the methods that create a DataFrame from a data type (ex. fromArray, fromScalar, fromVisitor, etc.) and return it
-    * void add_array(size_t, *type*): adds array into the DataFrame as a column; one for each type
+    * void add_array(size_t, *type*): adds array into the DataFrame as a column; one for each type [[distribute the blocks]]
     * void map(Rower): perform an operation on all data in the DataFrame
     * Schema& get_schema(): return schema of DataFrame
     * void add_column(Column): add column to DataFrame
@@ -352,10 +369,6 @@ Application:
         pln("");
     return;
 ```
-
-## Open questions
-
-Should all columns be the same length? If so, how should this be enforced?
 
 ## Status
 We have decided to use another group's Sorer implementation, as ours was written in Python and 
