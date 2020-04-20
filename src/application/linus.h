@@ -37,6 +37,15 @@ public:
 
     Linus(size_t idx, INetwork *net) : Application(idx, net) {}
 
+    ~Linus()
+    {
+        delete projects;
+        delete users;
+        delete commits;
+        delete uSet;
+        delete pSet;
+    }
+
     /** Compute DEGREES of Linus.  */
     void run_() override
     {
@@ -59,14 +68,16 @@ public:
         if (idx_ == 0)
         {
             pln("Reading...");
-            projects = DataFrame::fromFile(PROJ, pK.clone(), kv_);
+            projects = DataFrame::fromFile(PROJ, &pK, kv_);
             p("    ").p(projects->nrows()).pln(" projects");
-            users = DataFrame::fromFile(USER, uK.clone(), kv_);
+            users = DataFrame::fromFile(USER, &uK, kv_);
             p("    ").p(users->nrows()).pln(" users");
-            commits = DataFrame::fromFile(COMM, cK.clone(), kv_);
+            commits = DataFrame::fromFile(COMM, &cK, kv_);
             p("    ").p(commits->nrows()).pln(" commits");
             // This dataframe contains the id of Linus.
-            delete DataFrame::fromInt(new Key("users-0-0", 0), kv_, LINUS);
+            Key* intKey = new Key("users-0-0", 0);
+            delete DataFrame::fromInt(intKey, kv_, LINUS);
+            delete intKey;
         }
         else
         {
@@ -87,7 +98,9 @@ public:
 		//printf("###A");
 		//uSet->print();
         // Key of the shape: users-stage-0
-        Key uK(StrBuff("users-").c(stage).c("-0").get(), 0);
+        String* keyStr = StrBuff("users-").c(stage).c("-0").get();
+        Key uK(keyStr, 0);
+        delete keyStr;
         // A df with all the users added on the previous round
         DataFrame *newUsers = dynamic_cast<DataFrame *>(kv_->waitAndGet(&uK));
         Set delta(users);
@@ -137,7 +150,9 @@ public:
             }
             p("    storing ").p(set.setSize()).pln(" merged elements");
             SetWriter writer(set);
-            Key k(StrBuff(name).c(stage).c("-0").get(), 0);
+            String* keyStr = StrBuff(name).c(stage).c("-0").get();
+            Key k(keyStr, 0);
+            delete keyStr;
             delete DataFrame::fromVisitor(&k, kv_, "I", &writer);
         }
         else

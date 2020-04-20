@@ -12,10 +12,10 @@
   * trivial test (all 4 trials)
   * demo test
   * Sorer
+  * Linus
 
 * Tests with memory leaks/unchecked
-  * Wordcount
-  * Linus
+  * Wordcount (1 leak - 10 bytes)
 
 
 

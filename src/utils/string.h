@@ -130,11 +130,13 @@ public:
         //delete[] val_;
     }
 
+    /** Grow size of string buffer. This method appears to be leaky */
     void grow_by_(size_t step) {
         if (step + size_ < capacity_) return;
         capacity_ *= 2;
         if (step + size_ >= capacity_) capacity_ += step;        
         char* oldV = val_;
+        //making new char array is leaky
         val_ = new char[capacity_];
         memcpy(val_, oldV, size_);
         delete[] oldV;
@@ -157,6 +159,7 @@ public:
     StrBuff& c(String &s) { return c(s.c_str());  }
     StrBuff& c(size_t v) { return c(std::to_string(v).c_str());  } // Cpp
 
+    /** Return this string. Caller responsible for deleting this result */
     String* get() {
         assert(val_ != nullptr); // can be called only once
         grow_by_(1);     // ensure space for terminator
