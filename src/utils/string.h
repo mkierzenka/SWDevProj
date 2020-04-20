@@ -125,11 +125,6 @@ public:
         c(*s);
     }
 
-    ~StrBuff()
-    {
-        //delete[] val_;
-    }
-
     /** Grow size of string buffer. This method appears to be leaky */
     void grow_by_(size_t step) {
         if (step + size_ < capacity_) return;

@@ -5,13 +5,13 @@
 #include "../utils/string.h"
 
 /**
- * A class analogous to StringBuffer but for Keys. The Key is external.
+ * A class analogous to StringBuffer but for Keys. The Key is owned.
  * Provided as part of Milestone 4.
  *
  */
 class KeyBuff : public Object {                                                  
   public:                                                                        
-  Key* orig_; // external                                                        
+  Key* orig_; // owned                                                        
   StrBuff buf_;                                                                  
 
   /** Caller should delete passed in key */                                                                               
