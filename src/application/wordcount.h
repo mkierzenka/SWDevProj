@@ -49,7 +49,6 @@ public:
   {
     Key *k = kbuf.c(idx).get();
     p("Created key ").pln(k->c_str());
-    //LOG("Created key " << k->c_str());
     return k;
   }
 
