@@ -39,7 +39,7 @@ ourTests:
 	./tests/testSorer data/datafile.sor
 
 memory:
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./tests/testGeneral
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./eau2 -app demo -num_nodes 1 -pseudo
 
 #use this target if you're trying to debug a specific test in the suite
 buildDebug:
@@ -71,6 +71,7 @@ testWordcount:
 
 testLinus:
 	./eau2 -app linus -num_nodes 1 -i 0 -ip 127.0.0.1 -port 8080 -serverIp 127.0.0.1 -serverPort 8080
+	#./eau2 -app demo -num_nodes 1 -pseudo
 
 .SILENT: clean
 clean:
