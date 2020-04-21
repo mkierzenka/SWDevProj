@@ -31,7 +31,7 @@ class NodeThread : public Thread
 
     void run()
     {
-        printf("Starting NodeThread %zu\n", app_->this_node());
+        printf("Starting Node %zu\n", app_->this_node());
         if (app_->this_node() == args.serverIndex) {
           net_->server_init();
         } else {
