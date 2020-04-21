@@ -36,8 +36,4 @@ It sends the responses if available
 * See if there are other places where Blocks can be cleared instead of repeatedly
 	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
 
-* Sorer code- make the arrays use our array instead of re-implementing functionality (Field object)
-
-* Move sorer into sorwriter
-
 * Check command line arguments for valid input
