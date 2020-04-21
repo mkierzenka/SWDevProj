@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "../src/dataframe/dataframe.h"
+#include "../src/dataframe/datatodf.h"
 #include "../src/store/kvstore.h"
 #include "../src/store/key.h"
 #include "../src/store/value.h"
@@ -126,7 +127,7 @@ void dataFrameFromWriter() {
   int SZ = 30;
   IncWriter wr(SZ);
   
-  DataFrame* df = DataFrame::fromVisitor(&k, &kv, "I", &wr);
+  DataFrame* df = DataToDf::fromVisitor(&k, &kv, "I", &wr);
   assert(df->ncols() == 1);
   assert(df->nrows() == SZ);
 
@@ -168,7 +169,7 @@ void dataFrameFromSummer()
   Summer sum(*map);
   Key k("df", 0);
   KVStore kv(0, nullptr);
-  DataFrame* df = DataFrame::fromVisitor(&k, &kv, "SI", &sum);
+  DataFrame* df = DataToDf::fromVisitor(&k, &kv, "SI", &sum);
   assert(df->ncols() == 2);
   assert(df->nrows() == 4);
 

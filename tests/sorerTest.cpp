@@ -10,6 +10,7 @@
 #include <sys/mman.h>
 
 #include "../src/dataframe/dataframe.h"
+#include "../src/dataframe/datatodf.h"
 #include "../src/dataframe/column/column.h"
 #include "../src/utils/args.h"
 #include "../src/store/key.h"
@@ -23,7 +24,7 @@ int main(int argc, char **argv) {
 	puts("Sorer test started...");
     Key* key = new Key("df", 0);
     KVStore* store = new KVStore(0, nullptr);
-    DataFrame* d = DataFrame::fromFile(argv[1], key, store);
+    DataFrame* d = DataToDf::fromFile(argv[1], key, store);
     //some checks to make sure our dataframe reading worked properly
     assert(d->ncols() == 12);
     assert(d->nrows() == 1000);

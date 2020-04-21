@@ -3,6 +3,7 @@
 #include "../src/store/value.h"
 #include "../src/store/getimpls.h"
 #include "../src/dataframe/dataframe.h"
+#include "../src/dataframe/datatodf.h"
 #include "../src/network/pseudo/messagequeuearray.h"
 #include "../src/network/pseudo/pseudonetwork.h"
 #include "../src/utils/args.h"
@@ -27,7 +28,7 @@ void checkGetSingle() {
 	for (int i = 0; i < dataSize; i++) {
 		data[i] = 211 * i;
 	}
-	DataFrame* df = DataFrame::fromArray(&k1, kv, dataSize, data);
+	DataFrame* df = DataToDf::fromArray(&k1, kv, dataSize, data);
 	delete[] data;
 	assert(df->ncols() == 1);
 	assert(df->nrows() == dataSize);

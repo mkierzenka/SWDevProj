@@ -2,6 +2,7 @@
 
 #include "application.h"
 #include "../dataframe/dataframe.h"
+#include "../dataframe/datatodf.h"
 #include "../network/inetwork.h"
 #include "../linus/set.h"
 #include "../linus/setwriter.h"
@@ -68,15 +69,15 @@ public:
         if (idx_ == 0)
         {
             pln("Reading...");
-            projects = DataFrame::fromFile(PROJ, &pK, kv_);
+            projects = DataToDf::fromFile(PROJ, &pK, kv_);
             p("    ").p(projects->nrows()).pln(" projects");
-            users = DataFrame::fromFile(USER, &uK, kv_);
+            users = DataToDf::fromFile(USER, &uK, kv_);
             p("    ").p(users->nrows()).pln(" users");
-            commits = DataFrame::fromFile(COMM, &cK, kv_);
+            commits = DataToDf::fromFile(COMM, &cK, kv_);
             p("    ").p(commits->nrows()).pln(" commits");
             // This dataframe contains the id of Linus.
             Key* intKey = new Key("users-0-0", 0);
-            delete DataFrame::fromInt(intKey, kv_, LINUS);
+            delete DataToDf::fromInt(intKey, kv_, LINUS);
             delete intKey;
         }
         else
@@ -153,14 +154,14 @@ public:
             String* keyStr = StrBuff(name).c(stage).c("-0").get();
             Key k(keyStr, 0);
             delete keyStr;
-            delete DataFrame::fromVisitor(&k, kv_, "I", &writer);
+            delete DataToDf::fromVisitor(&k, kv_, "I", &writer);
         }
         else
         {
             p("    sending ").p(set.size()).pln(" elements to master node");
             SetWriter writer(set);
             Key k(StrBuff(name).c(stage).c("-").c(idx_).get(), 0);
-            delete DataFrame::fromVisitor(&k, kv_, "I", &writer);
+            delete DataToDf::fromVisitor(&k, kv_, "I", &writer);
             Key mK(StrBuff(name).c(stage).c("-0").get(), 0);
             DataFrame *merged = dynamic_cast<DataFrame *>(kv_->waitAndGet(&mK));
             p("    receiving ").p(merged->nrows()).pln(" merged elements");

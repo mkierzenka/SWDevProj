@@ -41,5 +41,3 @@ It sends the responses if available
 * Move sorer into sorwriter
 
 * Check command line arguments for valid input
-
-* Move from methods from dataframe.h to own file

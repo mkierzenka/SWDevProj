@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include "../dataframe/dataframe.h"
+#include "../dataframe/datatodf.h"
 #include "../store/key.h"
 #include "../store/kvstore.h"
 #include "../utils/string.h"
@@ -37,7 +38,7 @@ class Trivial : public Application {
     for (size_t i = 0; i < sz; ++i)
       sum += vals[i] = i;
     Key key("triv", 0);
-    DataFrame *df = DataFrame::fromArray(&key, kv_, sz, vals);
+    DataFrame *df = DataToDf::fromArray(&key, kv_, sz, vals);
     assert(df->get_double(0, 1) == 1);
     DataFrame *df2 = kv_->get(&key);
     for (size_t i = 0; i < sz; ++i)
@@ -56,7 +57,7 @@ class Trivial : public Application {
     for (size_t i = 0; i < sz; ++i)
       sum += vals[i] = i;
     Key key("triv", 0);
-    DataFrame *df = DataFrame::fromArray(&key, kv_, sz, vals);
+    DataFrame *df = DataToDf::fromArray(&key, kv_, sz, vals);
     assert(df->get_int(0, 1) == 1);
     DataFrame *df2 = kv_->get(&key);
     for (size_t i = 0; i < sz; ++i)
@@ -85,7 +86,7 @@ class Trivial : public Application {
     String *expected = buf->get();
     delete buf;
     Key key("triv", 0);
-    DataFrame *df = DataFrame::fromArray(&key, kv_, sz, vals);
+    DataFrame *df = DataToDf::fromArray(&key, kv_, sz, vals);
 
     // Test df values are okay
     String* actualStr = df->get_string(0, 1);
@@ -129,7 +130,7 @@ class Trivial : public Application {
       vals[i] = ((i % 2) == 0 || (i > (sz - 5)));
     }
     Key key("triv", 0);
-    DataFrame *df = DataFrame::fromArray(&key, kv_, sz, vals);
+    DataFrame *df = DataToDf::fromArray(&key, kv_, sz, vals);
     assert(df->get_bool(0, 1) == false);
     assert(df->get_bool(0, 4) == true);
     assert(df->get_bool(0, sz - 3) == true);
