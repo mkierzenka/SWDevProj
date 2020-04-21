@@ -2,6 +2,7 @@
 #include "src/utils/args.h"
 #include "src/application/application.h"
 #include "src/application/demo.h"
+#include "src/application/demolocalmap.h"
 #include "src/application/trivial.h"
 #include "src/application/wordcount.h"
 #include "src/application/linus.h"
@@ -22,6 +23,8 @@ Application* initializeApplication(INetwork* net, size_t nodeIdx)
         a = new Trivial(nodeIdx, net);
     } else if (strcmp(args.appName, "demo") == 0) {
         a = new Demo(nodeIdx, net);
+    } else if (strcmp(args.appName, "demoLM") == 0) {
+        a = new DemoLocalMap(nodeIdx, net);
     } else if(strcmp(args.appName, "wordcount") == 0) {
         a = new WordCount(nodeIdx, net);
     } else if(strcmp(args.appName, "linus") == 0) {
