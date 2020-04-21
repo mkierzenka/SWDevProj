@@ -44,7 +44,7 @@ class NodeThread : public Thread
         app_->run_();
 
         // Let server know that we're done executing
-        net_->sendMsg(new DoneMsg(app_->this_node(), args.serverIndex, 0));
+        net_->sendMsg(new DoneMsg(app_->this_node(), args.serverIndex));
         rt->join();
         delete rt;
     }

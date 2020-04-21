@@ -23,22 +23,19 @@ public:
 	MsgKind kind_;	// the message kind
 	size_t sender_; // the index of the sender node
 	size_t target_; // the index of the receiver node
-	size_t id_;		// an id t unique within the node
 
 	Message() : Object()
 	{
 		kind_ = Done;
 		sender_ = 0;
 		target_ = 0;
-		id_ = 0;
 	}
 
-	Message(MsgKind kind, size_t sender, size_t target, size_t id) : Object()
+	Message(MsgKind kind, size_t sender, size_t target) : Object()
 	{
 		kind_ = kind;
 		sender_ = sender;
 		target_ = target;
-		id_ = id;
 	}
 
 	virtual ~Message() {}
@@ -48,7 +45,6 @@ public:
 		s->write(kind_);
 		s->write(sender_);
 		s->write(target_);
-		s->write(id_);
 	}
 
 	virtual void deserialize(Serializer *s)
@@ -56,7 +52,6 @@ public:
 		kind_ = s->readMsgKind();
 		sender_ = s->readSizeT();
 		target_ = s->readSizeT();
-		id_ = s->readSizeT();
 	}
 
 	size_t getTarget()
@@ -89,7 +84,7 @@ public:
 		value_ = new Value();
 	}
 
-	ReplyDataMsg(Key* k, Value *v, size_t sender, size_t target) : Message(ReplyData, sender, target, 0)
+	ReplyDataMsg(Key* k, Value *v, size_t sender, size_t target) : Message(ReplyData, sender, target)
 	{
 		value_ = v->clone();
 		key_ = k->clone();
@@ -156,7 +151,7 @@ public:
 		key_ = new Key();
 	}
 
-	WaitAndGetMsg(Key *k, size_t sender, size_t target) : Message(WaitAndGet, sender, target, 0)
+	WaitAndGetMsg(Key *k, size_t sender, size_t target) : Message(WaitAndGet, sender, target)
 	{
 		key_ = k->clone();
 	}
@@ -198,7 +193,7 @@ public:
 	}
 
 	/** Constructs a new DirectoryMsg, clones the Directory (caller responsible for deleting dir) */
-	DirectoryMsg(Directory* dir, size_t sender, size_t target, size_t id) : Message(Dir, sender, target, id)
+	DirectoryMsg(Directory* dir, size_t sender, size_t target) : Message(Dir, sender, target)
 	{
 		dir_ = dir->clone();
 	}
@@ -240,12 +235,12 @@ public:
 		delete str;
 	}
 
-	RegisterMsg(String* client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
+	RegisterMsg(String* client, size_t port, size_t sender, size_t target) : Message(Register, sender, target)
 	{
 		info_ = new NodeInfo(client, port);
 	}
 
-	RegisterMsg(char* client, size_t port, size_t sender, size_t target, size_t id) : Message(Register, sender, target, id)
+	RegisterMsg(char* client, size_t port, size_t sender, size_t target) : Message(Register, sender, target)
 	{
 		String* str = new String(client);
 		info_ = new NodeInfo(str, port);
@@ -298,7 +293,7 @@ public:
 		value_ = new Value();
 	}
 
-	PutMsg(Key *k, Value *v, size_t sender, size_t target) : Message(Put, sender, target, 0)
+	PutMsg(Key *k, Value *v, size_t sender, size_t target) : Message(Put, sender, target)
 	{
 		key_ = k->clone();
 		value_ = v->clone();
@@ -350,7 +345,7 @@ public:
 	{
 		key_ = new Key();
 	}
-	GetDataMsg(Key *k, size_t sender, size_t target) : Message(GetData, sender, target, 0)
+	GetDataMsg(Key *k, size_t sender, size_t target) : Message(GetData, sender, target)
 	{
 		key_ = k->clone();
 	}
@@ -386,7 +381,7 @@ class DoneMsg : public Message
 public:
 	DoneMsg() : Message() {}
 
-	DoneMsg(size_t sender, size_t target, size_t id) : Message(Done, sender, target, id) {}
+	DoneMsg(size_t sender, size_t target) : Message(Done, sender, target) {}
 
 	~DoneMsg() {}
 };
@@ -397,7 +392,7 @@ class TeardownMsg : public Message
 	public:
 	TeardownMsg() : Message() {}
 
-	TeardownMsg(size_t sender, size_t target, size_t id) : Message(Teardown, sender, target, id) {}
+	TeardownMsg(size_t sender, size_t target) : Message(Teardown, sender, target) {}
 
 	~TeardownMsg() {}
 };
