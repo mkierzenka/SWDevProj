@@ -150,7 +150,7 @@ public:
         }
         else
         {
-            p("    sending ").p(set.size()).pln(" elements to master node");
+            p("    sending ").p(set.setSize()).pln(" elements to master node");
             SetWriter writer(set);
             Key k(StrBuff(name).c(stage).c("-").c(idx_).get(), 0);
             delete DataToDf::fromVisitor(&k, kv_, "I", &writer);
