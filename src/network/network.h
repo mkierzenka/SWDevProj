@@ -71,7 +71,7 @@ public:
         // When all nodes (expected number) have registered, send directory to everyone
         for (int i = 0; i < args.numNodes; i++) {
             if (i == args.serverIndex) continue;
-            DirectoryMsg* dMsg = new DirectoryMsg(dir_, 8080, args.index, i, 0);
+            DirectoryMsg* dMsg = new DirectoryMsg(dir_, args.index, i, 0);
             fprintf(stderr, "Server sending Directory Message to Node %d\n", i);
             sendMsg(dMsg);
         }

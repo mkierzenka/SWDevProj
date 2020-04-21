@@ -76,14 +76,13 @@ public:
 };
 
 /**
- * This is the message type that will be sent by a KVStore in response to a GetData Message
+ * This is the message type that will be sent by a KVStore in response to a GetData or WaitAndGet Message
  */
 class ReplyDataMsg : public Message
 {
 public:
-	//key to be sent in message
-	Value *value_;
 	Key* key_;
+	Value *value_;
 
 	ReplyDataMsg() : Message() {
 		key_ = new Key();
@@ -191,7 +190,6 @@ public:
 class DirectoryMsg : public Message
 {
 public:
-	size_t port_;
 	Directory* dir_; //owned, keep track of clients
 
 	DirectoryMsg() : Message()
@@ -199,10 +197,10 @@ public:
 		dir_ = new Directory();
 	}
 
-	DirectoryMsg(Directory* dir, size_t port, size_t sender, size_t target, size_t id) : Message(Dir, sender, target, id)
+	/** Constructs a new DirectoryMsg, clones the Directory (caller responsible for deleting dir) */
+	DirectoryMsg(Directory* dir, size_t sender, size_t target, size_t id) : Message(Dir, sender, target, id)
 	{
 		dir_ = dir->clone();
-		port_ = port;
 	}
 
 	~DirectoryMsg() {
@@ -213,7 +211,6 @@ public:
 	{
 		Message::serialize(s);
 		dir_->serialize(s);
-		s->write(port_);
 	}
 
 	virtual void deserialize(Serializer *s)
@@ -222,7 +219,6 @@ public:
 		delete dir_;
 		dir_ = new Directory();
 		dir_->deserialize(s);
-		port_ = s->readSizeT();
 	}
 
 	Directory* getDirectory()
