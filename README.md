@@ -44,8 +44,4 @@ It sends the responses if available
 
 * Check command line arguments for valid input
 
-* Remove message ids from Message classes
-
-* Remove unused port_ field from DirectoryMsg
-
 * Move from methods from dataframe.h to own file

@@ -82,7 +82,7 @@ public:
      */
     void sendTeardownMsgs_() {
         for (size_t i = 0; i < mqa_->size(); i++) {
-            sendMsg(new TeardownMsg(nodeId_, i, 0));
+            sendMsg(new TeardownMsg(nodeId_, i));
         }
     }
 };

@@ -71,14 +71,14 @@ public:
         // When all nodes (expected number) have registered, send directory to everyone
         for (int i = 0; i < args.numNodes; i++) {
             if (i == args.serverIndex) continue;
-            DirectoryMsg* dMsg = new DirectoryMsg(dir_, 8080, args.index, i, 0);
+            DirectoryMsg* dMsg = new DirectoryMsg(dir_, args.index, i);
             fprintf(stderr, "Server sending Directory Message to Node %d\n", i);
             sendMsg(dMsg);
         }
     }
 
     void client_init() override {
-        RegisterMsg* rMsg = new RegisterMsg(args.ip, args.serverPort, args.index, args.serverIndex, 0);
+        RegisterMsg* rMsg = new RegisterMsg(args.ip, args.serverPort, args.index, args.serverIndex);
         sendMsg(rMsg);
         fprintf(stderr, "Node %zu Registered\n", args.index);
 		Message* m = receiveMsg();
@@ -262,7 +262,7 @@ public:
     void sendTeardownMsgs_() {
         printf("Server starting teardown\n");
         for (size_t i = 0; i < args.numNodes; i++) {
-            sendMsg(new TeardownMsg(args.index, i, 0));
+            sendMsg(new TeardownMsg(args.index, i));
         }
     }
 
