@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../utils/object.h"
-#include "../dataframe/row/row.h"
+#include "../../utils/object.h"
+#include "row.h"
 
 
 /**

@@ -2,7 +2,7 @@
 
 #include "../utils/map.h"
 #include "../utils/string.h"
-#include "writer.h"
+#include "../dataframe/row/writer.h"
 
 /** Summer provided to us in M4 */
 /***************************************************************************/

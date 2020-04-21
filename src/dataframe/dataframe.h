@@ -9,14 +9,14 @@
 #include "../store/kvstore.h"
 #include "../store/key.h"
 #include "../serial/serial.h"
-#include "../filereader/writer.h"
-#include "../filereader/reader.h"
 #include "../sorer/sorer.h"
 #include "../sorer/sorwriter.h"
 #include "../sorer/field_array.h"
 #include "column/columnarray.h"
 #include "schema.h"
 #include "row/row.h"
+#include "row/writer.h"
+#include "row/reader.h"
 
 /****************************************************************************
  * DataFrame::

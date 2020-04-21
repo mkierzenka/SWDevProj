@@ -1,6 +1,6 @@
 #pragma once
 
-#include "writer.h"
+#include "../dataframe/row/writer.h"
 
 const char *FILE_NAME = "data/100k.txt";
 

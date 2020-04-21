@@ -1,7 +1,7 @@
 #pragma once
 
 #include "set.h"
-#include "../filereader/reader.h"
+#include "../dataframe/row/reader.h"
 
 /***************************************************************************
  * The ProjectTagger is a reader that is mapped over commits, and marks all

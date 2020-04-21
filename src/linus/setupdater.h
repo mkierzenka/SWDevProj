@@ -1,7 +1,7 @@
 #pragma once
 
 #include "set.h"
-#include "../filereader/reader.h"
+#include "../dataframe/row/reader.h"
 
 /*******************************************************************************
  * A SetUpdater is a reader that gets the first column of the data frame and

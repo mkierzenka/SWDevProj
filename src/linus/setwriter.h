@@ -1,7 +1,7 @@
 #pragma once
 
 #include "set.h"
-#include "../filereader/writer.h"
+#include "../dataframe/row/writer.h"
 
 /*****************************************************************************
  * A SetWriter copies all the values present in the set into a one-column
