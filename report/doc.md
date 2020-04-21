@@ -69,12 +69,16 @@ data across the eau2 system.
 In the following paragraphs, we will explain diagrams that outline the basic interactions between
 components of our system. There are three PNG diagrams, and can be found within this "report" folder.
 
-The first diagram, "localgetflow," shows a node running an application that retrieves data that
+
+![](localgetflow.PNG)\
+The first diagram, localgetflow, shows a node running an application that retrieves data that
 exists locally in its KV store. The process is fairly simple; the application calls on the store
 to get data under a certain key. The store recognizes it has that data. It then takes the serialized
 data, converts it into a dataframe, and then returns the result to the application. 
 
-The second diagram, "networkgetflow," represents the process of retrieving data that does not
+
+![](networkgetflow.PNG)\
+The second diagram, networkgetflow, represents the process of retrieving data that does not
 exist in the node's local store. Like in localget, the application calls on its store to get data
 under a certain key. However, this time, the store does not have that key. Therefore, the store
 needs to request the data from a store running on a different node. Through the networking layer,
@@ -82,7 +86,9 @@ the local store asks the store mapped to that key for the data. If it is availab
 sends the data back to the local store. The store then converts the data received and returns the
 dataframe result.
 
-The last diagram, "addframeflow," represents how an application can insert a dataframe into its
+
+![](addframeflow.PNG)\
+The last diagram, addframeflow, represents how an application can insert a dataframe into its
 node's store. First, the application needs to call a static "from" method, which will create a
 dataframe given a key and certain pieces of information. Contrary to the previous cases, the method
 converts a dataframe into a blob of data. It then takes the key and the value generated and puts it
