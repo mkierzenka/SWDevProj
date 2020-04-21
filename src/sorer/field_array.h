@@ -5,6 +5,7 @@
  * FieldArray: Vector container of a bunch of fields
  *
  * Author: cao.yuan1@husky.neu.edu & zhan.d@husky.neu.edu
+ * Modified by broder.c@husky.neu.edu & kierzenka.m@husky.neu.edu
  */
 
 

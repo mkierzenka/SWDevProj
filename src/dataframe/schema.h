@@ -15,8 +15,7 @@
 class Schema : public Object
 {
 public:
-	//char *types_;      //owned
-	DataType* types_; //owned
+	DataType *types_; //owned
 	size_t numCols_;
 	size_t capCols_;
 	size_t numRows_;
@@ -120,14 +119,16 @@ public:
 	}
 
 	/** Increment the number of rows tracked by this Schema by 1 */
-	void add_row() {
-	  add_rows(1);
-  	}
+	void add_row()
+	{
+		add_rows(1);
+	}
 
 	/** Increase the row count of this Schema */
-	void add_rows(size_t numRows) {
-	  numRows_ += numRows;
-  	}
+	void add_rows(size_t numRows)
+	{
+		numRows_ += numRows;
+	}
 
 	/** Return char type of column at idx. An idx >= width is undefined. */
 	char col_type_char(size_t idx)
@@ -160,7 +161,7 @@ public:
 			exit(1);
 		}
 
-		types_[idx] = type;		
+		types_[idx] = type;
 	}
 
 	/** The number of columns */
@@ -175,11 +176,10 @@ public:
 		return numRows_;
 	}
 
-	bool equals(Object* other)
+	bool equals(Object *other)
 	{
-		Schema* s = dynamic_cast<Schema*>(other);
-		if (numCols_ != s->numCols_ || capCols_ != s->capCols_
-		|| numRows_ != s->numRows_)
+		Schema *s = dynamic_cast<Schema *>(other);
+		if (numCols_ != s->numCols_ || capCols_ != s->capCols_ || numRows_ != s->numRows_)
 		{
 			return false;
 		}
@@ -204,7 +204,7 @@ public:
 	}
 
 	/** Return types of this schema */
-	DataType* getTypes()
+	DataType *getTypes()
 	{
 		return types_;
 	}
@@ -212,9 +212,9 @@ public:
 	/** Return types of this schema in character form. Caller responsible for deleting
 	 * returned character array
 	 */
-	char* getTypesChar()
+	char *getTypesChar()
 	{
-		char* typesChar = new char[numCols_+1];
+		char *typesChar = new char[numCols_ + 1];
 		for (size_t i = 0; i < numCols_; i++)
 		{
 			typesChar[i] = DataTypeUtils::typeToChar(types_[i]);
@@ -233,7 +233,7 @@ public:
 	void growColList_()
 	{
 		capCols_ *= 2;
-		DataType* newTypesArr = new DataType[capCols_];
+		DataType *newTypesArr = new DataType[capCols_];
 		for (size_t i = 0; i < numCols_; i++)
 		{
 			newTypesArr[i] = types_[i];

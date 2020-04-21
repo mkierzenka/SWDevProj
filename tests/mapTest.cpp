@@ -237,24 +237,6 @@ public:
     OK("test_contains_keys_0");
   }
 
-  /*void test_hash_1() { adding same object twice will break on 
-    MapStrObj* m1 = new MapStrObj();
-    MapStrObj* m2 = new MapStrObj();
-    Object * a = new Object();
-    String * s = new String("s");
-
-    assert(m1->hash() == m2->hash());
-    m1->put(s, a);
-    assert(!m1->hash() == m2->hash());
-    m2->put(s, a);
-    assert(m1->hash() == m2->hash());
-
-    delete m1;
-    delete m2;
-
-    OK("test_hash_1");
-  }*/
-
   void test_big()
   {
     String *a = new String("ABC");
@@ -303,7 +285,6 @@ int main(int argc, char **argv)
   test->test_get_2();
   test->test_equals_0();
   test->test_contain_keys_0();
-  //test->test_hash_1();
   test->test_big();
   test->OK("All map tests passed!");
   delete test;

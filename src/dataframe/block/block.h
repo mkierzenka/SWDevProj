@@ -2,7 +2,6 @@
 
 #include "../../utils/object.h"
 #include "../../utils/args.h"
-//static const size_t BLOCK_SIZE = 1024;//2048;
 
 /**
 * Block - to represent a block of one type of data.
@@ -23,7 +22,7 @@ public:
 	{
 		return size_;
 	}
-	
+
 	/** Get the number of elements this block can hold */
 	virtual size_t capacity()
 	{
@@ -41,5 +40,4 @@ public:
 	{
 		return 0;
 	}
-
 };

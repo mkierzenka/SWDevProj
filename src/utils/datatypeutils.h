@@ -10,9 +10,7 @@
 class DataTypeUtils
 {
 public:
-    /** Convert char to data type
-	 * NOTE: this logic is duplicated in column; maybe make static util file
-	 */
+    /** Convert char to data type */
     static DataType charToType(char c)
     {
         switch (c)

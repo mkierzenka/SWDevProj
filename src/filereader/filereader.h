@@ -21,8 +21,8 @@ public:
         {
             fprintf(stderr, "Cannot open file %s\n", FILE_NAME);
             exit(1);
-            //FATAL_ERROR("Cannot open file " << FILE_NAME);
         }
+
         buf_ = new char[BUFSIZE + 1]; //  null terminator
         fillBuffer_();
         skipWhitespace_();

@@ -17,8 +17,6 @@
 * Tests with memory leaks/unchecked
   * Wordcount (1 leak - 10 bytes)
 
-
-
 ### ReceiverThread Info
 Receives WaitAndGet message it can't currently respond to -> add to KVStore's msgsCache_ (map).
 When new data is added to a KVStore (RT calls kv_->put()), KVStore adds it locally, 
