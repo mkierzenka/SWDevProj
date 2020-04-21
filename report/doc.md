@@ -37,7 +37,6 @@ of the "work" for the chosen application. There will be a lead node ("server") t
 of registered nodes as well as initiates and terminates the application. Besides that, there is no inherent
 difference between the server and other nodes.
 
-
 Each node is made up of three layers of abstraction.
 
 The first and lowest layer is the distributed key-value store. There will be one key-value
@@ -95,18 +94,28 @@ we provided descriptions of how they'll be used.
     * kvMap_ (MapStrObj): the String key will map to a serialized piece of data (Value)
     * node_ (INetwork): this network abstraction will allow the store to listen for 
     messages from other nodes and send messages to other stores to request data or put data in another node's store
-    * storeId (size_t): each local store will be represented by a unique numerical identifier (the "index" commandline argument)
-    At a higher level, this identifier will help keep track of where the data is stored
-    * msgCache_ (Map): this map will hold the messages that the KVStore cannot handle right away. For example, if another node requests data from this store that is guaranteed to eventually be in this store, the store will hold that message in the queue until the data is present. The key will be an actual Key object and the value will be an array of messages referencing that key. For example, if two nodes try to get the same data from the same store, then the key for that data will correspond to two get messages. Right now only two types of messages will exist in this cache: WaitAndGetMsg and ReplyDataMsg
-    * msgCacheLock_ (Lock): used when accessing the cache, to avoid another thread from reading from/writing to the cache at the same time
+    * storeId (size_t): each local store will be represented by a unique numerical identifier (the "index" command line 
+    argument); at a higher level, this identifier will help keep track of where the data is stored
+    * msgCache_ (Map): this map will hold the messages that the KVStore cannot handle right away. For example, if another 
+      node requests data from this store that is guaranteed to eventually be in this store, the store will hold that message 
+      in the queue until the data is present. The key will be an actual Key object and the value will be an array of messages 
+      referencing that key. For example, if two nodes try to get the same data from the same store, then the key for that data 
+      will correspond to two get messages. Right now only two types of messages will exist in this cache: WaitAndGetMsg 
+      and ReplyDataMsg
+    * msgCacheLock_ (Lock): used when accessing the cache, to avoid another thread from reading from/writing to the cache at 
+      the same time
  
   * Methods:
     * put(Key, Value): adds given data to the key-value store specified in the key, 
     not blocking; sends Put message if Key's node id doesn't correspond to this store's id
-    * get(Key): request for the data; returns deserialized data from its own store or from the network if data for the key exists, otherwise returns nullptr
-    * waitAndGet(Key): retrieves data with the given Key from the Key's node or from the network if not local; blocking, so won't return until data exists in store specified by key
-    * getValue(Key): return the value that the given key maps to, in the raw storage format (Value); goes to the network if data not stored locally
-    * addMsgWaitingOn(WaitAndGetMsg): add the message to cache; this kvstore currently doesn't have the data to respond to another node's request, so need to wait until the data is put into the local store
+    * get(Key): request for the data; returns deserialized data from its own store or from the network if data for the key exists, 
+      otherwise returns nullptr
+    * waitAndGet(Key): retrieves data with the given Key from the Key's node or from the network if not local; blocking, so won't 
+      return until data exists in store specified by key
+    * getValue(Key): return the value that the given key maps to, in the raw storage format (Value); goes to the network if 
+      data not stored locally
+    * addMsgWaitingOn(WaitAndGetMsg): add the message to cache; this kvstore currently doesn't have the data to respond to 
+      another node's request, so need to wait until the data is put into the local store
     * addReply(ReplyDataMsg): adds reply data message to the cache, to be forwarded to the application (which is waiting for it)
 
 * Key: These are used to identify a piece of data at a level higher than the local KV store. 
@@ -121,7 +130,9 @@ Since data can exist in any of the stores, we need multiple attributes specify l
 that holds the serialized data and a size_t that describes the maximum amount of bytes that can
 be stored in this pointer.
 
-* INetwork: An interface outlining the required operations to be a valid network in our system. This was so that our entire program could use an INetwork, allowing for easy swapping between network implementations. The interfaces includes seven methods.
+* INetwork: An interface outlining the required operations to be a valid network in our system. This was so that our 
+  entire program could use an INetwork, allowing for easy swapping between network implementations. The interfaces 
+  includes seven methods.
 
 * PseudoNetwork: A fake networking layer to aid with debugging our eau2 system (implements INetwork).
   The design was similar to that specified by Professor Vitek in his videos.
@@ -132,7 +143,7 @@ be stored in this pointer.
   we initialize a common MessageQueueArray that is passed into every PseudoNetwork object.
   This is the network class used when the "-pseudo" flag is specified. The INetwork methods
   server_init(), client_init(), handleRegisterMsg(), and handleDirectoryMsg() have empty implementations
-  because their behavior is unneeded for this fake network.
+  because their behavior is unnecessary for this fake network.
 
 * Network: A TCP networking layer for the eau2 system (implements INetwork). It's implementations
   of the INetwork methods contain all the code for opening/closing sockets, sending/receiving, etc.
@@ -140,30 +151,41 @@ be stored in this pointer.
 
   * Registration:
     * Server starts with IP Address and Port known to all nodes, will accept all incoming connections
-	* The rest of the nodes each start up and send a RegisterMsg containing their NodeInfo. Then blocking, waiting for a response from the server
-	* Once all of the nodes (expected number specified on the commandline) have registered, the Server node will send each one a Directory containing the information for how to contact every node.
+	* The rest of the nodes each start up and send a RegisterMsg containing their NodeInfo. Then blocking, waiting 
+    for a response from the server
+	* Once all of the nodes (expected number specified on the command line) have registered, the Server node will 
+    send each one a Directory containing the information for how to contact every node.
 
   * Teardown:
-    * Once a non-server node completes their application tasks, it will send the server a DoneMsg and wait to receive a response
-	* The server node tracks which nodes have finished. Once all nodes in the system are finished, the server sends everyone a TeardownMsg and shuts down.
+    * Once a non-server node completes their application tasks, it will send the server a DoneMsg and wait to receive 
+      a response
+	* The server node tracks which nodes have finished. Once all nodes in the system are finished, the server sends everyone 
+    a TeardownMsg and shuts down.
 	* Each client shuts down when it receives a TeardownMsg
 
 
-* Messages: messages are what nodes use to communicate each other. Data can be placed inside messages. Messages are serialized by the sending node, then sent, then deserialized and read by the receiving node. Each message type has a different purposes. The following outlines the current message types sent between nodes in our program:
-  * Get: this is a request for data. It is not blocking, so it will return a nullptr if the data doesn't exist in the requested node's store
-  * WaitAndGet: this is a request for data and is sent to a specific node that holds this data. This message is blocking; a response won't be delivered to the sender until the data exists in the requested node's store
-  * ReplyData: this is a response to a data request. The node who received this message will send serialized data back to the node that requested it
+* Messages: messages are what nodes use to communicate each other. Data can be placed inside messages. Messages are serialized 
+  by the sending node, then sent, then deserialized and read by the receiving node. Each message type has a different purposes. 
+  The following outlines the current message types sent between nodes in our program:
+  * Get: this is a request for data. It is not blocking, so it will return a nullptr if the data doesn't exist in the requested 
+    node's store
+  * WaitAndGet: this is a request for data and is sent to a specific node that holds this data. This message is blocking; a response 
+    won't be delivered to the sender until the data exists in the requested node's store
+  * ReplyData: this is a response to a data request. The node who received this message will send serialized data back to the 
+    node that requested it
   * PutMsg: this message puts data, both a key and a value, in another node's store
   * RegisterMsg: allows a client to register with a main, or server, node that keeps track of connections
-  * DirectoryMsg: broadcasts a list of connections to each clients; necessary for clients to be able to send messages between each other
-  * Other message types that may be used in the future include Ack, Directory, Register, Kill, and Status messages
-  * DoneMsg: a node sends this message to the server when it's done executing its task. It means it is ready to begin the teardown process, once the other nodes complete
-  * TeardownMsg: broadcasted from the server to all connected nodes. Means that the program is terminating, so all nodes should close their connections/sockets and delete their objects
+  * DirectoryMsg: broadcasts a list of connections to each clients; necessary for clients to be able to send messages 
+    between each other
+  * DoneMsg: a node sends this message to the server when it's done executing its task. It means it is ready to begin the teardown 
+    process, once the other nodes complete
+  * TeardownMsg: broadcasted from the server to all connected nodes. Means that the program is terminating, so all nodes should 
+    close their connections/sockets and delete their objects
 
 
 * DataFrame: The DataFrame API will be similar to that on previous assignments. It will 
 include operations to store and perform operations on data, such as map. A Schema will 
-be used to describe the Dataframe's column structure. A DataFrame will be immutable, so 
+be used to describe the DataFrame's column structure. A DataFrame will be immutable, so 
 it will not support operations such as deleting, setting, and modifying columns and rows. 
 
   DataFrame's data storage will change. In previous assignments, DataFrames held all of their
@@ -186,8 +208,6 @@ it will not support operations such as deleting, setting, and modifying columns 
   the column's distributed array. Once the input array is completely broken up and stored, the 
   DataFrame will be serialized and stored under its key in the distributed system.
 
- [[note how we distribute the blocks]]
-
   * Fields:
     * columns_ (ColumnArray): holds column information
     * store_ (KVStore): dataframe passes store to classes that need it for data lookup; static initialization 
@@ -198,7 +218,7 @@ frame's columns' chunks
 
   * Methods (new ones we anticipate):
     * all the methods that create a DataFrame from a data type (ex. fromArray, fromScalar, fromVisitor, etc.) and return it
-    * void add_array(size_t, *type*): adds array into the DataFrame as a column; one for each type [[distribute the blocks]]
+    * void add_array(size_t, *type*): adds array into the DataFrame as a column; one for each type
     * void map(Rower): perform an operation on all data in the DataFrame
     * Schema& get_schema(): return schema of DataFrame
     * void add_column(Column): add column to DataFrame
@@ -208,7 +228,8 @@ frame's columns' chunks
     * size_t ncols(): returns number of columns in the df
 
 
-* Column: A column now stores data in the distributed KV Store, instead of locally. A Column will be a DistributedArray where each Key points to a Value containing a fixed sized number of elements that belong to this Column. Since we are no longer storing elements directly in the column, we do not need separate column implementations for each type
+* Column: A column stores data in the distributed KV Store, instead of locally. A Column will be a DistributedArray where 
+  each Key points to a Value containing a fixed sized number of elements that belong to this Column
 
   * Fields:
     * blocks_ (DistributedArray): holds blocks of column data
@@ -218,10 +239,16 @@ frame's columns' chunks
     * baseKey_ (Key): key of the dataframe that the column belongs to; will be used to build up block keys
 
   * Methods:
-    * most methods from before, for getting data from the column. not 'set' methods (or anything else that modifies the column). Might include the push_back methods
-    * void add_all(size_t, *type*): one for each data type; adds all given elements of that datatype to the column; breaks data up into chunks, creates keys for those chunks, and adds them to the KVStore
-    * void setStore(KVStore): pass a KVStore to the dataframe; will initially start in the dataframe, which will be passed to the column array and eventually the column
-    * void push_back(val): add value to end of column; currently debating whether or not this implementation is necessary, would have one for each type
+    * most methods from before, for getting data from the column. not 'set' methods (or anything else that modifies the column). 
+      Might include the push_back methods
+    * void add_all(size_t, *type*): one for each data type; adds all given elements of that datatype to the column; breaks data 
+      up into chunks, creates keys for those chunks, and adds them to the KVStore
+      * The chunks are inserted into the KVStore in a distributed fashion. Therefore, not every chunk is inserted into the same
+        store as its Dataframe. When adding a block, we determine which block number it will be in the column. We then find the modulus
+        of dividing the block number by the number of nodes. For example let's say we're about to add block 9 to the column and there are
+        four nodes running. We'd add the block to the KVStore on node 9 % 4 = 1. 
+    * void setStore(KVStore): pass a KVStore to the dataframe; will initially start in the dataframe, which will be passed to the 
+      column array and eventually the column
     * size_t size(): return size of column
     * get: get element from column; one method for each type
 
@@ -252,25 +279,27 @@ first check to see if the data exists in the cache.
   * Methods:
     * bool containsKey(Key): does the distributed array's key list contain the given key?
     * void addKey(Key): add the given key to the distributed array's list of keys
-    * get(Key, size_t): get the value for the specified key from the distributed array. Check the cache first and if the cache does not contain the data, then make a call too the KV
-  store; one for each type
+    * get(Key, size_t): get the value for the specified key from the distributed array. Check the cache first and if the 
+      cache does not contain the data, then make a call to the KV store; one for each type
     * Key getKeyAtIndex(size_t): return key at the given index in the array
-    * void setStore(KVStore): this method will be used to pass a store into the distributed array; the store will come from the dataframe initially and move down the hierarchy (dataframe -> columnarray -> column -> distributed array)
+    * void setStore(KVStore): this method will be used to pass a store into the distributed array; the store will come 
+      from the dataframe initially and move down the hierarchy (dataframe -> columnarray -> column -> distributed array)
     * Serialization and deserialization methods
 
-* Cache: class that represents a cache within a distributed array. Holds the data of
-some of the array's keys.
-keys array; the value will be the deserialized data.Holds the actual, deserialized data for improved retrieval
-efficiency. The cache will be limited in size and will be 
-refreshed occasionally. We currently use a FIFO strategy to refresh the cache; if we want to add a new item to the cache but it is full, then we remove the element that has been in there the longest
+* Cache: class that represents a cache within a distributed array. Holds the deserialized data of
+some of the distributed array's keys. The cache is limited in size and will be 
+refreshed occasionally. We currently use a FIFO strategy to refresh the cache; if we want to add a new item 
+to the cache but it is full, then we remove the element that has been in there the longest. Decided to store the
+deserialized data for improve retrieval efficiency.
 
 
   * Fields:
-    * maxSize_ (size_t): defines a maximum size of the cache; the cache's map cannot hold more than 
-this amount of elements at any given time
+    * maxSize_ (size_t): defines a maximum size of the cache; the cache's map cannot hold more than   
+      this amount of elements at any given time
     * data_ (Map): this map will hold the data within the cache. The keys will 
-be Key objects, and they will map to the serialized data.
-    * keyOrder_ (Queue): this queue will keep the order in which keys are added to the cache. This will help us update our cache by adding and removing elements on a FIFO basis
+      be Key objects, and they will map to the deserialized data.
+    * keyOrder_ (Queue): this queue will keep the order in which keys are added to the cache. This will 
+      help us update our cache by adding and removing elements on a FIFO basis
 
   * Methods:
     * bool containsKey(Key): does the map contain data for the given key?
@@ -298,13 +327,19 @@ set of data. An application will run on each node. To specify operations, Applic
     * run_(): given the node id, perform a certain set of operations. The node id will be 
     placed in a switch statement, and each case will contain a different helper for each 
     application running (ex.producer to initialize and create the data, summarizer to 
-    perform some operation on the data). Distributed arrays and dataframes and can be 
-    initialized and used for these helpers, depending on the purpose of the application
+    perform some operation on the data). Can retrieve and read data from the KV store
 
   * Current applications supported
-    * Trivial: simple single-noded program. Creates a dataframe with a large amount of elements in a single column, then makes sure that the get methods on the dataframe retrieve the proper data.
-    * Demo: currently runs with three nodes. Some nodes are putting data into the KVStore, some are retrieving data from the KVStore, and others are doing both. Program tests that the KVStore can be read from and written to concurrently by using messaging in a network layer.
-    * Wordcount: single-noded program. Tests the functionality of fromVisitor, which allows the user to pass in a writer and generate a dataframe by visiting that writer. This program tests a Summer writer, which takes in an SIMAP of words that appear in a file to the number of occurrences in that file.
+    * Trivial: simple single-noded program. Creates a dataframe with a large amount of elements in a single column, 
+      then makes sure that the get methods on the dataframe retrieve the proper data.
+    * Demo: currently runs with three nodes. Some nodes are putting data into the KVStore, some are retrieving data 
+      from the KVStore, and others are doing both. Program tests that the KVStore can be read from and written to concurrently 
+      by using messaging in a network layer.
+    * Wordcount: tests the functionality of fromVisitor, which allows the user to pass in a writer and generate a dataframe by 
+      visiting that writer. This program tests a Summer writer, which takes in an SIMAP of words that appear in a file to the 
+      number of occurrences in that file.
+    * Linus: calculates the degrees of Linus. Uses the sorer to read in large .sor files describing the users, projects, and commits to
+      those projects
 
 
 * Utilities: We have a variety of common classes used throughout the code base
@@ -314,7 +349,9 @@ set of data. An application will run on each node. To specify operations, Applic
   * Map: represents implementation of a map. Used for when we want an item to map to a specific value
   * Queue: represents implementation of a queue. Used when we want to store and retrieve data on a first-in, first-out basis
   * Thread: represents a thread of execution. Allows program to split into multiple, "simultaneous" tasks
-  * Args: class for handling command line inputs. Sets the field based on what is provided on the command line. Use of "extern" allows entire program to access these elements. We run an entry .cpp file that passes the arguments into this Args object and then starts the program based on the configurations.
+  * Args: class for handling command line inputs. Sets the field based on what is provided on the command line. Use of "extern" 
+    allows entire program to access these elements. We run an entry .cpp file that passes the arguments into this Args object 
+    and then starts the program based on the configurations.
   * DataType: our enum for the four data types
   * DataTypeUtils: contains static methods relating to data types; currently support converting chars to data types and vice versa
   
@@ -405,11 +442,17 @@ As part of incorporating their Sorer into our codebase, we discovered a bug that
 locally and notified the team so they could fix their codebase.
 
 We succeeded in creating an adapter to use their Sorer with our DataFrame classes; a test 
-demonstrating this can be found in tests/sorerTest.cpp. We use the datafile.sor file for this test, which can be found in the data directory. We recently updated our adapter to set the rows of the dataframe by using a writer;
+demonstrating this can be found in tests/sorerTest.cpp. We use the datafile.sor file for this test, 
+which can be found in the data directory. We recently updated our adapter to set the rows of the dataframe by using a writer;
 the writer finds the element in the file and sets it in the row passed in to visit.
 
-We have implemented serialization for all of the necessary classes and messages, and are able to use the key-value store for data storage and retrieval. We also have a completely working pseudonetwork and actual network, allowing us to distribute our data. However we currently store our blocks on the same node as our dataframe. We would like to come up with some sort of mechanism for effectively distributing data across nodes.
+We have implemented serialization for all of the necessary classes and messages, and are able to use the key-value store for 
+data storage and retrieval. We also have a completely working pseudonetwork and actual network, allowing us to distribute our data.
 
-Our Trivial, Demo, and Wordcount tests work fully on both or pseudo and real networks. For wordcount, we use the test.txt file, which can be found at the top of the repository.
+Our Trivial, Demo, and Wordcount tests work fully on both or pseudo and real networks. For wordcount, we use the test.txt file, 
+which can be found at the top of the repository.
 
-Our Linus program needs to undergo much more testing. Most of our time this week has gone towards fixing the wordcount application from m4. However, now that we updated our sorer, we should be well on our way to testing Linus.
+Our Linus program needs to undergo more testing. The program works for a small test case we created, with only four users and
+four projects. However, we noticed for larger files (1,000,000 line sor files), we get different outputs depending on the number of
+nodes running. For each number of nodes, the output is consistent. Running the full files currently take up a large amount of RAM; if
+possible, we'd like to determine a way to reduce this RAM usage.
