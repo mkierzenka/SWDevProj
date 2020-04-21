@@ -1,7 +1,10 @@
 # EAU2
 Chase Broder
+
 Marcin Kierzenka
+
 CS 4500 - Software Development
+
 Spring 2020
 
 ## Usage:
@@ -58,7 +61,7 @@ These abstractions include distributed arrays and dataframes. A dataframe allows
 to access a set of values distributed across multiple nodes. It supports data storage and retrieval 
 without exposing the details of how and where the individual elements are stored. A dataframe holds a 
 collection of columns. Columns do not own their own data, rather they are distributed arrays. 
-Therefore, columns contain references to their data that exists across the nodes' stores. 
+Therefore, columns contain references to their data that exist across the nodes' stores. 
 
 The last and highest level is the application layer. In the application, the user 
 will be able to specify what they want each node to do. Each node will run its assigned operations
@@ -67,7 +70,8 @@ key-value store system. Distributed arrays can be used to track, organize, and w
 data across the eau2 system.
 
 In the following paragraphs, we will explain diagrams that outline the basic interactions between
-components of our system. There are three PNG diagrams, and can be found within this "report" folder.
+components of our system. There are three attached PNG diagrams that can also be found within this 
+"report" folder.
 
 
 ![](localgetflow.PNG)\
@@ -205,15 +209,17 @@ include operations to store and perform operations on data, such as map. A Schem
 be used to describe the DataFrame's column structure. A DataFrame will be immutable, so 
 it will not support operations such as deleting, setting, and modifying columns and rows. 
 
-  DataFrame's data storage will change. In previous assignments, DataFrames held all of their
-  data in columns and rows. However we now want to make the data storage distributed. Instead 
+  DataFrame's data storage will change. In early assignments, DataFrames held all of their
+  data in columns and rows. However data storage is now distributed. Instead 
   of storing the actual data, Columns will now be distributed. Like before, the DataFrame will 
   have an array of columns. However the Column class will now contain a Distributed Array of keys.
-  Each key will map to a "block" of data that is held in some KVStore in the eau2 system.
+  Each key will map to a "block" of data that is held in a KVStore in the eau2 system.
 
-  The DataFrame will contain a pointer to the KVStore that contains the frame's actual data.
-  Not only does the DataFrame need this object, but also any other objects within
-  the frame that need to store and request data will get a pointer to it.
+  The DataFrame will contain a pointer to the KVStore running on that node. It may contain some of the
+  DataFrame's data, but some blocks can also exist in other KVStores. Therefore, the store is not only important for
+  local retrieval, but for also getting data that exists on other nodes.
+  Not only does the DataFrame need this object, but any other objects within
+  the frame that need to store and request data will also get a pointer to it.
 
   The DataFrame will have methods that support converting data types into frames. An example 
   is fromArray; it will take in an array of a certain type, and it will return the DataFrame 
@@ -231,7 +237,6 @@ it will not support operations such as deleting, setting, and modifying columns 
 
 
   * Methods:
-    * static methods that create a DataFrame from a data type (eg. fromArray, fromScalar, fromVisitor, etc.) and return it
     * void add_array(size_t, *type*): adds array into the DataFrame as a column; one for each type
     * void map(Rower): perform an operation on all data in the DataFrame
     * void local_map(Reader): perform an operation on all local data in the DataFrame (ie. data stored in the KVStore field)
@@ -243,6 +248,9 @@ it will not support operations such as deleting, setting, and modifying columns 
     * size_t nrows(): return number of rows in the df
     * size_t ncols(): returns number of columns in the df
 
+* DataToDf: this class contains all of our static "from" methods that create and serialize DataFrames fromData. These methods
+  include fromFile, fromArray, fromVisitors, and our from scalars (int, String, bool, double). These files were initially in
+  dataframe.h. However, since these methods are stateless, we decided to move them out to reduce the size of the dataframe file.
 
 * Column: A column stores data in the distributed KV Store, instead of locally. A Column will be a DistributedArray where 
   each Key points to a Value containing a fixed sized number of elements that belong to this Column
@@ -465,10 +473,11 @@ the writer finds the element in the file and sets it in the row passed in to vis
 We have implemented serialization for all of the necessary classes and messages, and are able to use the key-value store for 
 data storage and retrieval. We also have a completely working pseudonetwork and actual network, allowing us to distribute our data.
 
-Our Trivial, Demo, and Wordcount tests work fully on both or pseudo and real networks. For wordcount, we use the test.txt file, 
+Our Trivial, Demo, and Wordcount tests work fully on both or pseudo and real networks. For Wordcount, we use the test.txt file, 
 which can be found at the top of the repository.
 
 Our Linus program needs to undergo more testing. The program works for a small test case we created, with only four users and
 four projects. However, we noticed for larger files (1,000,000 line sor files), we get different outputs depending on the number of
-nodes running. For each number of nodes, the output is consistent. Running the full files currently take up a large amount of RAM; if
+nodes running. For each number of nodes, the output is consistent. We believe there is an issue with our local_map implementation, 
+so we'll need to add more tests for that. Running the full files currently take up a large amount of RAM; if
 possible, we'd like to determine a way to reduce this RAM usage.
