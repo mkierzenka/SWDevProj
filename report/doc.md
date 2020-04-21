@@ -471,11 +471,14 @@ which can be found in the data directory. We recently updated our adapter to set
 using a writer (SorWriter);
 the writer finds the element in the file and sets it in the row passed in to visit.
 
-Our Trivial, Demo, and Wordcount tests work fully on both our pseudo and real networks. For Wordcount, we use the 
+We have both a real TCP network layer implementation and a pseudonetwork implementation
+(spawning a thread to represent each "node", passing messages between themselves on shared MessageQueues)
+
+Our Trivial, Demo, and Wordcount applications work fully on both our pseudo and real networks. For Wordcount, we use the 
 test.txt file, which can be found at the top of the repository.
 
 Our Linus program needs to undergo more testing. The program works for a small test case we created, with only four users and
 four projects. However, we noticed for larger files (1,000,000 line sor files), we get different outputs depending on the number of
 nodes running. For each number of nodes, the output is consistent. We believe there is an issue with our local_map implementation, 
-so we'll need to add more tests for that. Running the full files currently take up a large amount of RAM; if
-possible, we'd like to determine a way to reduce this RAM usage.
+so we'll need to add more tests for that (DemoLocalMap highlights the issue). Running Linus with the full files currently takes up a
+large amount of RAM; if possible, we'd like to determine a way to reduce this RAM usage.
