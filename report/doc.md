@@ -1,3 +1,9 @@
+# EAU2
+Chase Broder
+Marcin Kierzenka
+CS 4500 - Software Development
+Spring 2020
+
 ## Usage:
 ### Makefile
 * "make build" - compiles all tests
@@ -118,7 +124,7 @@ we provided descriptions of how they'll be used.
       another node's request, so need to wait until the data is put into the local store
     * addReply(ReplyDataMsg): adds reply data message to the cache, to be forwarded to the application (which is waiting for it)
 
-* Key: These are used to identify a piece of data at a level higher than the local KV store. 
+* Key: Identifies a piece of data at a level higher than the local KV store (ie. eau2 system-wide). 
 Since data can exist in any of the stores, we need multiple attributes specify location
   * Fields:
     * kStr_ (String): maps to a piece of data within a key-value store
@@ -147,43 +153,48 @@ be stored in this pointer.
 
 * Network: A TCP networking layer for the eau2 system (implements INetwork). It's implementations
   of the INetwork methods contain all the code for opening/closing sockets, sending/receiving, etc.
-  It implements the registration and teardown processes outlined below.
+  It implements the registration and teardown processes outlined below. Each node has a socket that it
+  uses to receive messages. For sending it will create a new connection directly to the target node,
+  send the data, then close the connection.
 
   * Registration:
-    * Server starts with IP Address and Port known to all nodes, will accept all incoming connections
+    * Server starts up on an IP Address and Port known to all nodes, will accept all incoming connections
 	* The rest of the nodes each start up and send a RegisterMsg containing their NodeInfo. Then blocking, waiting 
-    for a response from the server
+      for a response from the server
 	* Once all of the nodes (expected number specified on the command line) have registered, the Server node will 
-    send each one a Directory containing the information for how to contact every node.
+      send each one a Directory containing the information for how to contact every node.
 
   * Teardown:
     * Once a non-server node completes their application tasks, it will send the server a DoneMsg and wait to receive 
       a response
 	* The server node tracks which nodes have finished. Once all nodes in the system are finished, the server sends everyone 
-    a TeardownMsg and shuts down.
+      a TeardownMsg and shuts down.
 	* Each client shuts down when it receives a TeardownMsg
 
+* NodeInfo: A class to wrap a struct sockaddr_in allowing easy storage/retrieval in our Map, Array, Messages, etc.
 
-* Messages: messages are what nodes use to communicate each other. Data can be placed inside messages. Messages are serialized 
-  by the sending node, then sent, then deserialized and read by the receiving node. Each message type has a different purposes. 
+* Messages: Messages are what nodes use to communicate each other. Data can be placed inside messages. They are serialized 
+  by the sending node, then sent, then deserialized and read by the receiving node. There is an enum (MsgKind) that outlines
+  the types of messages used in the eau2 system. Each message type corresponds to a message subclass with a distinct purpose.
   The following outlines the current message types sent between nodes in our program:
-  * Get: this is a request for data. It is not blocking, so it will return a nullptr if the data doesn't exist in the requested 
-    node's store
-  * WaitAndGet: this is a request for data and is sent to a specific node that holds this data. This message is blocking; a response 
-    won't be delivered to the sender until the data exists in the requested node's store
-  * ReplyData: this is a response to a data request. The node who received this message will send serialized data back to the 
-    node that requested it
-  * PutMsg: this message puts data, both a key and a value, in another node's store
-  * RegisterMsg: allows a client to register with a main, or server, node that keeps track of connections
-  * DirectoryMsg: broadcasts a list of connections to each clients; necessary for clients to be able to send messages 
+  * GetData: this signifies a sending node's request for data from the destination node. If the target node does not have the
+    data when it receives this message, it should respond with nullptr
+  * WaitAndGet: like a GetData message, except it expects the response to contain the value. If the target node does not have the
+    data when it receives his message, it should cache it and respond once it adds the data to its store. The sending node's application
+	will pause execution until the data comes back (ReplyData, non-nullptr Value)
+  * ReplyData: this is a response to a data request (either GetData or WaitAndGet). The node who received the request message will
+    use this message to respond with the serialized data (or nullptr in some cases)
+  * Put: this message puts data, both a key and a value, in another node's store
+  * Register: allows a client to register with a main, or server, node that keeps track of connections
+  * Directory: broadcasts a list of connections to each client; necessary for clients to be able to send messages 
     between each other
-  * DoneMsg: a node sends this message to the server when it's done executing its task. It means it is ready to begin the teardown 
+  * Done: a node sends this message to the server when it's done executing its task. It means it is ready to begin the teardown 
     process, once the other nodes complete
-  * TeardownMsg: broadcasted from the server to all connected nodes. Means that the program is terminating, so all nodes should 
+  * Teardown: broadcasted from the server to all connected nodes. Means that the program is terminating, so all nodes should 
     close their connections/sockets and delete their objects
 
 
-* DataFrame: The DataFrame API will be similar to that on previous assignments. It will 
+* DataFrame: The DataFrame API will be similar to that of previous assignments. It will 
 include operations to store and perform operations on data, such as map. A Schema will 
 be used to describe the DataFrame's column structure. A DataFrame will be immutable, so 
 it will not support operations such as deleting, setting, and modifying columns and rows. 
@@ -191,39 +202,38 @@ it will not support operations such as deleting, setting, and modifying columns 
   DataFrame's data storage will change. In previous assignments, DataFrames held all of their
   data in columns and rows. However we now want to make the data storage distributed. Instead 
   of storing the actual data, Columns will now be distributed. Like before, the DataFrame will 
-  have an array of columns. However the Column class will change, as it will now contain a 
-  Distributed Array of keys. Each key will map to a "block" of data that is held in the store. 
-  With this change, now that Columns no longer store their own data, we will be able to eliminate 
-  the duplicate Column classes for each type. Instead, we can just have a field in Column that 
-  describes the type.
+  have an array of columns. However the Column class will now contain a Distributed Array of keys.
+  Each key will map to a "block" of data that is held in some KVStore in the eau2 system.
 
-  The DataFrame will hold a KVStore object that contains the frame's actual data.
+  The DataFrame will contain a pointer to the KVStore that contains the frame's actual data.
   Not only does the DataFrame need this object, but also any other objects within
-  the frame that need to store and request data
+  the frame that need to store and request data will get a pointer to it.
 
   The DataFrame will have methods that support converting data types into frames. An example 
   is fromArray; it will take in an array of a certain type, and it will return the DataFrame 
   version (add the values in one new column). It will break up the array into chunks; each chunk 
   will be assigned a key to be stored in the distributed KV system. The key will then be added to 
   the column's distributed array. Once the input array is completely broken up and stored, the 
-  DataFrame will be serialized and stored under its key in the distributed system.
+  DataFrame will be serialized and stored under its own key in the distributed system.
 
   * Fields:
     * columns_ (ColumnArray): holds column information
     * store_ (KVStore): dataframe passes store to classes that need it for data lookup; static initialization 
     * schema_ (Schema): keeps track of the DataFrame's column structure
     * key_ (Key): key for this dataframe in the store; will be used to create the keys for the
-frame's columns' chunks
+    frame's columns' chunks
 
 
-  * Methods (new ones we anticipate):
-    * all the methods that create a DataFrame from a data type (ex. fromArray, fromScalar, fromVisitor, etc.) and return it
+  * Methods:
+    * static methods that create a DataFrame from a data type (eg. fromArray, fromScalar, fromVisitor, etc.) and return it
     * void add_array(size_t, *type*): adds array into the DataFrame as a column; one for each type
     * void map(Rower): perform an operation on all data in the DataFrame
+    * void local_map(Reader): perform an operation on all local data in the DataFrame (ie. data stored in the KVStore field)
     * Schema& get_schema(): return schema of DataFrame
     * void add_column(Column): add column to DataFrame
-    * get: get and return certain value from DataFrame's columns; one for each type
+    * get: get and return certain value from DataFrame's columns; one for each type. These block on network lookups
     * void add_row (Row): add a row to the DataFrame (currently not fully implemented)
+	* void visit(Writer): get new rows from a Writer that are sequentially added to this df
     * size_t nrows(): return number of rows in the df
     * size_t ncols(): returns number of columns in the df
 
@@ -240,7 +250,6 @@ frame's columns' chunks
 
   * Methods:
     * most methods from before, for getting data from the column. not 'set' methods (or anything else that modifies the column). 
-      Might include the push_back methods
     * void add_all(size_t, *type*): one for each data type; adds all given elements of that datatype to the column; breaks data 
       up into chunks, creates keys for those chunks, and adds them to the KVStore
       * The chunks are inserted into the KVStore in a distributed fashion. Therefore, not every chunk is inserted into the same
@@ -253,18 +262,18 @@ frame's columns' chunks
     * get: get element from column; one method for each type
 
 
-* Serializer: This class will be similar to the one started in Assignment 6. It supports writing 
-primitive types, character pointers (strings), and message types to its buffer, and can also read
-these when deserializing. It will be 
+* Serializer: This class supports writing primitive types, character pointers (strings),
+and message types to its buffer, and can also read these when deserializing. It will be 
 in charge of serializing and deserializing data, and buffering the result. The Serializer 
-will be used in multiple places in this project. All of DataFrame's from... methods need to 
-initialize a Serializer to serialize the constructed dataframe, to store in the 
-key-value store. The wait and waitAndGet methods within Store need to initialize a 
-Serializer; the serializer will need to convert the serialized string data into the dataframe 
-that it represents. Serialization is also needed whenever attempting to retrieve
-data from the DataFrame, as all the data is serialized in the KVStore
+will be used in multiple places in this project. Serializers are used in the static
+DataFrame fromX methods to store the new df in the distributed key-value store.
+They are also used in the KVStore:get and KVStore::waitAndGet methods to build a DataFrame
+from the serialized KVStore data. Also, in the sendMsg/receiveMsg Network methods to
+move data (as a series of bytes) across a TCP connection. Finally, Serialization is
+also needed whenever attempting to retrieve data from the DataFrame, as all the data
+is serialized in the distributed KVStore system.
 
-* DistributedArray: this class will hold reference information about data throughout the 
+* DistributedArray: This class will hold reference information about data throughout the 
 system. The purpose of this class is to bridge data that lives in different areas of the 
 system. This class also holds a KVStore reference, so that it can look up data not
 stored locally.
@@ -272,7 +281,7 @@ stored locally.
   * Fields:
     * store_ (KVStore): to get data from the distributed system
     * keyList_ (KeyArr): this array will hold all Key values of interest
-    * cache_ (Cache): this object will hold the data for some of the Keys within 
+    * cache_ (Cache): this object will hold the data (Values) for some of the Keys within 
 this distributed array. Before sending a data request to a key-value store, we will 
 first check to see if the data exists in the cache.
 
@@ -336,7 +345,7 @@ set of data. An application will run on each node. To specify operations, Applic
       from the KVStore, and others are doing both. Program tests that the KVStore can be read from and written to concurrently 
       by using messaging in a network layer.
     * Wordcount: tests the functionality of fromVisitor, which allows the user to pass in a writer and generate a dataframe by 
-      visiting that writer. This program tests a Summer writer, which takes in an SIMAP of words that appear in a file to the 
+      visiting that writer. This program tests a Summer writer, which takes in an SIMap of words that appear in a file to the 
       number of occurrences in that file.
     * Linus: calculates the degrees of Linus. Uses the sorer to read in large .sor files describing the users, projects, and commits to
       those projects
@@ -347,6 +356,7 @@ set of data. An application will run on each node. To specify operations, Applic
   * String: represents implementation of a string. Provided to us
   * Array: represents implementation of an array. Used for storing a collection of objects
   * Map: represents implementation of a map. Used for when we want an item to map to a specific value
+    * Various implementations depending on needs - SIMap (String-Num), MapStrObj (String-Object)
   * Queue: represents implementation of a queue. Used when we want to store and retrieve data on a first-in, first-out basis
   * Thread: represents a thread of execution. Allows program to split into multiple, "simultaneous" tasks
   * Args: class for handling command line inputs. Sets the field based on what is provided on the command line. Use of "extern" 
