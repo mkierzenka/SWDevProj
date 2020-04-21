@@ -35,5 +35,3 @@ It sends the responses if available
 
 * See if there are other places where Blocks can be cleared instead of repeatedly
 	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
-
-* Check command line arguments for valid input
