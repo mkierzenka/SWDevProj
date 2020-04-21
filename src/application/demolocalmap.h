@@ -3,6 +3,7 @@
 
 #include "application.h"
 #include "../dataframe/dataframe.h"
+#include "../dataframe/datatodf.h"
 #include "../store/key.h"
 #include "../network/inetwork.h"
 #include "../dataframe/row/mysummer.h"
@@ -45,7 +46,7 @@ public:
     int expectedSum = 0;
     int* vals = new int[SZ];
     for (size_t i = 0; i < SZ; ++i) expectedSum += vals[i] = i;
-    DataFrame* dfa = DataFrame::fromArray(main, kv_, SZ, vals);
+    DataFrame* dfa = DataToDf::fromArray(main, kv_, SZ, vals);
     delete[] vals;
     MySummer s;
     dfa->local_map(s);
@@ -78,8 +79,8 @@ public:
     MySummer s;
     df->local_map(s);
     int mySum = s.getSum();
-    if (idx_ == 1) delete DataFrame::fromInt(sumN1, kv_, mySum);
-    else if (idx_ == 2) delete DataFrame::fromInt(sumN2, kv_, mySum);
+    if (idx_ == 1) delete DataToDf::fromInt(sumN1, kv_, mySum);
+    else if (idx_ == 2) delete DataToDf::fromInt(sumN2, kv_, mySum);
     p("Node ").p(idx_).p(" local sum = ").pln(mySum);
     delete df;
   }
