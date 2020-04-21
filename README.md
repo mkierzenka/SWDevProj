@@ -32,6 +32,3 @@ It sends the responses if available
 * Real Network sends a Message as the serialized msg type prepended to the serialized message.
   
 ### Notes for things to improve from before:
-
-* See if there are other places where Blocks can be cleared instead of repeatedly
-	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
