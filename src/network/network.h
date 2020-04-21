@@ -76,7 +76,6 @@ public:
             if (i == args.serverIndex)
                 continue;
             DirectoryMsg *dMsg = new DirectoryMsg(dir_, args.index, i);
-            fprintf(stderr, "Server sending Directory Message to Node %d\n", i);
             sendMsg(dMsg);
         }
     }
@@ -214,7 +213,6 @@ public:
     {
         int val = bind(fd, (struct sockaddr *)&myAddr, (socklen_t)myAddrLen);
         crashIfError_("bind error", val == 0);
-        fprintf(stderr, "Node %zu binded to socket(%d)\n", args.index, fd);
     }
 
     /** Constructs a new sockaddr_in from given ip and port */

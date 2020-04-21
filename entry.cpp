@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
         node->start();
 		// Node runs the application. Waits for server to send Teardown msg
         node->join();
-        printf("Thread %zu ended\n", args.index);
+        printf("Node %zu Shutdown\n", args.index);
         delete node;
         delete a;
     }
