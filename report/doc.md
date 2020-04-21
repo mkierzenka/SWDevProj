@@ -467,14 +467,12 @@ locally and notified the team so they could fix their codebase.
 
 We succeeded in creating an adapter to use their Sorer with our DataFrame classes; a test 
 demonstrating this can be found in tests/sorerTest.cpp. We use the datafile.sor file for this test, 
-which can be found in the data directory. We recently updated our adapter to set the rows of the dataframe by using a writer;
+which can be found in the data directory. We recently updated our adapter to set the rows of the dataframe by 
+using a writer (SorWriter);
 the writer finds the element in the file and sets it in the row passed in to visit.
 
-We have implemented serialization for all of the necessary classes and messages, and are able to use the key-value store for 
-data storage and retrieval. We also have a completely working pseudonetwork and actual network, allowing us to distribute our data.
-
-Our Trivial, Demo, and Wordcount tests work fully on both or pseudo and real networks. For Wordcount, we use the test.txt file, 
-which can be found at the top of the repository.
+Our Trivial, Demo, and Wordcount tests work fully on both our pseudo and real networks. For Wordcount, we use the 
+test.txt file, which can be found at the top of the repository.
 
 Our Linus program needs to undergo more testing. The program works for a small test case we created, with only four users and
 four projects. However, we noticed for larger files (1,000,000 line sor files), we get different outputs depending on the number of
