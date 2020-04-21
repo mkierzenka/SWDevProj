@@ -18,11 +18,11 @@
 class ColumnArray : public Object
 {
 public:
-	KVStore *store_;  //external
-	Array *colList_;  //owned, the columns in this ColumnArray
-	Key *dfKey_;      //external, key of dataframe this column array belongs to
+	KVStore *store_; //external
+	Array *colList_; //owned, the columns in this ColumnArray
+	Key *dfKey_;	 //external, key of dataframe this column array belongs to
 
-    /**
+	/**
      * Constructs a new ColumnArray from external arguments (not cloned).
      * Do not delete store and k until done with this ColumnArray.
      */
@@ -192,7 +192,7 @@ public:
 		{
 			fprintf(stderr, "Cannot get bool from null column\n");
 		}
-		
+
 		return c->get_bool(row, col);
 	}
 
@@ -203,7 +203,7 @@ public:
 		{
 			fprintf(stderr, "Cannot get double from null column\n");
 		}
-		
+
 		return c->get_double(row, col);
 	}
 
@@ -218,30 +218,4 @@ public:
 
 		return c->get_string(row, col);
 	}
-
-	/** Type appropriate push_back methods. Appends the element to the end of the
-	  * specified column. Calling the wrong method is undefined behavior. **/
-/*	void push_back(size_t col, int val)
-	{
-		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		return c->push_back(val);
-	}
-
-	void push_back(size_t col, bool val)
-	{
-		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		return c->push_back(val);
-	}
-
-	void push_back(size_t col, double val)
-	{
-		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		return c->push_back(val);
-	}
-
-	void push_back(size_t col, String *val)
-	{
-		Column *c = dynamic_cast<Column *>(colList_->get(col));
-		return c->push_back(val);
-	}*/
 };

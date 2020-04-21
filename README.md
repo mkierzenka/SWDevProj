@@ -17,8 +17,6 @@
 * Tests with memory leaks/unchecked
   * Wordcount (1 leak - 10 bytes)
 
-
-
 ### ReceiverThread Info
 Receives WaitAndGet message it can't currently respond to -> add to KVStore's msgsCache_ (map).
 When new data is added to a KVStore (RT calls kv_->put()), KVStore adds it locally, 
@@ -32,14 +30,3 @@ It sends the responses if available
 * Real Network sends a Message as the serialized msg type prepended to the serialized message.
   
 ### Notes for things to improve from before:
-
-* See if there are other places where Blocks can be cleared instead of repeatedly
-	created and deleted. (like deserializing for get methods, etc.) Saves memory usage
-
-* Sorer code- make the arrays use our array instead of re-implementing functionality (Field object)
-
-* Move sorer into sorwriter
-
-* Check command line arguments for valid input
-
-* Move from methods from dataframe.h to own file

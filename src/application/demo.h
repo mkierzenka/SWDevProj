@@ -3,6 +3,7 @@
 
 #include "application.h"
 #include "../dataframe/dataframe.h"
+#include "../dataframe/datatodf.h"
 #include "../store/key.h"
 #include "../network/inetwork.h"
 
@@ -44,8 +45,8 @@ public:
     double* vals = new double[SZ];
     double sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
-    DataFrame* dfa = DataFrame::fromArray(main, kv_, SZ, vals);
-    DataFrame* dfs = DataFrame::fromDouble(check, kv_, sum);
+    DataFrame* dfa = DataToDf::fromArray(main, kv_, SZ, vals);
+    DataFrame* dfs = DataToDf::fromDouble(check, kv_, sum);
 
     delete dfa;
     delete dfs;
@@ -59,7 +60,7 @@ public:
     double sum = 0;
     for (size_t i = 0; i < 100*1000; ++i) sum += v->get_double(0,i);
     p("The sum is  ").pln(sum);
-    delete DataFrame::fromDouble(verify, kv_, sum);
+    delete DataToDf::fromDouble(verify, kv_, sum);
     delete v;
     pln("Counter Finished");
   }

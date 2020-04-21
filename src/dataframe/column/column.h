@@ -97,48 +97,6 @@ public:
         baseKey_->deserialize(s);
     }
 
-    /** Type appropriate push_back methods. Calling the wrong method is
-    * undefined behavior. **/
-    /*void push_back(int val)
-    {
-        assert(false);
-        if (type_ != DataType::Integer)
-        {
-            fprintf(stderr, "Cannot add integer to column of type %c", DataTypeUtils::charToType(type_));
-            exit(1);
-        }
-    }
-
-    void push_back(bool val)
-    {
-        assert(false);
-        if (type_ != DataType::Boolean)
-        {
-            fprintf(stderr, "Cannot add boolean to column of type %c", DataTypeUtils::charToType(type_));
-            exit(1);
-        }
-    }
-
-    void push_back(double val)
-    {
-        assert(false);
-        if (type_ != DataType::Double)
-        {
-            fprintf(stderr, "Cannot add double to column of type %c", DataTypeUtils::charToType(type_));
-            exit(1);
-        }
-    }
-
-    void push_back(String *val)
-    {
-        assert(false);
-        if (type_ != DataType::Str)
-        {
-            fprintf(stderr, "Cannot add String to column of type %c", DataTypeUtils::charToType(type_));
-            exit(1);
-        }
-    }*/
-
     /** Append an entire list of integers to this column */
     void add_all(size_t len, int *vals, size_t colIdx)
     {

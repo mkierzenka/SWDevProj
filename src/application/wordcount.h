@@ -37,7 +37,7 @@ public:
     if (idx_ == 0)
     {
       FileReader fr;
-      delete DataFrame::fromVisitor(&in, kv_, "S", &fr);
+      delete DataToDf::fromVisitor(&in, kv_, "S", &fr);
     }
     local_count();
     reduce();
@@ -63,7 +63,7 @@ public:
     delete words;
     Summer cnt(map);
     Key* localKey = mk_key(idx_);
-    delete DataFrame::fromVisitor(localKey, kv_, "SI", &cnt);
+    delete DataToDf::fromVisitor(localKey, kv_, "SI", &cnt);
     delete localKey;
   }
 

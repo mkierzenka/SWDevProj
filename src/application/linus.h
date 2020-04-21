@@ -2,6 +2,7 @@
 
 #include "application.h"
 #include "../dataframe/dataframe.h"
+#include "../dataframe/datatodf.h"
 #include "../network/inetwork.h"
 #include "../linus/set.h"
 #include "../linus/setwriter.h"
@@ -21,8 +22,8 @@
 class Linus : public Application
 {
 public:
-    int DEGREES = 4;  // How many degrees of separation form linus?
-    int LINUS = 3; // The uid of Linus (offset in the user df)
+    int DEGREES = 4; // How many degrees of separation form linus?
+    int LINUS = 3;   // The uid of Linus (offset in the user df)
     // const char *PROJ = "data/projects.ltgt";
     // const char *USER = "data/users.ltgt";
     // const char *COMM = "data/commits.ltgt";
@@ -68,15 +69,15 @@ public:
         if (idx_ == 0)
         {
             pln("Reading...");
-            projects = DataFrame::fromFile(PROJ, &pK, kv_);
+            projects = DataToDf::fromFile(PROJ, &pK, kv_);
             p("    ").p(projects->nrows()).pln(" projects");
-            users = DataFrame::fromFile(USER, &uK, kv_);
+            users = DataToDf::fromFile(USER, &uK, kv_);
             p("    ").p(users->nrows()).pln(" users");
-            commits = DataFrame::fromFile(COMM, &cK, kv_);
+            commits = DataToDf::fromFile(COMM, &cK, kv_);
             p("    ").p(commits->nrows()).pln(" commits");
             // This dataframe contains the id of Linus.
-            Key* intKey = new Key("users-0-0", 0);
-            delete DataFrame::fromInt(intKey, kv_, LINUS);
+            Key *intKey = new Key("users-0-0", 0);
+            delete DataToDf::fromInt(intKey, kv_, LINUS);
             delete intKey;
         }
         else
@@ -95,10 +96,8 @@ public:
     void step(int stage)
     {
         p("Stage ").pln(stage);
-		//printf("###A");
-		//uSet->print();
         // Key of the shape: users-stage-0
-        String* keyStr = StrBuff("users-").c(stage).c("-0").get();
+        String *keyStr = StrBuff("users-").c(stage).c("-0").get();
         Key uK(keyStr, 0);
         delete keyStr;
         // A df with all the users added on the previous round
@@ -117,16 +116,10 @@ public:
         merge(utagger.newUsers, "users-", stage + 1);
         uSet->union_(utagger.newUsers);
         p("    after stage ").p(stage).pln(":");
-        // p("        tagged projects: ").pln(pSet->size());
-        // p("        tagged users: ").pln(uSet->size());
-        //p("        tagged projects: ").pln(pSet->setSize());
-        //p("        tagged users: ").pln(uSet->setSize());
         p("        Number of users with degree ").p(stage).p(" of Linus: ").pln(utagger.newUsers.setSize());
         p("        Number of users with degree <= ").p(stage).p(" of Linus: ").pln(uSet->setSize());
         p("        Number of projects with degree ").p(stage).p(" of Linus: ").pln(ptagger.newProjects.setSize());
         p("        Number of projects with degree <= ").p(stage).p(" of Linus: ").pln(pSet->setSize());
-		//printf("###B");
-		//uSet->print();
     }
 
     /** Gather updates to the given set from all the nodes in the systems.
@@ -150,17 +143,17 @@ public:
             }
             p("    storing ").p(set.setSize()).pln(" merged elements");
             SetWriter writer(set);
-            String* keyStr = StrBuff(name).c(stage).c("-0").get();
+            String *keyStr = StrBuff(name).c(stage).c("-0").get();
             Key k(keyStr, 0);
             delete keyStr;
-            delete DataFrame::fromVisitor(&k, kv_, "I", &writer);
+            delete DataToDf::fromVisitor(&k, kv_, "I", &writer);
         }
         else
         {
-            p("    sending ").p(set.size()).pln(" elements to master node");
+            p("    sending ").p(set.setSize()).pln(" elements to master node");
             SetWriter writer(set);
             Key k(StrBuff(name).c(stage).c("-").c(idx_).get(), 0);
-            delete DataFrame::fromVisitor(&k, kv_, "I", &writer);
+            delete DataToDf::fromVisitor(&k, kv_, "I", &writer);
             Key mK(StrBuff(name).c(stage).c("-0").get(), 0);
             DataFrame *merged = dynamic_cast<DataFrame *>(kv_->waitAndGet(&mK));
             p("    receiving ").p(merged->nrows()).pln(" merged elements");

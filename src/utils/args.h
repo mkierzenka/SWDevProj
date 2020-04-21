@@ -97,20 +97,6 @@ public:
         }
     }
 
-    /** Print the arguments. For testing/debugging purposes */
-    void print()
-    {
-        printf("App name: %s\n", appName);
-        printf("Num nodes: %zu\n", numNodes);
-        printf("Node index: %zu\n", index);
-        printf("IP: %s\n", ip);
-        printf("Port: %zu\n", port);
-        printf("Server IP: %s\n", serverIp);
-        printf("Server port: %zu\n", serverPort);
-        printf("Server index: %zu\n", serverIndex);
-        printf("Use pseudo network: %d\n", usePseudoNet);
-    }
-
     /** Try to get a numerical value from a string. Error if invalid */
     size_t tryParseSizeT_(char *arg)
     {

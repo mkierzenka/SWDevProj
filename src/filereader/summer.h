@@ -25,7 +25,6 @@ public:
           ++i;
           j = 0;
           while( i < map_.capacity_ && !map_.buckets_[i] )  i++;
-          //if (k()) ++seen;
       }
   }
  

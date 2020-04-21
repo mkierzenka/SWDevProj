@@ -2,6 +2,7 @@
 
 #include "../src/network/message.h"
 #include "../src/dataframe/dataframe.h"
+#include "../src/dataframe/datatodf.h"
 #include "../src/store/kvstore.h"
 #include "../src/store/key.h"
 #include "../src/store/value.h"
@@ -26,7 +27,7 @@ void replyDataMsgTest()
     double* vals = new double[SZ];
     double sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
-    DataFrame* dfa = DataFrame::fromArray(k, kv_, SZ, vals);
+    DataFrame* dfa = DataToDf::fromArray(k, kv_, SZ, vals);
 
     //get value of key
     Value* v = kv_->getValue(k, false);
