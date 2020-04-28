@@ -310,7 +310,7 @@ public:
       else
       {
         // skip this block
-        rowIdx += args.blockSize;
+        rowIdx += (args.blockSize - 1); //forloop will increment rowIdx an extra time before continuing
       }
     }
 
