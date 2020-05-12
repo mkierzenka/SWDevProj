@@ -57,7 +57,7 @@ public:
         delete mySer_;
         delete dir_;
         delete[] isNodeDone_;
-        close(fd);
+        closeSock_(fd);
     }
 
     void server_init() override
@@ -108,7 +108,7 @@ public:
         crashIfError_("send error", sendVal >= 0);
         mySer_->clear();
         lock_.unlock();
-        close(targetFd);
+        closeSock_(targetFd);
         delete msg;
     }
 
@@ -118,7 +118,7 @@ public:
     {
         int tmpFd = acceptConnection_();
         String *buffStr = readStrFromNet_(tmpFd); //Complete set of bytes received on net
-        close(tmpFd);
+        closeSock_(tmpFd);
         lock_.lock();
         mySer_->write(buffStr->size(), buffStr->c_str());
         Message *tmp = nullptr;
@@ -299,5 +299,10 @@ public:
             return;
         perror(msg);
         assert(false);
+    }
+
+    void closeSock_(int socket) {
+        int rv = close(socket);
+        crashIfError_("close error", rv == 0);
     }
 };
