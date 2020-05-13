@@ -61,6 +61,7 @@ public:
             return;
         }
 
+        fprintf(stderr, "Adding key (%s, %zu) to store\n", k->getKeyStr()->c_str(), k->getNode());
         Object *putRes = kvMap_->put(k->getKeyStr()->clone(), data->clone());
         if (putRes)
             delete putRes;
