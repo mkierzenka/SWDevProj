@@ -23,13 +23,10 @@ class Linus : public Application
 {
 public:
     int DEGREES = 4; // How many degrees of separation form linus?
-    int LINUS = 3;   // The uid of Linus (offset in the user df)
-    // const char *PROJ = "data/projects.ltgt";
-    // const char *USER = "data/users.ltgt";
-    // const char *COMM = "data/commits.ltgt";
-    const char *PROJ = "data/our_projects.ltgt";
-    const char *USER = "data/our_users.ltgt";
-    const char *COMM = "data/our_commits.ltgt";
+    int LINUS = 4967;   // The uid of Linus (offset in the user df)
+    const char *PROJ = "data/projects_subset3.ltgt";
+    const char *USER = "data/users.ltgt";
+    const char *COMM = "data/commits_subset3.ltgt";
     DataFrame *projects; //  pid x project name
     DataFrame *users;    // uid x user name
     DataFrame *commits;  // pid x uid x uid
