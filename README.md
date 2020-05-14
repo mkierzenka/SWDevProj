@@ -1,6 +1,36 @@
 # SWDevProj
 
+This repo is forked from the one Chase and I worked on together.
+The intent is to rework it to offer the same functionality by take fuller advantage of new C++.
 
+
+### Notes for things to improve:
+	strbuff.get()
+	used to steal ownership, now I think it copies b/c steal string constructor doesn't really steal.
+	consider fixing that
+	also, look at strbuff.steal()
+	the places I use inner_.clear() and innerBuffer_.clear() maybe should be redesigned. test with wordcout (affects keybuf)
+	in general, maybe take another look at the design/uses for these buffer things
+--
+	diffs worth transferring to new
+	b/src/application/thread/nodethread.h
+	@@ -45,7 +45,14 @@ class NodeThread : public Thread
+			 // Let server know that we're done executing
+			 net_->sendMsg(new DoneMsg(app_->this_node(), args.serverIndex));
+	+        if (app_->this_node() != args.serverIndex) {
+	+            fprintf(stderr, "Node %zu reporting done\n", app_->this_node());
+	+            net_->sendMsg(new DoneMsg(app_->this_node(), args.serverIndex));
+	+        } else {
+	+            net_->handleDoneMsg(new DoneMsg(app_->this_node(), args.serverIndex));
+	+        }
+			 rt->join();
+			 delete rt;
+	+        fprintf(stderr, "Nodethread %zu completed\n", app_->this_node());
+		 }
+--
+
+
+possibly invalid since changes in this proj
 ### Memory/Ownership Notes
 * Array, Map, Queue all steal ownership of what's passed into them
 * Test files without memory leaks:
@@ -29,4 +59,5 @@ It sends the responses if available
 * Key stored for each block (DF is DataFrame's key): Key('DF-colIdx-blockIdx', blockIdx % numNodes)
 * Real Network sends a Message as the serialized msg type prepended to the serialized message.
   
-### Notes for things to improve from before:
+
+
