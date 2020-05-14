@@ -72,7 +72,7 @@ public:
     /**
      * Returns a pointer to the char* of this key
      */
-    char* c_str() override {
+    const char* c_str() override {
         return kStr_->c_str();
     }
 

@@ -30,5 +30,5 @@ public:
     virtual size_t hash_me() { return 1; };
 
     /** Returned c_str is owned by the object, don't modify nor delete. */
-    virtual char* c_str() { return nullptr; }
+    virtual const char* c_str() { return nullptr; }
 }; 
