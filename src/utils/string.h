@@ -1,10 +1,10 @@
 #pragma once
-// LANGUAGE: CwC
-#include <cstring>
 #include <string>
 #include <cassert>
 #include "object.h"
 #include "../serial/serial.h"
+
+using namespace std;
 
 /** An immutable string class that wraps a character array.
  * The character array is zero terminated. The size() of the
@@ -15,61 +15,54 @@
  *  modified by broder.c@husky.neu.edu */
 class String : public Object {
 public:
-    size_t size_; // number of characters excluding terminate (\0)
-    char *cstr_;  // owned; char array
+    string inner_;
 
     /** Build a string from a string constant */
-    String(char const* cstr, size_t len) {
-       size_ = len;
-       cstr_ = new char[size_ + 1];
-       memcpy(cstr_, cstr, size_ + 1);
-       cstr_[size_] = 0; // terminate
-    }
+    String(char const* cstr, size_t len) : inner_(cstr, len) {}
+
     /** Builds a string from a char*, steal must be true, we do not copy!
      *  cstr must be allocated for len+1 and must be zero terminated. */
-    String(bool steal, char* cstr, size_t len) {
-        assert(steal && cstr[len]==0);
-        size_ = len;
-        cstr_ = cstr;
-    }
+    String(bool steal, char* cstr, size_t len) : inner_(cstr, len) {}
 
     String(char const* cstr) : String(cstr, strlen(cstr)) {}
 
     /** Build a string from another String */
-    String(String & from):
+    String(const String& from):
         Object(from) {
-        size_ = from.size_;
-        cstr_ = new char[size_ + 1]; // ensure that we copy the terminator
-        memcpy(cstr_, from.cstr_, size_ + 1);
+        inner_.assign(from.inner_);
+        inner_.shrink_to_fit();
     }
 
     /** Delete the string */
-    ~String() { delete[] cstr_; }
+    ~String() {}
     
     /** Return the number characters in the string (does not count the terminator) */
-    size_t size() { return size_; }
+    size_t size() { return inner_.size(); }
     
     /** Return the raw char*. The result should not be modified or freed. */
-    char* c_str() {  return cstr_; }
+    const char* c_str() {
+        return inner_.c_str();
+    }
 
     void serialize(Serializer* s) {
-        s->write(size_);
-        s->write(cstr_);
+        s->write(size());
+        s->write(c_str());
     }
 
     /** Deserialize as a String into this String*/
     void deserialize(Serializer* s) {
-        if (cstr_ != nullptr) {
-            delete[] cstr_;
-        }
-        size_ = s->readSizeT();
-        cstr_ = s->readString();
+        inner_.clear();
+        size_t size = s->readSizeT();
+        char* cstr = s->readString();
+        inner_.assign(cstr, size);
+        inner_.shrink_to_fit();
+        delete[] cstr;
     }
     
     /** Returns the character at index */
     char at(size_t index) {
-        assert(index < size_);
-        return cstr_[index];
+        assert(index < size());
+        return inner_[index];
     }
     
     /** Compare two strings. */
@@ -77,26 +70,27 @@ public:
         if (other == this) return true;
         String* x = dynamic_cast<String *>(other);
         if (x == nullptr) return false;
-        if (size_ != x->size_) return false;
-        return strncmp(cstr_, x->cstr_, size_) == 0;
+        return inner_.compare(x->inner_) == 0;
     }
     
     /** Deep copy of this string */
-    String * clone() { return new String(*this); }
+    String* clone() { return new String(*this); }
 
     /** This consumes cstr_, the String must be deleted next */
-    char * steal() {
-        char *res = cstr_;
-        cstr_ = nullptr;
-        return res;
+    char* steal() {
+        size_t lenInner = size();
+        char* out = new char[lenInner + 1];
+        size_t len = inner_.copy(out, lenInner);
+        assert(len == lenInner);
+        out[len] = '\0';
+        inner_.clear();
+        return out;
     }
 
     /** Compute a hash for this string. */
     size_t hash_me() {
-        size_t hash = 0;
-        for (size_t i = 0; i < size_; ++i)
-            hash = cstr_[i] + (hash << 6) + (hash << 16) - hash;
-        return hash;
+        std::hash<std::string> str_hash;
+        return str_hash(inner_);
     }
  };
 
@@ -104,70 +98,48 @@ public:
  *  author: jv */
 class StrBuff : public Object {
 public:
-    char *val_; // owned
-    size_t capacity_;
-    size_t size_;
+    string innerBuf_;
 
-    StrBuff() {
-        val_ = new char[capacity_ = 10];
-        size_ = 0;
+    StrBuff() {}
+
+    StrBuff(const char* s)
+    {
+        innerBuf_.assign(s);
     }
 
-    StrBuff(const char* s) {
-        val_ = new char[capacity_ = strlen(s) + 1];
-        size_ = 0;
-        c(s);
+    StrBuff(String* s)
+    {
+        innerBuf_.assign(s->c_str(), s->size());
     }
 
-    StrBuff(String* s) {
-        val_ = new char[capacity_ = s->size() + 1];
-        size_ = 0;
-        c(*s);
-    }
-
-    /** Grow size of string buffer. This method appears to be leaky */
-    void grow_by_(size_t step) {
-        if (step + size_ < capacity_) return;
-        capacity_ *= 2;
-        if (step + size_ >= capacity_) capacity_ += step;        
-        char* oldV = val_;
-        //making new char array is leaky
-        val_ = new char[capacity_];
-        memcpy(val_, oldV, size_);
-        delete[] oldV;
-    }
-    StrBuff& c(const char* str) {
+    StrBuff& c(const char* str)
+    {
         return c(str, strlen(str));
     }
 
-    /** Write character pointer to buffer
-     * but specify how many bytes */
+    /** Write character pointer to buffer, but specify how many bytes */
     StrBuff& c(const char* str, size_t step)
     {
-        grow_by_(step);
-        memcpy(val_+size_, str, step);
-        size_ += step;
+        innerBuf_.append(str, step);
         return *this;
-
     }
 
     StrBuff& c(String &s) { return c(s.c_str());  }
-    StrBuff& c(size_t v) { return c(std::to_string(v).c_str());  } // Cpp
+    StrBuff& c(size_t v) { return c(std::to_string(v).c_str());  }
 
     /** Return this string. Caller responsible for deleting this result */
-    String* get() {
-        assert(val_ != nullptr); // can be called only once
-        grow_by_(1);     // ensure space for terminator
-        val_[size_] = 0; // terminate
-        String *res = new String(true, val_, size_);
-        //val_ = nullptr; // val_ was consumed above
-        size_ = 0;
+    String* get()
+    {
+        // consider changing to make the returned value actual steal ownership, not copy
+        // String *res = new String(true, innerBuf_.c_str(), innerBuf_.size());
+        String *res = new String(innerBuf_.c_str(), innerBuf_.size());
+        innerBuf_.clear();
         return res;
     }
 
     /** Return size of buffer */
     size_t size()
     {
-        return size_;
+        return innerBuf_.size();
     }
 };

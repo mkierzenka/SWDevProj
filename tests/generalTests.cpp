@@ -58,10 +58,11 @@ void dataFrameFromWriter()
   {
     assert(df->get_int(0, i) == i);
   }
-
+  delete df;
   SYSTEM.pln("Data frame from writer test passed!");
 }
 
+// Depends on hashing algorithm
 void dataFrameFromSummer()
 {
   printf("Data frame from summer test started\n");
@@ -73,15 +74,23 @@ void dataFrameFromSummer()
   String *key3 = new String("a");
   String *key4 = new String("test");
 
-  map->set(*key1, new Num(1));
-  map->set(*key2, new Num(2));
-  map->set(*key3, new Num(3));
-  map->set(*key4, new Num(1));
+  Num* num1 = new Num(1);
+  Num* num2 = new Num(2);
+  Num* num3 = new Num(3);
 
-  assert(map->get(*key1)->equals(new Num(1)));
-  assert(map->get(*key2)->equals(new Num(2)));
-  assert(map->get(*key3)->equals(new Num(3)));
-  assert(map->get(*key4)->equals(new Num(1)));
+  map->set(*key1, num1->clone());
+  map->set(*key2, num2->clone());
+  map->set(*key3, num3->clone());
+  map->set(*key4, num1->clone());
+
+  assert(map->get(*key1)->equals(num1));
+  assert(map->get(*key2)->equals(num2));
+  assert(map->get(*key3)->equals(num3));
+  assert(map->get(*key4)->equals(num1));
+
+  delete num1;
+  delete num2;
+  delete num3;
 
   Summer sum(*map);
   Key k("df", 0);
@@ -90,15 +99,26 @@ void dataFrameFromSummer()
   assert(df->ncols() == 2);
   assert(df->nrows() == 4);
 
-  assert(df->get_string(0, 0)->equals(key3));
-  assert(df->get_string(0, 1)->equals(key1));
-  assert(df->get_string(0, 2)->equals(key2));
-  assert(df->get_string(0, 3)->equals(key4));
+  // Order may change when hashing changes
+  String* tmp = df->get_string(0, 0);
+  assert(tmp->equals(key1));
+  delete tmp;
+  tmp = df->get_string(0, 1);
+  assert(tmp->equals(key2));
+  delete tmp;
+  tmp = df->get_string(0, 2);
+  assert(tmp->equals(key3));
+  delete tmp;
+  tmp = df->get_string(0, 3);
+  assert(tmp->equals(key4));
+  delete tmp;
 
-  assert(df->get_int(1, 0) == 3);
-  assert(df->get_int(1, 1) == 1);
-  assert(df->get_int(1, 2) == 2);
+  assert(df->get_int(1, 0) == 1);
+  assert(df->get_int(1, 1) == 2);
+  assert(df->get_int(1, 2) == 3);
   assert(df->get_int(1, 3) == 1);
+  delete df;
+  delete map;
   printf("Data frame from summer test passed!\n");
 }
 

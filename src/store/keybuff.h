@@ -31,9 +31,11 @@ class KeyBuff : public Object {
    * for deleting key */  
   Key* get() {                                                                   
     String* s = buf_.get();                                                      
+    char* bufCstr = s->steal();
     buf_.c(orig_->c_str());                                                      
-    Key* k = new Key(s->steal(), orig_->getNode());                                 
+    Key* k = new Key(bufCstr, orig_->getNode());
     delete s;                                                                    
+    delete[] bufCstr;
     return k;                                                                    
   }                                                                              
 }; // KeyBuff 
