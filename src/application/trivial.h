@@ -43,7 +43,7 @@ class Trivial : public Application {
     DataFrame *df2 = kv_->get(&key);
     for (size_t i = 0; i < sz; ++i)
       sum -= df2->get_double(0, i);
-    printf("Final Difference (double) = %3.6lf\n", sum);
+    fprintf(stderr, "Final Difference (double) = %3.6lf\n", sum);
     assert(sum == 0);
     delete df;
     delete df2;
@@ -62,7 +62,7 @@ class Trivial : public Application {
     DataFrame *df2 = kv_->get(&key);
     for (size_t i = 0; i < sz; ++i)
       sum -= df2->get_int(0, i);
-    printf("Final Difference (int) = %d\n", sum);
+    fprintf(stderr, "Final Difference (int) = %d\n", sum);
     assert(sum == 0);
     delete df;
     delete df2;
@@ -118,7 +118,7 @@ class Trivial : public Application {
     delete expected;
     delete df;
     delete df2;
-    fprintf(stdout, "String DataFrame OK\n");
+    fprintf(stderr, "String DataFrame OK\n");
   }
 
   void trial4(size_t sz)
@@ -142,6 +142,6 @@ class Trivial : public Application {
     delete df;
     delete df2;
     delete[] vals;
-    fprintf(stdout, "Bool DataFrame OK\n");
+    fprintf(stderr, "Bool DataFrame OK\n");
   }
 };
