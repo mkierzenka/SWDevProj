@@ -4,7 +4,6 @@
 #include "object.h"
 #include "../serial/serial.h"
 
-using namespace std;
 
 /** An immutable string class that wraps a character array.
  * The character array is zero terminated. The size() of the
@@ -15,7 +14,7 @@ using namespace std;
  *  modified by broder.c@husky.neu.edu */
 class String : public Object {
 public:
-    string inner_;
+    std::string inner_;
 
     /** Build a string from a string constant */
     String(char const* cstr, size_t len) : inner_(cstr, len) {}
@@ -98,7 +97,7 @@ public:
  *  author: jv */
 class StrBuff : public Object {
 public:
-    string innerBuf_;
+    std::string innerBuf_;
 
     StrBuff() {}
 
