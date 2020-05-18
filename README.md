@@ -28,6 +28,17 @@ The intent is to rework it to offer the same functionality by take fuller advant
 	+        fprintf(stderr, "Nodethread %zu completed\n", app_->this_node());
 		 }
 --
+works well now
+replace with unique_ptr instead of Object* then i don't need the loop iterating for deleting.
+this change should be separate commit.
+didn't do it yet b/c doesn't play well with Object* Array.get(i)
+--
+also, switch to this (but it's big project). keep old version around b/c may not compile right away
+equals(const object other) const { }
+--
+
+
+
 
 
 possibly invalid since changes in this proj
