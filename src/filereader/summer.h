@@ -4,54 +4,31 @@
 #include "../utils/string.h"
 #include "../dataframe/row/writer.h"
 
-/** Summer provided to us in M4 */
+/** Summer over an SIMap, modified from M4 starter code */
 /***************************************************************************/
 class Summer : public Writer {
 public:
   SIMap& map_;
-  size_t i = 0;
-  size_t j = 0;
-  size_t seen = 0;
+  String** strs_;
+  size_t size_;
+  size_t curIdx_;
  
-   Summer(SIMap& map) : map_(map) {}
+   Summer(SIMap& map) : map_(map) {
+       strs_ = map.get_str_keys();
+       size_ = map.size();
+       curIdx_ = 0;
+   }
 
-  void next() {
-      if (i == map_.capacity_) return;
-
-      if (map_.buckets_[i] && j < map_.buckets_[i]->length()) {
-          j++;
-          ++seen;
-      } else {
-          ++i;
-          j = 0;
-          while( i < map_.capacity_ && !map_.buckets_[i] )  i++;
-      }
-  }
- 
-  String* k() {
-      if (i==map_.capacity_ || !map_.buckets_[i] || j == map_.buckets_[i]->length()) {
-          return nullptr;
-      }
-      return (String*) (map_.buckets_[i]->getKey(j));
-  }
-
-  size_t v() {
-      if (i == map_.capacity_ || !map_.buckets_[i] || j == map_.buckets_[i]->length()) {
-          assert(false); return 0;
-      }
-      return ((Num*)(map_.buckets_[i]->getValue(j)))->asInt();
-  }
- 
   void visit(Row& r) {
-      if (!k()) next();
-      String & key = *k();
-      size_t value = v();
-      r.set(0, &key);
-      r.set(1, (int) value);
-      next();
+      String* key = strs_[curIdx_];
+      Num* val = (Num*)(map_.get(key));
+      size_t valInt = val->asInt();
+      r.set(0, key);
+      r.set(1, (int) valInt);
+      curIdx_++;
   }
  
   bool done() {
-        return seen == map_.size(); 
+        return curIdx_ == map_.size();
     }
 };
