@@ -84,7 +84,7 @@ public:
         return homeNode_;
     }
 
-    bool equals(Object *other)
+    bool equals(Object *other) override
     {
         if (other == this)
         {
@@ -96,7 +96,7 @@ public:
                homeNode_ == o->getNode();
     }
 
-    size_t hash_me_()
+    size_t hash_me() override
     {
         return kStr_->hash() + homeNode_;
     }
