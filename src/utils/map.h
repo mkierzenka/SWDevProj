@@ -411,7 +411,7 @@ public:
 		* @return new Object array of keys
 		*/
 	// Overrides Map.get_keys()
-	Object **get_keys()
+	Object **get_keys() override
 	{
 		return this->helper_->get_keys();
 	}
@@ -422,7 +422,7 @@ public:
 		* @return new Object array of values
 		*/
 	// Overrides Map.get_values()
-	Object **get_values()
+	Object **get_values() override
 	{
 		return this->helper_->get_values();
 	}
@@ -432,7 +432,7 @@ public:
 		 * @return size of map
 		 */
 	// Overrides Map.size()
-	size_t size()
+	size_t size() override
 	{
 		return this->helper_->size();
 	}
@@ -446,7 +446,7 @@ public:
 		 * @return equals or not
 		 */
 	// Overrides Map.equals
-	bool equals(Object *other)
+	bool equals(Object *other) override
 	{
 		if (this == other)
 			return true;
@@ -477,7 +477,7 @@ public:
 		 * @return hash representation of each key value pair in the map
 		 */
 	// Overrides Map.hash
-	size_t hash()
+	size_t hash() override
 	{
 		return this->helper_->hash();
 	}
