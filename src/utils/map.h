@@ -2,174 +2,14 @@
 
 #include "object.h"
 #include "string.h"
-#include "helper.h"
 #include "num.h"
-#include <cstdio>
+#include <assert.h>
+#include <map>
 
-// some inspiration from https://dzone.com/articles/custom-hashmap-implementation-in-java
-
-/**
-* The Entry class represents an Entry in a HashMap as implemented below.
-* Each Entry has a Key, Value pair of Object* and a field to link it to
-*   the next Entry. This Entry object is intended to be used as a linked
-*   list. It takes ownership of keys and values.
-*
-*/
-class Entry : public Object
-{
-public:
-	Object *key_;	//owned
-	Object *value_; //owned
-	Entry *next_;	//owned
-
-	Entry() : Object()
-	{
-		this->key_ = nullptr;
-		this->value_ = nullptr;
-		this->next_ = nullptr;
-	}
-
-	Entry(Object *key, Object *value) : Object()
-	{
-		this->key_ = key;
-		this->value_ = value;
-		this->next_ = nullptr;
-	}
-
-	~Entry()
-	{
-		if (key_)
-		{
-			delete key_;
-		}
-		if (value_)
-		{
-			delete value_;
-		}
-		if (next_)
-		{
-			delete next_;
-		}
-	}
-
-	// Gets key field
-	Object *getKey()
-	{
-		return this->key_;
-	}
-
-	// Sets key field
-	void setKey(Object *newKey)
-	{
-		this->key_ = newKey;
-	}
-
-	// Gets value field
-	Object *getValue()
-	{
-		return this->value_;
-	}
-
-	// Sets next field to newValue
-	void setValue(Object *newValue)
-	{
-		this->value_ = newValue;
-	}
-
-	// Gets 'next' field
-	Entry *getNext()
-	{
-		return this->next_;
-	}
-
-	// Sets 'next' field to newNext
-	void setNext(Entry *newNext)
-	{
-		this->next_ = newNext;
-	}
-
-	// A helper method that will add keys to keysArr starting at the specified index
-	// This method will recursively call itself until all Entry objects linked to this are sequentially
-	//   added to keysArr. ASSUME: keysArr is big enough to hold all entries
-	int addKeysToArr(Object **keysArr, int nextIdx)
-	{
-		if (!keysArr)
-		{
-			return -1;
-		}
-		keysArr[nextIdx] = this->key_;
-		nextIdx++;
-		if (!next_)
-		{
-			return nextIdx;
-		}
-		return next_->addKeysToArr(keysArr, nextIdx);
-	}
-
-	// A helper method that will add values to valuesArr starting at the specified index
-	// This method will recursively call itself until all Entry objects linked to this are sequentially
-	//   added to valuesArr. ASSUME: valuesArr is big enough to hold all entries
-	int addValuesToArr(Object **valuesArr, int nextIdx)
-	{
-		if (!valuesArr)
-		{
-			return -1;
-		}
-		valuesArr[nextIdx] = this->value_;
-		nextIdx++;
-		if (!next_)
-		{
-			return nextIdx;
-		}
-		return next_->addValuesToArr(valuesArr, nextIdx);
-	}
-
-	/** Get the number of Entries connected to this one (including this) */
-	size_t length()
-	{
-		if (!next_)
-		{
-			return 1;
-		}
-
-		return 1 + next_->length();
-	}
-
-	/**
-		 * Return the key of the idx-th entry in this Entry list. Even if nullptr.
-		 * Will also return nullptr if list isn't long enough
-		 */
-	Object *getKey(size_t idx)
-	{
-		if (idx == 0)
-		{
-			return key_;
-		}
-		if (!next_)
-		{
-			fprintf(stderr, "Cannot get key from entry list: out-of-bounds\n");
-			exit(-1);
-		}
-		return next_->getKey(idx - 1);
-	}
-
-	/**
-		 * Return the value of the idx-th entry in this Entry list. Even if nullptr.
-		 * Will also return nullptr if list isn't long enough
-		 */
-	Object *getValue(size_t idx)
-	{
-		if (idx == 0)
-		{
-			return value_;
-		}
-		if (!next_)
-		{
-			fprintf(stderr, "Cannot get value from entry list: out-of-bounds\n");
-			exit(-1);
-		}
-		return next_->getValue(idx - 1);
-	}
+struct cmpByHash {
+    bool operator()(Object* a, Object* b) const {
+        return a->hash() < b->hash();
+    }
 };
 
 /**
@@ -186,9 +26,7 @@ public:
 class Map : public Object
 {
 public:
-	Entry **buckets_;
-	size_t capacity_;
-	size_t size_;
+	std::map<Object*, Object*, cmpByHash> inner_;
 
 	/**
 		 * @brief Construct a new Map object
@@ -197,16 +35,10 @@ public:
 	Map() : Map(4) {}
 
 	/**
-		 * Constructor to optimize performance of map.
+		 * Constructor to optimize performance of map. !!Argument is ignored!!
 		 * @param capacity number of buckets available to store different values.
 		 */
-	Map(size_t capacity) : Object()
-	{
-		capacity_ = capacity;
-		size_ = 0;
-		buckets_ = new Entry *[capacity_];
-		memset(buckets_, 0, capacity_ * sizeof(buckets_));
-	}
+	Map(size_t capacity) : Object() {}
 
 	/**
 		 * @brief Destroy the Map object
@@ -215,6 +47,7 @@ public:
 	~Map()
 	{
 		deleteData_();
+		inner_.clear();
 	}
 
 	// Helper method for equals()
@@ -248,18 +81,17 @@ public:
 		{
 			return false;
 		}
-		if (this->size_ != otherMap->size_)
+		if (this->size() != otherMap->size())
 			return false;
-		// different values for capacity_ (the number of buckets) is okay
 
 		Object **thisKeys = this->get_keys();
 		Object **otherKeys = otherMap->get_keys();
 
 		Object *curKey = nullptr;
-		for (size_t i = 0; i < this->size_; i++)
+		for (size_t i = 0; i < this->size(); i++)
 		{
 			curKey = thisKeys[i];
-			if (!isInArr_(curKey, otherKeys, otherMap->size_))
+			if (!isInArr_(curKey, otherKeys, otherMap->size()))
 			{
 				delete[] otherKeys;
 				delete[] thisKeys;
@@ -276,10 +108,10 @@ public:
 		Object **otherValues = otherMap->get_values();
 
 		Object *curValue = nullptr;
-		for (size_t i = 0; i < this->size_; i++)
+		for (size_t i = 0; i < this->size(); i++)
 		{
 			curValue = thisValues[i];
-			if (!isInArr_(curValue, otherValues, otherMap->size_))
+			if (!isInArr_(curValue, otherValues, otherMap->size()))
 			{
 				delete[] otherValues;
 				delete[] thisValues;
@@ -288,10 +120,10 @@ public:
 		}
 
 		curValue = nullptr;
-		for (size_t i = 0; i < otherMap->size_; i++)
+		for (size_t i = 0; i < otherMap->size(); i++)
 		{
 			curValue = otherValues[i];
-			if (!isInArr_(curValue, thisValues, this->size_))
+			if (!isInArr_(curValue, thisValues, this->size()))
 			{
 				delete otherValues;
 				delete thisValues;
@@ -326,11 +158,11 @@ public:
 		Object **values = this->get_values();
 
 		size_t hash = 0;
-		for (size_t i = 0; i < this->size_; i++)
+		for (size_t i = 0; i < this->size(); i++)
 		{
 			hash += reinterpret_cast<size_t>(keys[i]);
 		}
-		for (size_t i = 0; i < this->size_; i++)
+		for (size_t i = 0; i < this->size(); i++)
 		{
 			hash += reinterpret_cast<size_t>(values[i]);
 		}
@@ -346,7 +178,7 @@ public:
 		 */
 	virtual size_t size()
 	{
-		return size_;
+		return inner_.size();
 	}
 
 	/**
@@ -354,43 +186,7 @@ public:
 		 */
 	size_t capacity()
 	{
-		return capacity_;
-	}
-
-	/** A helper method to insert a <K, V> pair into a specific bucket
-		* Returns nullptr if there was no entry for that key previously, else
-		* overwrites the old value with val and returns the old value 
-		*/
-	Object *insertIntoBucket_(size_t index, Object *key, Object *val)
-	{
-		Entry *bucket = this->buckets_[index];
-		if (!bucket)
-		{
-			this->buckets_[index] = new Entry(key, val);
-			this->size_++;
-			return nullptr;
-		}
-
-		Entry *prevEntry = nullptr;
-		Entry *curEntry = bucket;
-		while (curEntry)
-		{
-			if (curEntry->getKey()->equals(key))
-			{
-				// already seen this key, replace the value
-				Object *oldVal = curEntry->getValue();
-				//key passed in will not be used
-				delete key;
-				curEntry->setValue(val);
-				return oldVal;
-			}
-			prevEntry = curEntry;
-			curEntry = curEntry->getNext();
-		}
-		Entry *newEntry = new Entry(key, val);
-		prevEntry->setNext(newEntry);
-		this->size_++;
-		return nullptr;
+		return inner_.max_size();
 	}
 
 	/**
@@ -411,31 +207,13 @@ public:
 		{
 			return nullptr;
 		}
-		size_t hash = key->hash();
-		size_t index = hash % capacity_;
-		return this->insertIntoBucket_(index, key, val);
-	}
-
-	// Returns the Object* corresponding to the specified key in the specified (by index) bucket
-	// nullptr if not found in that bucket
-	Object *getFromBucket_(size_t index, Object *key)
-	{
-		Entry *bucket = this->buckets_[index];
-		if (!bucket)
-		{
-			return nullptr;
+		Object* prev = nullptr;
+		bool alreadyHadKV = contains_key(key);
+		if (alreadyHadKV) {
+			prev = remove(key);
 		}
-
-		Entry *curEntry = bucket;
-		while (curEntry)
-		{
-			if (curEntry->getKey()->equals(key))
-			{
-				return curEntry->getValue();
-			}
-			curEntry = curEntry->getNext();
-		}
-		return nullptr;
+		inner_.insert(std::make_pair(key, val));
+		return prev;
 	}
 
 	/**
@@ -446,54 +224,11 @@ public:
 		 */
 	Object *get(Object *key)
 	{
-		if (!key)
+		if (!key || !contains_key(key))
 		{
 			return nullptr;
 		}
-		size_t hash = key->hash();
-		size_t index = hash % capacity_;
-
-		return this->getFromBucket_(index, key);
-	}
-
-	// A helper method for remove()
-	// Removes an object, equality based on key, from the specific bucket
-	// Returns nullptr if the key isn't found, returns the entry removed if it is
-	// Note, the entry returned is modified from what was stored:
-	//   - the next field will be set to nullptr
-	Entry *removeFromBucket_(size_t index, Object *key)
-	{
-		Entry *bucket = this->buckets_[index];
-		if (!bucket)
-		{
-			return nullptr;
-		}
-
-		Entry *prevEntry = nullptr;
-		Entry *curEntry = bucket;
-		while (curEntry)
-		{
-			if (curEntry->getKey()->equals(key))
-			{
-				if (!prevEntry)
-				{
-					// deleting curEntry, the first item of the bucket
-					this->buckets_[index] = curEntry->getNext();
-					this->size_--;
-					curEntry->setNext(nullptr);
-					return curEntry;
-				}
-				// deleting curEntry, an item in the middle of the bucket
-				prevEntry->setNext(curEntry->getNext());
-				curEntry->setNext(nullptr);
-				this->size_--;
-				return curEntry;
-			}
-			prevEntry = curEntry;
-			curEntry = curEntry->getNext();
-		}
-		// key not found
-		return nullptr;
+		return inner_.at(key);
 	}
 
 	/**
@@ -505,40 +240,13 @@ public:
 		 */
 	Object *remove(Object *key)
 	{
-		if (!key)
+		if (!key || !contains_key(key))
 		{
 			return nullptr;
 		}
-		size_t hash = key->hash();
-		size_t index = hash % capacity_;
-
-		Entry *removedEntry = this->removeFromBucket_(index, key);
-		assert(removedEntry);
-		Object *val = removedEntry->getValue();
-		removedEntry->setValue(nullptr);
-		delete removedEntry;
+		Object *val = get(key);
+		inner_.erase(key);
 		return val;
-	}
-
-	// Returns true if the bucket of given index contains the key
-	bool bucketContainsKey_(size_t index, Object *key)
-	{
-		Entry *bucket = this->buckets_[index];
-		if (!bucket)
-		{
-			return false;
-		}
-
-		Entry *curEntry = bucket;
-		while (curEntry)
-		{
-			if (curEntry->getKey()->equals(key))
-			{
-				return true;
-			}
-			curEntry = curEntry->getNext();
-		}
-		return false;
 	}
 
 	/**
@@ -552,10 +260,7 @@ public:
 		{
 			return false;
 		}
-		size_t hash = key->hash();
-		size_t index = hash % capacity_;
-
-		return this->bucketContainsKey_(index, key);
+		return inner_.count(key) >= 1;
 	}
 
 	/**
@@ -564,27 +269,18 @@ public:
 	void clear()
 	{
 		deleteData_();
-
-		capacity_ = 4;
-		size_ = 0;
-		buckets_ = new Entry *[capacity_];
-		memset(buckets_, 0, capacity_ * sizeof(buckets_));
+		inner_.clear();
 	}
 
 	/**
-		 * Removes all bucket data from the map
-		 */
+	 * Removes all bucket data from the map
+	 */
 	void deleteData_()
 	{
-		for (size_t i = 0; i < capacity_; i++)
-		{
-			if (buckets_[i])
-			{
-				delete buckets_[i];
-			}
+		for (std::pair<Object*, Object*> kvpair : inner_) {
+			delete kvpair.first;
+			delete kvpair.second;
 		}
-
-		delete[] buckets_;
 	}
 
 	/**
@@ -594,16 +290,12 @@ public:
 		*/
 	virtual Object **get_keys()
 	{
-		Object **keys = new Object *[this->size_];
-		Entry *bucket = nullptr;
-		int nextIdx = 0;
-		for (size_t i = 0; i < this->capacity_; i++)
-		{
-			bucket = this->buckets_[i];
-			if (bucket)
-			{
-				nextIdx = bucket->addKeysToArr(keys, nextIdx);
-			}
+		Object **keys = new Object *[this->size()];
+		size_t i = 0;
+		for (std::pair<Object* const, Object*> kvpair : inner_) {
+			Object* curKey = kvpair.first;
+			keys[i] = curKey;
+			i++;
 		}
 		return keys;
 	}
@@ -615,18 +307,14 @@ public:
 		*/
 	virtual Object **get_values()
 	{
-		Object **values = new Object *[this->size_];
-		Entry *bucket = nullptr;
-		int nextIdx = 0;
-		for (size_t i = 0; i < this->capacity_; i++)
-		{
-			bucket = this->buckets_[i];
-			if (bucket)
-			{
-				nextIdx = bucket->addValuesToArr(values, nextIdx);
-			}
+		Object **vals = new Object *[this->size()];
+		size_t i = 0;
+		for (std::pair<Object* const, Object*> kvpair : inner_) {
+			Object* curVal = kvpair.second;
+			vals[i] = curVal;
+			i++;
 		}
-		return values;
+		return vals;
 	}
 };
 
@@ -681,7 +369,6 @@ public:
 	Object *put(String *key, Object *val)
 	{
 		Object *prev = this->helper_->put(key, val);
-		this->size_ = this->helper_->size();
 		return prev;
 	}
 
@@ -705,7 +392,6 @@ public:
 	Object *remove(String *key)
 	{
 		Object *removed = this->helper_->remove(key);
-		this->size_ = this->helper_->size();
 		return removed;
 	}
 
@@ -769,10 +455,9 @@ public:
 		{
 			return false;
 		}
-		if (this->size_ != otherMap->size_)
+		if (this->size() != otherMap->size())
 			return false;
 		// different values for capacity_ (the number of buckets) is okay
-
 		return this->helper_->equals(otherMap->helper_);
 	}
 
@@ -817,9 +502,20 @@ public:
 	}
 	~SIMap() {}
 	Num *get(String &key) { return dynamic_cast<Num *>(Map::get(&key)); }
+	Num *get(String* key) { return dynamic_cast<Num *>(Map::get(key)); }
 	void set(String &k, Num *v)
 	{
 		assert(v);
 		Map::put(&k, v);
+	}
+	String** get_str_keys() {
+		String **keys = new String *[this->size()];
+		auto myElems = inner_.begin();
+		for (size_t i = 0; i < this->size(); i++)
+		{
+			Object* curKey = (*(myElems++)).first;
+			keys[i] = (String*)curKey;
+		}
+		return keys;
 	}
 };

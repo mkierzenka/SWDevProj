@@ -104,18 +104,18 @@ void dataFrameFromSummer()
   assert(tmp->equals(key1));
   delete tmp;
   tmp = df->get_string(0, 1);
-  assert(tmp->equals(key2));
+  assert(tmp->equals(key3));
   delete tmp;
   tmp = df->get_string(0, 2);
-  assert(tmp->equals(key3));
+  assert(tmp->equals(key2));
   delete tmp;
   tmp = df->get_string(0, 3);
   assert(tmp->equals(key4));
   delete tmp;
 
   assert(df->get_int(1, 0) == 1);
-  assert(df->get_int(1, 1) == 2);
-  assert(df->get_int(1, 2) == 3);
+  assert(df->get_int(1, 1) == 3);
+  assert(df->get_int(1, 2) == 2);
   assert(df->get_int(1, 3) == 1);
   delete df;
   delete map;
