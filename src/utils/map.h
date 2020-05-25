@@ -210,9 +210,13 @@ public:
 		Object* prev = nullptr;
 		bool alreadyHadKV = contains_key(key);
 		if (alreadyHadKV) {
-			prev = remove(key);
+			prev = inner_.at(key);
+			inner_[key] = val;
+			assert(contains_key(key));
+			delete key;
+		} else {
+			inner_[key] = val;
 		}
-		inner_.insert(std::make_pair(key, val));
 		return prev;
 	}
 
@@ -240,13 +244,21 @@ public:
 		 */
 	Object *remove(Object *key)
 	{
-		if (!key || !contains_key(key))
+		if (!key)
 		{
 			return nullptr;
 		}
-		Object *val = get(key);
-		inner_.erase(key);
-		return val;
+		auto itr = inner_.find(key);
+		if (itr != inner_.end())
+		{
+			// found it - delete it
+			Object* prev = itr->second;
+			delete itr->first;
+			inner_.erase(itr);
+			return prev;
+		} else {
+			return nullptr;
+		}
 	}
 
 	/**
