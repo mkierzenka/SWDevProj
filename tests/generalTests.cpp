@@ -34,8 +34,12 @@ void dataFrameTest()
 
   assert(df->ncols() == 1);
   assert(df->nrows() == 3);
-  assert(df->get_string(0, 0)->equals(valsS[0]));
-  assert(df->get_string(0, 1)->equals(valsS[1]));
+  String* tmp = df->get_string(0, 0);
+  assert(tmp->equals(valsS[0]));
+  delete tmp;
+  tmp = df->get_string(0, 1);
+  assert(tmp->equals(valsS[1]));
+  delete tmp;
 
   delete kv;
   delete df;

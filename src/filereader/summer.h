@@ -9,7 +9,7 @@
 class Summer : public Writer {
 public:
   SIMap& map_;
-  String** strs_;          //owned
+  String** strs_;          //array is owned, objects are not (they're actual keys)
   size_t size_;
   size_t curIdx_;
  
@@ -20,10 +20,7 @@ public:
   }
 
   ~Summer() {
-    for (size_t i = 0; i < size_; i++) {
-      delete strs_[i];
-	}
-	delete[] strs_;
+    delete[] strs_;
   }
 
   void visit(Row& r) {
