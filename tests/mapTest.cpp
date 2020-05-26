@@ -136,10 +136,10 @@ public:
     assert(!keys[0]->equals(values[0]));
     assert(keys != nullptr);
     assert(values != nullptr);
-    assert(keys[0]->equals(a));
-    assert(values[0]->equals(b));
-    assert(keys[1]->equals(s));
-    assert(values[1]->equals(t));
+    assert(keys[1]->equals(a));
+    assert(values[1]->equals(b));
+    assert(keys[0]->equals(s));
+    assert(values[0]->equals(t));
 
     delete mss;
     delete[] keys;

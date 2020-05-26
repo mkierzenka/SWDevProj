@@ -105,22 +105,22 @@ void dataFrameFromSummer()
 
   // Order may change when hashing changes
   String* tmp = df->get_string(0, 0);
-  assert(tmp->equals(key1));
+  assert(tmp->equals(key4));
   delete tmp;
   tmp = df->get_string(0, 1);
   assert(tmp->equals(key3));
   delete tmp;
   tmp = df->get_string(0, 2);
-  assert(tmp->equals(key2));
+  assert(tmp->equals(key1));
   delete tmp;
   tmp = df->get_string(0, 3);
-  assert(tmp->equals(key4));
+  assert(tmp->equals(key2));
   delete tmp;
 
   assert(df->get_int(1, 0) == 1);
   assert(df->get_int(1, 1) == 3);
-  assert(df->get_int(1, 2) == 2);
-  assert(df->get_int(1, 3) == 1);
+  assert(df->get_int(1, 2) == 1);
+  assert(df->get_int(1, 3) == 2);
   delete df;
   delete map;
   printf("Data frame from summer test passed!\n");

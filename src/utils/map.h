@@ -4,13 +4,21 @@
 #include "string.h"
 #include "num.h"
 #include <assert.h>
-#include <map>
+#include <unordered_map>
 
-struct cmpByHash {
-    bool operator()(Object* a, Object* b) const {
-        return a->hash() < b->hash();
-    }
+
+struct myMapHash {
+	size_t operator()(Object* a) const {
+		return a->hash();
+	}
 };
+
+struct myMapEquals {
+	bool operator()(Object* a, Object* b) const {
+		return a->equals(b);
+	}
+};
+
 
 /**
  * Represents a map where elements are mapped from key to value. A map can return its value by key
@@ -26,7 +34,7 @@ struct cmpByHash {
 class Map : public Object
 {
 public:
-	std::map<Object*, Object*, cmpByHash> inner_;
+	std::unordered_map<Object*, Object*, myMapHash, myMapEquals> inner_;
 
 	/**
 		 * @brief Construct a new Map object
@@ -208,11 +216,9 @@ public:
 			return nullptr;
 		}
 		Object* prev = nullptr;
-		bool alreadyHadKV = contains_key(key);
-		if (alreadyHadKV) {
+		if (contains_key(key)) {
 			prev = inner_.at(key);
 			inner_[key] = val;
-			assert(contains_key(key));
 			delete key;
 		} else {
 			inner_[key] = val;
