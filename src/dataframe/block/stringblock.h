@@ -1,33 +1,17 @@
 #pragma once
 
-#include "block.h"
+#include "simpleblock.h"
 #include "../../utils/string.h"
 #include "../../serial/serial.h"
-
 
 
 /**
 * StringBlock - to represent a block of Strings.
 *
 */
-class StringBlock : public Block
+class StringBlock : public SimpleBlock<String*>
 {
 public:
-	String** vals_; //owned, list of String*
-
-	StringBlock()
-	{
-		capacity_ = args.blockSize;
-		size_ = 0;
-		vals_ = new String*[capacity_];
-		memset(vals_, 0, capacity_ * sizeof(String*));
-	}
-
-	~StringBlock()
-	{
-		clear(); //expected that this calls delete on each String
-		delete[] vals_;
-	}
 	
 	/** Serialize this block of strings into s */
 	void serialize(Serializer* s) {
@@ -57,58 +41,28 @@ public:
 	}
 
 	/** Get a pointer to the String with the index in the block. Does not clone! */
-	String* get(size_t index)
-	{
-		// check for out-of-bounds
-		if (index >= size_)
-		{
-			fprintf(stderr, "Out-Of-Bounds Error: cannot get value from index %zu", index);
-			exit(1);
-		}
-		return vals_[index];
-	}
+//	String* get(size_t index)
 
 	/** Adds the String to end of this block, does not clone. Now owns.
 	 * If can't fit, return -1
 	 */
-	int add(String* s)
-	{
-		if (size_ >= capacity_)
-		{
-			return -1;
-		}
-        vals_[size_] = s;
-		size_++;
-	}
+//	int add(String* s)
 
 	/**
 	 * Set the element in the given index to the given String pointer.
 	 * Now owns, returns the old value which the caller is responsible for deleting.
 	 */
-	String* set(size_t index, String* s)
-	{
-		// check for out-of-bounds
-		if (index >= size_)
-		{
-			printf("Out-Of-Bounds Error: cannot set value at index %zu", index);
-			exit(1);
-		}
-		String* out = vals_[index];
-		vals_[index] = s;
-		return out;
-	}
+//	String* set(size_t index, String* s)
 
-	/** Check if two blocks equal */
-	bool equals(Object* other)
-	{
+	/** Check if this String block equals another Object */
+	bool equals(Object* other) override	{
 		if (this == other)
 		{
 			return true;
 		}
 
 		StringBlock* b = dynamic_cast<StringBlock*>(other);
-		
-		if (b == nullptr || size_ != b->size_ || capacity_ != b->capacity_)
+		if (!b || size_ != b->size_ || capacity_ != b->capacity_)
 		{
 			return false;
 		}
@@ -120,27 +74,23 @@ public:
 				return false;
 			}
 		}
-
 		return true;
 	}
 	
-	/** Compute hash code of this bool block */
-	size_t hash_me_()
-	{
+	/** Compute hash code of this string block */
+	size_t hash_me() override {
 		size_t hash_ = 0;
 		hash_ += size_;
 		hash_ += capacity_;
-
 		for (size_t i = 0; i < size_; i++)
 		{
 			hash_ += vals_[i]->hash();
 		}
-
 		return hash_;
 	}
 	
 	/** Clears the memory in this StringBlock, deleting each String ptr */
-	void clear() {
+	void clear() override {
 		for (size_t i = 0; i < size_; i++) {
 			delete vals_[i];
 		}
@@ -149,7 +99,7 @@ public:
 	}
 	
 	/** Returns a new StringBlock with all the elements cloned from this one */
-	StringBlock* clone() {
+	StringBlock* clone() override {
 		StringBlock* out = new StringBlock();
 		for (size_t i = 0; i < size_; i++) {
 			out->add(get(i)->clone());
