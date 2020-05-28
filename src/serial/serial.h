@@ -225,40 +225,40 @@ public:
 		{
 			return GetData;
 		}
-		}
+	}
 
-		inline size_t readSizeT() { return readA<size_t>(); }
+	inline size_t readSizeT() { return readA<size_t>(); }
 
-		template<typename T>
-		T readA()
-		{
-			T out;
-			memcpy(&out, buffer_ + numBytesRead_, sizeof(T));
-			numBytesRead_ += sizeof(T);
-			return out;
-		}
+	template<typename T>
+	T readA()
+	{
+		T out;
+		memcpy(&out, buffer_ + numBytesRead_, sizeof(T));
+		numBytesRead_ += sizeof(T);
+		return out;
+	}
 
-		char *getBuffer()
-		{
-			return buffer_;
-		}
+	char *getBuffer()
+	{
+		return buffer_;
+	}
 
-		size_t getNumBytesWritten()
-		{
-			return numBytesWritten_;
-		}
+	size_t getNumBytesWritten()
+	{
+		return numBytesWritten_;
+	}
 
-		size_t getNumBytesRead()
-		{
-			return numBytesRead_;
-		}
+	size_t getNumBytesRead()
+	{
+		return numBytesRead_;
+	}
 
-		char *clear()
-		{
-			delete[] buffer_;
-			buffer_ = new char[capacity_];
-			memset(buffer_, 0, capacity_);
-			numBytesRead_ = 0;
-			numBytesWritten_ = 0;
-		}
-	};
+	char *clear()
+	{
+		delete[] buffer_;
+		buffer_ = new char[capacity_];
+		memset(buffer_, 0, capacity_);
+		numBytesRead_ = 0;
+		numBytesWritten_ = 0;
+	}
+};
