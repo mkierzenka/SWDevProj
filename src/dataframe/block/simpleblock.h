@@ -63,7 +63,7 @@ public:
 		return vals_[index];
 	}
 
-	/** Adds the item to end of this block. If can't fit, return -1 */
+	/** Adds the item to end of this block. If can't fit, return -1. Returns 0 on success */
 	int add(T n)
 	{
 		if (size_ >= capacity_)
@@ -72,6 +72,7 @@ public:
 		}
         vals_[size_] = n;
 		size_++;
+		return 0;
 	}
 
 	/** Sets the element at the given index. Returns the previous value */
