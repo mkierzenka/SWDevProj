@@ -80,8 +80,8 @@ public:
             delete removeFirstAddedElement_();
         }
 
-        data_->put(k, val);
         keyOrder_->push(k->clone());
+        data_->put(k, val);
         assert(data_->size() == keyOrder_->size());
     }
 
