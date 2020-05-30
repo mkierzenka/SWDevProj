@@ -172,53 +172,17 @@ public:
 		return out;
 	}
 
-	double readDouble()
-	{
-		double out;
-		memcpy(&out, buffer_ + numBytesRead_, sizeof(double));
-		numBytesRead_ += sizeof(double);
-		return out;
-	}
+	inline double readDouble() { return readA<double>(); }
 
-	short readShort()
-	{
-		short out;
-		memcpy(&out, buffer_ + numBytesRead_, sizeof(short));
-		numBytesRead_ += sizeof(short);
-		return out;
-	}
+	inline short readShort() { return readA<short>(); }
 
-	long readLong()
-	{
-		long out;
-		memcpy(&out, buffer_ + numBytesRead_, sizeof(long));
-		numBytesRead_ += sizeof(long);
-		return out;
-	}
+	inline long readLong()	{ return readA<long>(); }
 
-	int readInt()
-	{
-		int out;
-		memcpy(&out, buffer_ + numBytesRead_, sizeof(int));
-		numBytesRead_ += sizeof(int);
-		return out;
-	}
+	inline int readInt() { return readA<int>(); }
 
-	bool readBool()
-	{
-		bool out;
-		memcpy(&out, buffer_ + numBytesRead_, sizeof(bool));
-		numBytesRead_ += sizeof(bool);
-		return out;
-	}
+	inline bool readBool() { return readA<bool>(); }
 
-	char readChar()
-	{
-		char out;
-		memcpy(&out, buffer_ + numBytesRead_, sizeof(char));
-		numBytesRead_ += sizeof(char);
-		return out;
-	}
+	inline char readChar() { return readA<char>(); }
 
 	MsgKind readMsgKind()
 	{
@@ -261,37 +225,40 @@ public:
 		{
 			return GetData;
 		}
-		}
+	}
 
-		size_t readSizeT()
-		{
-			size_t out;
-			memcpy(&out, buffer_ + numBytesRead_, sizeof(size_t));
-			numBytesRead_ += sizeof(size_t);
-			return out;
-		}
+	inline size_t readSizeT() { return readA<size_t>(); }
 
-		char *getBuffer()
-		{
-			return buffer_;
-		}
+	template<typename T>
+	T readA()
+	{
+		T out;
+		memcpy(&out, buffer_ + numBytesRead_, sizeof(T));
+		numBytesRead_ += sizeof(T);
+		return out;
+	}
 
-		size_t getNumBytesWritten()
-		{
-			return numBytesWritten_;
-		}
+	char *getBuffer()
+	{
+		return buffer_;
+	}
 
-		size_t getNumBytesRead()
-		{
-			return numBytesRead_;
-		}
+	size_t getNumBytesWritten()
+	{
+		return numBytesWritten_;
+	}
 
-		char *clear()
-		{
-			delete[] buffer_;
-			buffer_ = new char[capacity_];
-			memset(buffer_, 0, capacity_);
-			numBytesRead_ = 0;
-			numBytesWritten_ = 0;
-		}
-	};
+	size_t getNumBytesRead()
+	{
+		return numBytesRead_;
+	}
+
+	char *clear()
+	{
+		delete[] buffer_;
+		buffer_ = new char[capacity_];
+		memset(buffer_, 0, capacity_);
+		numBytesRead_ = 0;
+		numBytesWritten_ = 0;
+	}
+};
