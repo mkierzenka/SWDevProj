@@ -23,6 +23,7 @@ struct myMapEquals {
 /**
  * Represents a map where elements are mapped from key to value. A map can return its value by key
  * at O(1) time because each key is unique and grabbed by index, there are no duplicate keys.
+ * There may be duplicate values, though.
  * 
  * NOTE: This parent Map class will deal strictly with key-value pairs of (Object, Object). 
  * IT TAKES OWNERSHIP OF KEYS AND VALUES!
@@ -74,7 +75,7 @@ public:
 
 	/**
 	 * @brief Determines if this map equals the given object. For two maps to be equal, they must
-	 * contain the exact same key-value pairs, BUT do not need to share the same locations inside
+	 * contain the same key-value pairs, BUT do not need to share the same locations inside
 	 * of the buckets.
 	 * 
 	 * @param other object to compare to
@@ -83,65 +84,26 @@ public:
 	virtual bool equals(Object *other)
 	{
 		if (this == other)
+		{
 			return true;
+		}
 		Map *otherMap = dynamic_cast<Map *>(other);
-		if (!otherMap)
+		if (!otherMap || this->size() != otherMap->size())
 		{
 			return false;
 		}
-		if (this->size() != otherMap->size())
-			return false;
-
-		Object **thisKeys = this->get_keys();
-		Object **otherKeys = otherMap->get_keys();
-
-		Object *curKey = nullptr;
-		for (size_t i = 0; i < this->size(); i++)
+		for (const std::pair<Object*, Object*> kvpair : inner_)
 		{
-			curKey = thisKeys[i];
-			if (!isInArr_(curKey, otherKeys, otherMap->size()))
+			Object* curKey = kvpair.first;
+			Object* curValue = kvpair.second;
+			if (!(otherMap->contains_key(curKey)) || !(curValue->equals(otherMap->get(curKey))))
 			{
-				delete[] otherKeys;
-				delete[] thisKeys;
 				return false;
 			}
 		}
-
-		delete[] otherKeys;
-		delete[] thisKeys;
-
-		// Can't have duplicate keys in same map, so the above (length check and the for loop) should be enough to check equality
-
-		Object **thisValues = this->get_values();
-		Object **otherValues = otherMap->get_values();
-
-		Object *curValue = nullptr;
-		for (size_t i = 0; i < this->size(); i++)
-		{
-			curValue = thisValues[i];
-			if (!isInArr_(curValue, otherValues, otherMap->size()))
-			{
-				delete[] otherValues;
-				delete[] thisValues;
-				return false;
-			}
-		}
-
-		curValue = nullptr;
-		for (size_t i = 0; i < otherMap->size(); i++)
-		{
-			curValue = otherValues[i];
-			if (!isInArr_(curValue, thisValues, this->size()))
-			{
-				delete otherValues;
-				delete thisValues;
-				return false;
-			}
-		}
-		delete[] otherValues;
-		delete[] thisValues;
-
-		// Duplicate values may be possible for different keys
+		// above is sufficient for equality b/c:
+		//   same # of keys, no duplicate keys within a map => keys in this and otherMap are same
+		//   checks that this map's value for given key equals otherMap's value for that key
 		return true;
 	}
 
@@ -162,21 +124,11 @@ public:
 	 */
 	virtual size_t hash()
 	{
-		Object **keys = this->get_keys();
-		Object **values = this->get_values();
-
 		size_t hash = 0;
-		for (size_t i = 0; i < this->size(); i++)
-		{
-			hash += reinterpret_cast<size_t>(keys[i]);
+		for (const std::pair<Object* const, Object*> kvpair : inner_) {
+			hash += kvpair.first->hash();
+			hash += kvpair.second->hash();
 		}
-		for (size_t i = 0; i < this->size(); i++)
-		{
-			hash += reinterpret_cast<size_t>(values[i]);
-		}
-
-		delete values;
-		delete keys;
 		return hash;
 	}
 
