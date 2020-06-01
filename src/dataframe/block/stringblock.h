@@ -12,7 +12,11 @@
 class StringBlock : public SimpleBlock<String*>
 {
 public:
-	
+
+	~StringBlock() {
+		clear(); //delete the Strings stored within this block, ~SimpleBlock does the rest
+	}
+
 	/** Serialize this block of strings into s */
 	void serialize(Serializer* s) {
 		s->write(capacity_);
@@ -21,7 +25,7 @@ public:
 			vals_[i]->serialize(s);
 		}
 	}
-	
+
 	/** Deserialize a block of strings into this block (mutate) */
 	void deserialize(Serializer* s) {
 		for (size_t i = 0; i < size_; i++) {
@@ -76,7 +80,7 @@ public:
 		}
 		return true;
 	}
-	
+
 	/** Compute hash code of this string block */
 	size_t hash_me() override {
 		size_t hash_ = 0;
@@ -88,16 +92,16 @@ public:
 		}
 		return hash_;
 	}
-	
+
 	/** Clears the memory in this StringBlock, deleting each String ptr */
 	void clear() override {
 		for (size_t i = 0; i < size_; i++) {
 			delete vals_[i];
 		}
-		memset(vals_, 0, capacity_ * sizeof(int));
+		memset(vals_, 0, capacity_ * sizeof(String*));
 		size_ = 0;
 	}
-	
+
 	/** Returns a new StringBlock with all the elements cloned from this one */
 	StringBlock* clone() override {
 		StringBlock* out = new StringBlock();
