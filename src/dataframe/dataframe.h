@@ -41,7 +41,6 @@ public:
   {
     schema_ = new Schema();
     store_ = kv;
-    size_t numCols = schema_->width();
     key_ = k;
     columns_ = new ColumnArray(store_, key_);
   }
@@ -276,7 +275,7 @@ public:
     {
       row->set_idx(rowIdx);
       //iterate through each column to get value
-      for (int colIdx = 0; colIdx < row->width(); colIdx++)
+      for (size_t colIdx = 0; colIdx < row->width(); colIdx++)
       {
         setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type_char(colIdx));
       }
@@ -299,7 +298,7 @@ public:
       {
         row->set_idx(rowIdx);
         //iterate through each column to get value
-        for (int colIdx = 0; colIdx < row->width(); colIdx++)
+        for (size_t colIdx = 0; colIdx < row->width(); colIdx++)
         {
           setRowValByColType_(*row, colIdx, rowIdx, schema_->col_type_char(colIdx));
         }
@@ -357,7 +356,7 @@ public:
     r->set_idx(rowIdx);
 
     //iterate through each column to get value
-    for (int i = 0; i < r->width(); i++)
+    for (size_t i = 0; i < r->width(); i++)
     {
       setRowValByColType_(*r, i, rowIdx, schema_->col_type_char(i));
     }

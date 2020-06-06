@@ -63,7 +63,7 @@ public:
     void server_init() override
     {
         // Build a Directory from the msgs each node sends
-        for (int i = 1; i < args.numNodes; i++)
+        for (size_t i = 1; i < args.numNodes; i++)
         {
             RegisterMsg *rMsg = dynamic_cast<RegisterMsg *>(receiveMsg()); //blocking
             assert(rMsg);
@@ -71,7 +71,7 @@ public:
         }
         fprintf(stderr, "Server got all the nodes\n");
         // When all nodes (expected number) have registered, send directory to everyone
-        for (int i = 0; i < args.numNodes; i++)
+        for (size_t i = 0; i < args.numNodes; i++)
         {
             if (i == args.serverIndex)
                 continue;
