@@ -253,7 +253,7 @@ public:
 		return numBytesRead_;
 	}
 
-	char *clear()
+	void clear()
 	{
 		delete[] buffer_;
 		buffer_ = new char[capacity_];
