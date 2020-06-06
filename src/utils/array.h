@@ -115,7 +115,6 @@ public:
 	 */
 	int index_of(Object *o)
 	{
-		int i = 0;
 		auto myElems = inner_.begin();
 		size_t len = length();
 		for (size_t i = 0; i < len; i++)

@@ -80,7 +80,7 @@ public:
     SizeTWrapper** getNodes() {
         SizeTWrapper** nodes  = new SizeTWrapper*[ips_->size()];
         Object** keys = ips_->get_keys();
-        for (int i = 0; i < ips_->size(); i++)
+        for (size_t i = 0; i < ips_->size(); i++)
         {
             assert(keys[i]);
             nodes[i] = dynamic_cast<SizeTWrapper*>(keys[i])->clone();
@@ -96,7 +96,7 @@ public:
         }
         SizeTWrapper** otherNodes = other->getNodes();
         assert(otherNodes);
-        for (int i = 0; i < other->size(); i++) {
+        for (size_t i = 0; i < other->size(); i++) {
             size_t nodeIdx = otherNodes[i]->asSizeT();
             Object* prevEntry = ips_->put(otherNodes[i], other->getInfo(nodeIdx)->clone());
             delete prevEntry;

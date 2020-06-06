@@ -38,7 +38,9 @@ public:
     //compute hash
     size_t hash_me()
     {
-        return ((short)addr_.sin_family) << 2 + (long)addr_.sin_addr.s_addr + ((short)addr_.sin_port) << 4;
+        return (((short)addr_.sin_family) << 2) +
+				(long)addr_.sin_addr.s_addr +
+				(((short)addr_.sin_port) << 4);
     }
 
     /** Does this NodeInfo equal the other? */
