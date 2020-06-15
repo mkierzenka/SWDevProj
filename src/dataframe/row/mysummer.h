@@ -11,6 +11,7 @@
 class MySummer : public Reader {
 public:
     int sum_;
+
     MySummer() {
 		sum_ = 0;
 	}
@@ -19,6 +20,7 @@ public:
 
     virtual bool visit(Row& r) {
         sum_ += r.get_int(0);
+        return true; //always keep rows
 	}
 
     int getSum() {

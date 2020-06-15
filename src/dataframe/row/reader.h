@@ -11,9 +11,10 @@
  */
 class Reader : public Object {
 public:
-    Reader() { }
 
-    ~Reader() { }
-    
-    virtual bool visit(Row& r) { }
+    /**
+     * Visits the row of a DF, does not mutate it.
+     * Returns true if a filter on the DF should keep the row.
+     */
+    virtual bool visit(Row& r) = 0;
 };

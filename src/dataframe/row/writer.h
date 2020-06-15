@@ -12,15 +12,14 @@
  */
 class Writer : public Object {
 public:
-    Writer() { }
 
-    ~Writer() { }
-    
-    virtual void visit(Row& r) {
+    /**
+     * Called on rows of a dataframe (mutates them) until done() = true.
+     */
+    virtual void visit(Row& r) = 0;
 
-    }
-
-    virtual bool done() {
-        
-    }
+    /**
+     * Returns true when the writer has finished writing rows, false otherwise.
+     */
+    virtual bool done() = 0;
 };
