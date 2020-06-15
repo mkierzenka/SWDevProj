@@ -191,6 +191,7 @@ public:
 				return false;
 			}
 		}
+		return true;
 	}
 
 	/** Clear out the schema */
