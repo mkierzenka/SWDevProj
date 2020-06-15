@@ -19,9 +19,9 @@ public:
     /** Skip over false values and stop when the entire set has been seen */
     bool done()
     {
-        while (i_ < set_.size_ && set_.test(i_) == false)
+        while (i_ < (int)set_.size_ && set_.test(i_) == false)
             ++i_;
-        return i_ == set_.size_;
+        return i_ == (int)set_.size_;
     }
 
     void visit(Row &row) { row.set(0, i_++); }
